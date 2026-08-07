@@ -348,6 +348,14 @@
         </div>
       </div>
 
+      <div class="field">
+        <label for="recurrenceMode">Recurrence</label>
+        <select id="recurrenceMode">
+          <option value="scheduled">Scheduled — keep the established cadence</option>
+          <option value="since_completion">Since completion — restart from when I do it</option>
+        </select>
+      </div>
+
       <div class="inline-fields">
         <div class="field">
           <label for="graceValue">Grace period</label>
@@ -362,7 +370,7 @@
         </div>
       </div>
 
-      <div class="fineprint">A task becomes pending when its interval elapses. Its streak breaks only after the grace period also elapses.</div>
+      <div class="fineprint">Scheduled chores keep their cadence even when completed early or late. Since-completion chores start a fresh interval whenever you mark them done. A streak breaks only after the grace period expires.</div>
 
       <div class="modal-actions">
         <button type="button" class="danger-btn" id="deleteBtn" hidden>Delete</button>
@@ -387,14 +395,16 @@ const defaultTasks = [
   makeTask("Trim fingernails", 2, "weeks", 2, "days")
 ];
 
-function makeTask(name, intervalValue, intervalUnit, graceValue, graceUnit){
+function makeTask(name, intervalValue, intervalUnit, graceValue, graceUnit, recurrenceMode = "scheduled"){
   return {
     id: crypto.randomUUID(),
     name,
     intervalMs: intervalValue * MS[intervalUnit],
     graceMs: graceValue * MS[graceUnit],
     intervalValue, intervalUnit, graceValue, graceUnit,
+    recurrenceMode,
     doneAt: null,
+    dueAt: null,
     currentStreak: 0,
     bestStreak: 0,
     totalCompletions: 0,
@@ -404,6 +414,8 @@ function makeTask(name, intervalValue, intervalUnit, graceValue, graceUnit){
 }
 
 let state = loadState();
+migrateState();
+saveState();
 
 function loadState(){
   try{
@@ -420,21 +432,44 @@ function saveState(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+function migrateState(){
+  for(const task of state.tasks){
+    if(!task.recurrenceMode) task.recurrenceMode = "scheduled";
+    if(task.dueAt === undefined){
+      task.dueAt = task.doneAt ? task.doneAt + task.intervalMs : null;
+    }
+  }
+  if(!state.sort) state.sort = "urgency";
+}
+
 function taskStatus(task, now = Date.now()){
   if(!task.doneAt){
-    return { state:"pending", ratio:0, dueAt:null, overdueAt:null, msUntil:0 };
+    return { state:"pending", ratio:0, dueAt:task.dueAt ?? null, overdueAt:null, msUntil:0 };
   }
-  const dueAt = task.doneAt + task.intervalMs;
+  const dueAt = task.dueAt ?? (task.doneAt + task.intervalMs);
   const overdueAt = dueAt + task.graceMs;
   if(now < dueAt){
-    const elapsed = now - task.doneAt;
-    return {state:"done", ratio:Math.max(0,1-elapsed/task.intervalMs), dueAt, overdueAt, msUntil:dueAt-now};
+    const cycleStart = dueAt - task.intervalMs;
+    const elapsed = Math.max(0, now - cycleStart);
+    return {state:"done", ratio:Math.max(0,Math.min(1,1-elapsed/task.intervalMs)), dueAt, overdueAt, msUntil:dueAt-now};
   }
   if(now < overdueAt){
     const ratio = task.graceMs ? Math.max(0,1-(now-dueAt)/task.graceMs) : 0;
     return {state:"due", ratio, dueAt, overdueAt, msUntil:overdueAt-now};
   }
   return {state:"overdue", ratio:0, dueAt, overdueAt, msUntil:now-overdueAt};
+}
+
+function nextScheduledDue(task, now){
+  if(!task.dueAt) return now + task.intervalMs;
+
+  // Completing early satisfies the upcoming occurrence, so advance exactly one cycle.
+  if(now < task.dueAt) return task.dueAt + task.intervalMs;
+
+  // Completing on time or late keeps the original cadence and skips any fully missed cycles.
+  let next = task.dueAt + task.intervalMs;
+  while(next <= now) next += task.intervalMs;
+  return next;
 }
 
 function reconcileStreaks(){
@@ -564,18 +599,24 @@ function setDone(id, done){
   if(!task) return;
   if(done){
     const priorStatus = taskStatus(task).state;
-    task.doneAt = Date.now();
-    task.totalCompletions += 1;
-    if(priorStatus !== "overdue"){
-      task.currentStreak += 1;
-    }else{
-      task.currentStreak = 1;
+    const now = Date.now();
+
+    if(task.recurrenceMode === "since_completion") {
+      task.dueAt = now + task.intervalMs;
+    } else {
+      task.dueAt = nextScheduledDue(task, now);
     }
+
+    task.doneAt = now;
+    task.totalCompletions += 1;
+    if(priorStatus !== "overdue") task.currentStreak += 1;
+    else task.currentStreak = 1;
     task.bestStreak = Math.max(task.bestStreak, task.currentStreak);
     task.streakBrokenForCycle = false;
     toast(`${task.name} marked done`);
   }else{
     task.doneAt = null;
+    if(task.recurrenceMode === "since_completion") task.dueAt = null;
     task.streakBrokenForCycle = false;
     toast(`${task.name} marked pending`);
   }
@@ -592,6 +633,7 @@ document.getElementById("addTaskBtn").addEventListener("click",()=>{
   document.getElementById("dialogTitle").textContent = "Add task";
   document.getElementById("intervalValue").value = 1;
   document.getElementById("intervalUnit").value = "days";
+  document.getElementById("recurrenceMode").value = "scheduled";
   document.getElementById("graceValue").value = 6;
   document.getElementById("graceUnit").value = "hours";
   document.getElementById("deleteBtn").hidden = true;
@@ -606,6 +648,7 @@ function openEdit(id){
   document.getElementById("taskName").value = task.name;
   document.getElementById("intervalValue").value = task.intervalValue;
   document.getElementById("intervalUnit").value = task.intervalUnit;
+  document.getElementById("recurrenceMode").value = task.recurrenceMode || "scheduled";
   document.getElementById("graceValue").value = task.graceValue;
   document.getElementById("graceUnit").value = task.graceUnit;
   document.getElementById("deleteBtn").hidden = false;
@@ -618,6 +661,7 @@ form.addEventListener("submit", e=>{
   const name = document.getElementById("taskName").value.trim();
   const intervalValue = Number(document.getElementById("intervalValue").value);
   const intervalUnit = document.getElementById("intervalUnit").value;
+  const recurrenceMode = document.getElementById("recurrenceMode").value;
   const graceValue = Number(document.getElementById("graceValue").value);
   const graceUnit = document.getElementById("graceUnit").value;
   if(!name || intervalValue <= 0 || graceValue < 0) return;
@@ -625,13 +669,13 @@ form.addEventListener("submit", e=>{
   if(id){
     const task = state.tasks.find(t=>t.id===id);
     Object.assign(task,{
-      name, intervalValue, intervalUnit, graceValue, graceUnit,
+      name, intervalValue, intervalUnit, graceValue, graceUnit, recurrenceMode,
       intervalMs: intervalValue * MS[intervalUnit],
       graceMs: graceValue * MS[graceUnit]
     });
     toast("Task updated");
   }else{
-    state.tasks.push(makeTask(name,intervalValue,intervalUnit,graceValue,graceUnit));
+    state.tasks.push(makeTask(name,intervalValue,intervalUnit,graceValue,graceUnit,recurrenceMode));
     toast("Task added");
   }
   saveState();

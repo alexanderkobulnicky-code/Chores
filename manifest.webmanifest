@@ -1,0 +1,9 @@
+{
+  "name": "Chores",
+  "short_name": "Chores",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f4ef",
+  "theme_color": "#f4f4ef",
+  "icons": []
+}
