@@ -1,725 +1,1085 @@
 <!doctype html>
+
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#f4f4ef" />
-  <title>Chores</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <style>
-    :root{
-      --bg:#f4f4ef;
-      --panel:#ffffff;
-      --ink:#1d221f;
-      --muted:#6d756f;
-      --line:#dfe3dd;
-      --accent:#315f4a;
-      --accent-soft:#dfece5;
-      --warn:#8a5b16;
-      --warn-soft:#f5ead5;
-      --danger:#8d3d37;
-      --danger-soft:#f5dfdd;
-      --shadow:0 10px 30px rgba(23,33,27,.07);
-      --radius:18px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--ink);
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      min-height:100vh;
-    }
-    button,input,select{font:inherit}
-    .shell{
-      width:min(860px,100%);
-      margin:0 auto;
-      padding:24px 18px 56px;
-    }
-    header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:18px;
-    }
-    h1{
-      margin:0;
-      font-size:clamp(30px,6vw,48px);
-      letter-spacing:-.045em;
-      font-weight:760;
-    }
-    .subtle{
-      color:var(--muted);
-      font-size:14px;
-      margin-top:4px;
-    }
-    .icon-btn,.primary-btn,.ghost-btn,.danger-btn{
-      border:0;
-      border-radius:999px;
-      cursor:pointer;
-      transition:.18s ease;
-    }
-    .primary-btn{
-      background:var(--ink);
-      color:white;
-      padding:12px 17px;
-      font-weight:700;
-    }
-    .primary-btn:hover{transform:translateY(-1px)}
-    .ghost-btn{
-      background:transparent;
-      color:var(--ink);
-      padding:10px 12px;
-      border:1px solid var(--line);
-    }
-    .danger-btn{
-      background:var(--danger-soft);
-      color:var(--danger);
-      padding:10px 12px;
-      font-weight:700;
-    }
-    .status-card{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:22px;
-      box-shadow:var(--shadow);
-      margin-bottom:18px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:18px;
-    }
-    .status-title{
-      font-size:clamp(22px,4vw,32px);
-      font-weight:760;
-      letter-spacing:-.03em;
-      margin:0;
-    }
-    .status-copy{margin-top:5px;color:var(--muted)}
-    .status-badge{
-      min-width:58px;
-      height:58px;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      background:var(--accent-soft);
-      color:var(--accent);
-      font-weight:800;
-      font-size:20px;
-    }
-    .toolbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin:16px 0 10px;
-    }
-    .toolbar h2{font-size:15px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:0}
-    .sort-select{
-      background:transparent;
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:9px 12px;
-      color:var(--ink);
-    }
-    .task-list{
-      display:grid;
-      gap:12px;
-    }
-    .task{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:18px;
-      box-shadow:0 4px 18px rgba(23,33,27,.04);
-    }
-    .task-top{
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:14px;
-      align-items:center;
-    }
-    .task-name{
-      font-size:20px;
-      font-weight:750;
-      letter-spacing:-.02em;
-    }
-    .task-meta{
-      margin-top:4px;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.35;
-    }
-    .switch{
-      position:relative;
-      width:64px;
-      height:34px;
-      display:inline-block;
-      flex:0 0 auto;
-    }
-    .switch input{opacity:0;width:0;height:0}
-    .slider{
-      position:absolute;inset:0;
-      background:#cfd4cf;
-      border-radius:999px;
-      cursor:pointer;
-      transition:.2s;
-    }
-    .slider::before{
-      content:"";
-      position:absolute;
-      width:26px;height:26px;
-      left:4px;top:4px;
-      background:white;
-      border-radius:50%;
-      box-shadow:0 2px 7px rgba(0,0,0,.16);
-      transition:.2s;
-    }
-    .switch input:checked + .slider{background:var(--accent)}
-    .switch input:checked + .slider::before{transform:translateX(30px)}
-    .progress{
-      height:8px;
-      background:#e9ece8;
-      border-radius:999px;
-      overflow:hidden;
-      margin-top:15px;
-    }
-    .progress > div{
-      height:100%;
-      width:0;
-      background:var(--accent);
-      border-radius:inherit;
-      transition:width .25s ease;
-    }
-    .task-bottom{
-      margin-top:12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .stats{
-      display:flex;
-      gap:14px;
-      flex-wrap:wrap;
-      color:var(--muted);
-      font-size:13px;
-    }
-    .edit-link{
-      border:0;background:transparent;color:var(--ink);
-      text-decoration:underline;
-      text-underline-offset:3px;
-      cursor:pointer;
-      padding:0;
-    }
-    .state-due .progress > div{background:var(--warn)}
-    .state-overdue{border-color:#e5bbb8}
-    .state-overdue .progress > div{background:var(--danger)}
-    .empty{
-      text-align:center;
-      padding:40px 20px;
-      color:var(--muted);
-      border:1px dashed var(--line);
-      border-radius:var(--radius);
-    }
-    dialog{
-      width:min(520px,calc(100% - 28px));
-      border:0;
-      border-radius:22px;
-      padding:0;
-      box-shadow:0 28px 90px rgba(0,0,0,.25);
-    }
-    dialog::backdrop{background:rgba(20,25,22,.35);backdrop-filter:blur(3px)}
-    .modal{
-      padding:22px;
-      background:white;
-    }
-    .modal h3{margin:0 0 18px;font-size:26px;letter-spacing:-.03em}
-    .field{display:grid;gap:7px;margin:14px 0}
-    .field label{font-size:13px;font-weight:700;color:var(--muted)}
-    .field input,.field select{
-      width:100%;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:12px 13px;
-      background:white;
-      color:var(--ink);
-    }
-    .inline-fields{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-    .modal-actions{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-top:20px;
-    }
-    .modal-actions-right{display:flex;gap:8px}
-    .fineprint{
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.45;
-      margin-top:10px;
-    }
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom:24px;
-      transform:translateX(-50%) translateY(20px);
-      background:var(--ink);
-      color:white;
-      padding:11px 15px;
-      border-radius:999px;
-      opacity:0;
-      pointer-events:none;
-      transition:.2s;
-      z-index:50;
-      font-size:14px;
-    }
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    @media (max-width:560px){
-      .shell{padding-top:18px}
-      header{align-items:flex-start}
-      .status-card{align-items:flex-start}
-      .status-badge{min-width:48px;height:48px}
-      .inline-fields{grid-template-columns:1fr}
-      .task{padding:16px}
-    }
-  </style>
+
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<meta name="theme-color" content="#f4f4ef">
+
+<title>Chores</title>
+
+<link rel="manifest" href="manifest.webmanifest">
+
+<style>
+
+:root{
+
+  --bg:#f4f4ef;
+
+  --card:#fff;
+
+  --ink:#1d221f;
+
+  --muted:#6d756f;
+
+  --line:#dfe3dd;
+
+  --green:#315f4a;
+
+  --amber:#8a5b16;
+
+  --red:#8d3d37
+
+}
+
+*{box-sizing:border-box}
+
+body{
+
+  margin:0;
+
+  background:var(--bg);
+
+  color:var(--ink);
+
+  font-family:system-ui,-apple-system,sans-serif
+
+}
+
+.app{max-width:800px;margin:auto;padding:22px 16px 50px}
+
+header,.top,.row,.bottom{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:12px
+
+}
+
+h1{font-size:42px;margin:0}
+
+.muted{color:var(--muted);font-size:14px}
+
+button,select,input{font:inherit}
+
+.add,.save{
+
+  border:0;
+
+  border-radius:999px;
+
+  background:var(--ink);
+
+  color:white;
+
+  padding:11px 15px;
+
+  font-weight:700
+
+}
+
+.top,.task{
+
+  background:var(--card);
+
+  border:1px solid var(--line);
+
+  border-radius:18px;
+
+  padding:18px;
+
+  margin:14px 0
+
+}
+
+.top h2{margin:0;font-size:27px}
+
+.tasks{display:grid;gap:11px}
+
+.task{margin:0}
+
+.name{font-size:20px;font-weight:750}
+
+.bar{
+
+  height:8px;
+
+  background:#e9ece8;
+
+  border-radius:99px;
+
+  overflow:hidden;
+
+  margin:14px 0
+
+}
+
+.bar i{
+
+  display:block;
+
+  height:100%;
+
+  background:var(--green)
+
+}
+
+.pending .bar i,.due .bar i{background:var(--amber)}
+
+.overdue{border-color:#e3b5b1}
+
+.overdue .bar i{background:var(--red)}
+
+.bottom{font-size:12px;color:var(--muted)}
+
+.edit{
+
+  border:0;
+
+  background:none;
+
+  text-decoration:underline
+
+}
+
+.switch{position:relative;width:62px;height:34px}
+
+.switch input{opacity:0}
+
+.switch span{
+
+  position:absolute;
+
+  inset:0;
+
+  background:#cfd4cf;
+
+  border-radius:99px
+
+}
+
+.switch span:before{
+
+  content:"";
+
+  position:absolute;
+
+  width:26px;
+
+  height:26px;
+
+  left:4px;
+
+  top:4px;
+
+  background:white;
+
+  border-radius:50%;
+
+  transition:.2s;
+
+  box-shadow:0 2px 6px #0002
+
+}
+
+.switch input:checked+span{background:var(--green)}
+
+.switch input:checked+span:before{transform:translateX(28px)}
+
+dialog{
+
+  border:0;
+
+  border-radius:20px;
+
+  width:min(520px,calc(100% - 24px));
+
+  padding:0;
+
+  box-shadow:0 25px 80px #0004
+
+}
+
+dialog::backdrop{background:#0004}
+
+.modal{padding:21px}
+
+.field{display:grid;gap:6px;margin:12px 0}
+
+.field label{
+
+  font-size:13px;
+
+  color:var(--muted);
+
+  font-weight:700
+
+}
+
+.pair{
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:10px
+
+}
+
+input,select{
+
+  width:100%;
+
+  padding:11px;
+
+  border:1px solid var(--line);
+
+  border-radius:11px;
+
+  background:white
+
+}
+
+.actions{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  margin-top:18px
+
+}
+
+.ghost,.del{
+
+  border:1px solid var(--line);
+
+  border-radius:999px;
+
+  padding:10px 13px;
+
+  background:white
+
+}
+
+.del{color:var(--red)}
+
+.fine{
+
+  font-size:12px;
+
+  color:var(--muted);
+
+  line-height:1.4
+
+}
+
+@media(max-width:520px){
+
+  h1{font-size:36px}
+
+  .pair{grid-template-columns:1fr}
+
+}
+
+</style>
+
 </head>
+
 <body>
-  <main class="shell">
-    <header>
-      <div>
-        <h1>Chores</h1>
-        <div class="subtle" id="todayLabel"></div>
-      </div>
-      <button class="primary-btn" id="addTaskBtn">＋ Add task</button>
-    </header>
 
-    <section class="status-card" id="statusCard" aria-live="polite">
-      <div>
-        <p class="status-title" id="statusTitle">No tasks due</p>
-        <div class="status-copy" id="statusCopy">The field is clear.</div>
-      </div>
-      <div class="status-badge" id="statusBadge">✓</div>
-    </section>
+<main class="app">
 
-    <div class="toolbar">
-      <h2>Your tasks</h2>
-      <select id="sortSelect" class="sort-select" aria-label="Sort tasks">
-        <option value="urgency">Sort: urgency</option>
-        <option value="manual">Sort: added order</option>
-        <option value="name">Sort: name</option>
-      </select>
-    </div>
+<header>
 
-    <section class="task-list" id="taskList"></section>
-  </main>
+  <div>
 
-  <dialog id="taskDialog">
-    <form method="dialog" class="modal" id="taskForm">
-      <h3 id="dialogTitle">Add task</h3>
-      <input type="hidden" id="taskId">
+    <h1>Chores</h1>
 
-      <div class="field">
-        <label for="taskName">Task</label>
-        <input id="taskName" required maxlength="80" placeholder="e.g. Shave">
-      </div>
+    <div class="muted" id="date"></div>
 
-      <div class="inline-fields">
-        <div class="field">
-          <label for="intervalValue">Reset after</label>
-          <input id="intervalValue" type="number" min="0.25" step="0.25" value="1" required>
-        </div>
-        <div class="field">
-          <label for="intervalUnit">Unit</label>
-          <select id="intervalUnit">
-            <option value="hours">Hours</option>
-            <option value="days" selected>Days</option>
-            <option value="weeks">Weeks</option>
-          </select>
-        </div>
-      </div>
+  </div>
 
-      <div class="field">
-        <label for="recurrenceMode">Recurrence</label>
-        <select id="recurrenceMode">
-          <option value="scheduled">Scheduled — keep the established cadence</option>
-          <option value="since_completion">Since completion — restart from when I do it</option>
-        </select>
-      </div>
+  <button class="add" id="add">＋ Add task</button>
 
-      <div class="inline-fields">
-        <div class="field">
-          <label for="graceValue">Grace period</label>
-          <input id="graceValue" type="number" min="0" step="0.25" value="6">
-        </div>
-        <div class="field">
-          <label for="graceUnit">Unit</label>
-          <select id="graceUnit">
-            <option value="hours" selected>Hours</option>
-            <option value="days">Days</option>
-          </select>
-        </div>
-      </div>
+</header>
 
-      <div class="fineprint">Scheduled chores keep their cadence even when completed early or late. Since-completion chores start a fresh interval whenever you mark them done. A streak breaks only after the grace period expires.</div>
+<section class="top">
 
-      <div class="modal-actions">
-        <button type="button" class="danger-btn" id="deleteBtn" hidden>Delete</button>
-        <div class="modal-actions-right">
-          <button value="cancel" class="ghost-btn">Cancel</button>
-          <button value="default" class="primary-btn" id="saveBtn">Save</button>
-        </div>
-      </div>
-    </form>
-  </dialog>
+  <div>
 
-  <div class="toast" id="toast"></div>
+    <h2 id="headline">No tasks due</h2>
+
+    <div class="muted" id="summary">The field is clear.</div>
+
+  </div>
+
+  <strong id="count">✓</strong>
+
+</section>
+
+<section class="tasks" id="tasks"></section>
+
+</main>
+
+<dialog id="dlg">
+
+<form class="modal" id="form">
+
+<h2 id="title">Add task</h2>
+
+<input type="hidden" id="tid">
+
+<div class="field">
+
+<label>Task</label>
+
+<input id="nm" required>
+
+</div>
+
+<div class="pair">
+
+<div class="field">
+
+<label>Reset after</label>
+
+<input id="iv" type="number" min=".25" step=".25" value="1">
+
+</div>
+
+<div class="field">
+
+<label>Unit</label>
+
+<select id="iu">
+
+<option value="hours">Hours</option>
+
+<option value="days" selected>Days</option>
+
+<option value="weeks">Weeks</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="field">
+
+<label>Recurrence</label>
+
+<select id="mode">
+
+<option value="scheduled">Scheduled — keep cadence</option>
+
+<option value="since">Since completion — restart timer</option>
+
+</select>
+
+</div>
+
+<div class="pair">
+
+<div class="field">
+
+<label>Reset to Pending</label>
+
+<input id="lv" type="number" min="0" step=".25" value="6">
+
+</div>
+
+<div class="field">
+
+<label>Unit</label>
+
+<select id="lu">
+
+<option value="hours" selected>Hours</option>
+
+<option value="days">Days</option>
+
+<option value="weeks">Weeks</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="pair">
+
+<div class="field">
+
+<label>Grace period</label>
+
+<input id="gv" type="number" min="0" step=".25" value="6">
+
+</div>
+
+<div class="field">
+
+<label>Unit</label>
+
+<select id="gu">
+
+<option value="hours" selected>Hours</option>
+
+<option value="days">Days</option>
+
+<option value="weeks">Weeks</option>
+
+</select>
+
+</div>
+
+</div>
+
+<p class="fine">
+
+Done → Pending when the lead window opens → Due at the scheduled time →
+
+Overdue after the grace period. Scheduled chores keep their cadence when
+
+completed early.
+
+</p>
+
+<div class="actions">
+
+<button type="button" class="del" id="del" hidden>Delete</button>
+
+<div>
+
+<button type="button" class="ghost" id="cancel">Cancel</button>
+
+<button class="save">Save</button>
+
+</div>
+
+</div>
+
+</form>
+
+</dialog>
 
 <script>
-const STORAGE_KEY = "chores-app-v1";
-const MS = { hours: 3600000, days: 86400000, weeks: 604800000 };
 
-const defaultTasks = [
-  makeTask("Shave", 1, "days", 6, "hours"),
-  makeTask("Laundry", 1, "weeks", 1, "days"),
-  makeTask("Wash hair", 3, "days", 12, "hours"),
-  makeTask("Trim fingernails", 2, "weeks", 2, "days")
-];
+const K="chores-app-v1";
 
-function makeTask(name, intervalValue, intervalUnit, graceValue, graceUnit, recurrenceMode = "scheduled"){
-  return {
-    id: crypto.randomUUID(),
-    name,
-    intervalMs: intervalValue * MS[intervalUnit],
-    graceMs: graceValue * MS[graceUnit],
-    intervalValue, intervalUnit, graceValue, graceUnit,
-    recurrenceMode,
-    doneAt: null,
-    dueAt: null,
-    currentStreak: 0,
-    bestStreak: 0,
-    totalCompletions: 0,
-    streakBrokenForCycle: false,
-    createdAt: Date.now()
+const M={
+
+  hours:3600000,
+
+  days:86400000,
+
+  weeks:604800000
+
+};
+
+const $=x=>document.getElementById(x);
+
+const uid=()=>crypto.randomUUID();
+
+function mk(n,i,u,g,gu,l,lu,m="scheduled"){
+
+  return{
+
+    id:uid(),
+
+    name:n,
+
+    intervalValue:i,
+
+    intervalUnit:u,
+
+    intervalMs:i*M[u],
+
+    graceValue:g,
+
+    graceUnit:gu,
+
+    graceMs:g*M[gu],
+
+    leadValue:l,
+
+    leadUnit:lu,
+
+    leadMs:l*M[lu],
+
+    mode:m,
+
+    doneAt:null,
+
+    dueAt:null,
+
+    streak:0,
+
+    best:0,
+
+    total:0,
+
+    createdAt:Date.now()
+
   };
+
 }
 
-let state = loadState();
-migrateState();
-saveState();
+let S;
 
-function loadState(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){
-      const parsed = JSON.parse(raw);
-      if(Array.isArray(parsed.tasks)) return parsed;
+try{
+
+  S=JSON.parse(localStorage.getItem(K));
+
+}catch(e){}
+
+if(!S||!Array.isArray(S.tasks)){
+
+  S={
+
+    tasks:[
+
+      mk("Shave",1,"days",6,"hours",8,"hours"),
+
+      mk("Laundry",1,"weeks",1,"days",2,"days"),
+
+      mk("Wash hair",3,"days",12,"hours",1,"days"),
+
+      mk("Trim fingernails",2,"weeks",2,"days",3,"days")
+
+    ]
+
+  };
+
+}
+
+for(const t of S.tasks){
+
+  t.mode=t.mode||t.recurrenceMode||"scheduled";
+
+  if(t.streak==null)
+
+    t.streak=t.currentStreak||0;
+
+  if(t.best==null)
+
+    t.best=t.bestStreak||0;
+
+  if(t.total==null)
+
+    t.total=t.totalCompletions||0;
+
+  if(t.dueAt===undefined)
+
+    t.dueAt=t.doneAt?t.doneAt+t.intervalMs:null;
+
+  if(t.leadMs===undefined){
+
+    t.leadValue=0;
+
+    t.leadUnit="hours";
+
+    t.leadMs=0;
+
+  }
+
+}
+
+const save=()=>localStorage.setItem(K,JSON.stringify(S));
+
+function st(t,n=Date.now()){
+
+  if(!t.doneAt)
+
+    return{q:"pending",r:0,x:0};
+
+  let d=t.dueAt||t.doneAt+t.intervalMs;
+
+  let p=d-t.leadMs;
+
+  let o=d+t.graceMs;
+
+  if(n<p)
+
+    return{
+
+      q:"done",
+
+      r:1-(n-(d-t.intervalMs))/Math.max(1,p-(d-t.intervalMs)),
+
+      x:p-n
+
+    };
+
+  if(n<d)
+
+    return{
+
+      q:"pending",
+
+      r:(d-n)/Math.max(1,t.leadMs),
+
+      x:d-n
+
+    };
+
+  if(n<o)
+
+    return{
+
+      q:"due",
+
+      r:t.graceMs?1-(n-d)/t.graceMs:0,
+
+      x:o-n
+
+    };
+
+  return{
+
+    q:"overdue",
+
+    r:0,
+
+    x:n-o
+
+  };
+
+}
+
+function dur(x){
+
+  let h=Math.abs(x)/M.hours;
+
+  let d=Math.abs(x)/M.days;
+
+  if(h<1)
+
+    return Math.max(1,Math.round(Math.abs(x)/60000))+" min";
+
+  if(h<24)
+
+    return Math.round(h)+" hr";
+
+  if(d<14){
+
+    let z=Math.round(d);
+
+    return z+" day"+(z==1?"":"s");
+
+  }
+
+  let w=Math.round(d/7);
+
+  return w+" week"+(w==1?"":"s");
+
+}
+
+function text(t){
+
+  let s=st(t);
+
+  if(!t.doneAt)
+
+    return "Pending — not yet completed";
+
+  if(s.q=="done")
+
+    return "Done · pending in "+dur(s.x);
+
+  if(s.q=="pending")
+
+    return "Pending · due in "+dur(s.x);
+
+  if(s.q=="due")
+
+    return "Due now · grace ends in "+dur(s.x);
+
+  return "Overdue by "+dur(s.x);
+
+}
+
+function mark(t,on){
+
+  let before=st(t).q;
+
+  let n=Date.now();
+
+  if(on){
+
+    if(t.mode=="since"){
+
+      t.dueAt=n+t.intervalMs;
+
+    }else{
+
+      if(!t.dueAt)
+
+        t.dueAt=n+t.intervalMs;
+
+      while(t.dueAt<=n)
+
+        t.dueAt+=t.intervalMs;
+
     }
-  }catch(e){}
-  return { tasks: defaultTasks, sort: "urgency" };
-}
 
-function saveState(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
+    t.doneAt=n;
 
-function migrateState(){
-  for(const task of state.tasks){
-    if(!task.recurrenceMode) task.recurrenceMode = "scheduled";
-    if(task.dueAt === undefined){
-      task.dueAt = task.doneAt ? task.doneAt + task.intervalMs : null;
-    }
+    t.total++;
+
+    t.streak=before=="overdue"?1:t.streak+1;
+
+    t.best=Math.max(t.best,t.streak);
+
+  }else{
+
+    t.doneAt=null;
+
+    if(t.mode=="since")
+
+      t.dueAt=null;
+
   }
-  if(!state.sort) state.sort = "urgency";
+
+  save();
+
+  render();
+
 }
 
-function taskStatus(task, now = Date.now()){
-  if(!task.doneAt){
-    return { state:"pending", ratio:0, dueAt:task.dueAt ?? null, overdueAt:null, msUntil:0 };
-  }
-  const dueAt = task.dueAt ?? (task.doneAt + task.intervalMs);
-  const overdueAt = dueAt + task.graceMs;
-  if(now < dueAt){
-    const cycleStart = dueAt - task.intervalMs;
-    const elapsed = Math.max(0, now - cycleStart);
-    return {state:"done", ratio:Math.max(0,Math.min(1,1-elapsed/task.intervalMs)), dueAt, overdueAt, msUntil:dueAt-now};
-  }
-  if(now < overdueAt){
-    const ratio = task.graceMs ? Math.max(0,1-(now-dueAt)/task.graceMs) : 0;
-    return {state:"due", ratio, dueAt, overdueAt, msUntil:overdueAt-now};
-  }
-  return {state:"overdue", ratio:0, dueAt, overdueAt, msUntil:now-overdueAt};
-}
+function safeName(s){
 
-function nextScheduledDue(task, now){
-  if(!task.dueAt) return now + task.intervalMs;
+  return s
 
-  // Completing early satisfies the upcoming occurrence, so advance exactly one cycle.
-  if(now < task.dueAt) return task.dueAt + task.intervalMs;
+    .replaceAll("&","&amp;")
 
-  // Completing on time or late keeps the original cadence and skips any fully missed cycles.
-  let next = task.dueAt + task.intervalMs;
-  while(next <= now) next += task.intervalMs;
-  return next;
-}
+    .replaceAll("<","&lt;");
 
-function reconcileStreaks(){
-  let changed = false;
-  for(const task of state.tasks){
-    const s = taskStatus(task);
-    if(s.state === "overdue" && task.doneAt && !task.streakBrokenForCycle){
-      task.currentStreak = 0;
-      task.streakBrokenForCycle = true;
-      changed = true;
-    }
-  }
-  if(changed) saveState();
-}
-
-function fmtDuration(ms){
-  const abs = Math.abs(ms);
-  const hours = abs / MS.hours;
-  const days = abs / MS.days;
-  if(hours < 1) return `${Math.max(1, Math.round(abs/60000))} min`;
-  if(hours < 24) return `${Math.round(hours)} hr`;
-  if(days < 14) return `${Math.round(days)} day${Math.round(days)===1?"":"s"}`;
-  const weeks = Math.round(days/7);
-  return `${weeks} week${weeks===1?"":"s"}`;
-}
-
-function describe(task){
-  const s = taskStatus(task);
-  if(!task.doneAt) return "Pending — not yet completed";
-  if(s.state === "done") return `Done · due in ${fmtDuration(s.msUntil)}`;
-  if(s.state === "due") return `Due now · grace ends in ${fmtDuration(s.msUntil)}`;
-  return `Overdue by ${fmtDuration(s.msUntil)}`;
-}
-
-function sortTasks(tasks){
-  const copied = [...tasks];
-  if(state.sort === "name") return copied.sort((a,b)=>a.name.localeCompare(b.name));
-  if(state.sort === "manual") return copied.sort((a,b)=>a.createdAt-b.createdAt);
-  const rank = {overdue:0,due:1,pending:2,done:3};
-  return copied.sort((a,b)=>{
-    const sa = taskStatus(a), sb = taskStatus(b);
-    if(rank[sa.state] !== rank[sb.state]) return rank[sa.state]-rank[sb.state];
-    if(sa.state === "done") return sa.msUntil-sb.msUntil;
-    return a.createdAt-b.createdAt;
-  });
 }
 
 function render(){
-  reconcileStreaks();
-  document.getElementById("todayLabel").textContent = new Intl.DateTimeFormat(undefined,{
-    weekday:"long", month:"long", day:"numeric"
-  }).format(new Date());
 
-  const list = document.getElementById("taskList");
-  list.innerHTML = "";
+  $("date").textContent=
 
-  const tasks = sortTasks(state.tasks);
-  if(!tasks.length){
-    list.innerHTML = `<div class="empty">No tasks yet. Add one when something begins nagging at you.</div>`;
+    new Intl.DateTimeFormat(
+
+      undefined,
+
+      {weekday:"long",month:"long",day:"numeric"}
+
+    ).format(new Date());
+
+  $("tasks").innerHTML="";
+
+  let rank={
+
+    overdue:0,
+
+    due:1,
+
+    pending:2,
+
+    done:3
+
+  };
+
+  let a=[...S.tasks].sort(
+
+    (x,y)=>rank[st(x).q]-rank[st(y).q]
+
+  );
+
+  for(const t of a){
+
+    let s=st(t);
+
+    let e=document.createElement("article");
+
+    e.className="task "+s.q;
+
+    e.innerHTML=
+
+      '<div class="row">'+
+
+        '<div>'+
+
+          '<div class="name">'+safeName(t.name)+'</div>'+
+
+          '<div class="muted">'+text(t)+'</div>'+
+
+        '</div>'+
+
+        '<label class="switch">'+
+
+          '<input type="checkbox" '+(s.q=="done"?"checked":"")+'>'+
+
+          '<span></span>'+
+
+        '</label>'+
+
+      '</div>'+
+
+      '<div class="bar">'+
+
+        '<i style="width:'+
+
+        Math.max(0,Math.min(100,s.r*100))+
+
+        '%"></i>'+
+
+      '</div>'+
+
+      '<div class="bottom">'+
+
+        '<span>Streak '+t.streak+
+
+        ' · Best '+t.best+
+
+        ' · Total '+t.total+
+
+        '</span>'+
+
+        '<button class="edit">Edit</button>'+
+
+      '</div>';
+
+    e.querySelector("input").onchange=
+
+      x=>mark(t,x.target.checked);
+
+    e.querySelector(".edit").onclick=
+
+      ()=>edit(t);
+
+    $("tasks").appendChild(e);
+
   }
 
-  for(const task of tasks){
-    const s = taskStatus(task);
-    const article = document.createElement("article");
-    article.className = `task state-${s.state}`;
-    article.innerHTML = `
-      <div class="task-top">
-        <div>
-          <div class="task-name">${escapeHtml(task.name)}</div>
-          <div class="task-meta">${describe(task)}</div>
-        </div>
-        <label class="switch" title="Mark ${task.name} done or pending">
-          <input type="checkbox" ${s.state==="done" ? "checked" : ""} aria-label="Mark ${escapeHtml(task.name)} done">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="progress" aria-hidden="true"><div style="width:${Math.round(s.ratio*100)}%"></div></div>
-      <div class="task-bottom">
-        <div class="stats">
-          <span>Streak ${task.currentStreak}</span>
-          <span>Best ${task.bestStreak}</span>
-          <span>Total ${task.totalCompletions}</span>
-        </div>
-        <button class="edit-link">Edit</button>
-      </div>`;
-    article.querySelector("input").addEventListener("change", e => {
-      setDone(task.id, e.target.checked);
-    });
-    article.querySelector(".edit-link").addEventListener("click",()=>openEdit(task.id));
-    list.appendChild(article);
-  }
+  let q=S.tasks.map(st);
 
-  updateGlobalStatus();
-}
+  let o=q.filter(x=>x.q=="overdue").length;
 
-function updateGlobalStatus(){
-  const statuses = state.tasks.map(t=>taskStatus(t).state);
-  const overdue = statuses.filter(s=>s==="overdue").length;
-  const due = statuses.filter(s=>s==="due" || s==="pending").length;
-  const title = document.getElementById("statusTitle");
-  const copy = document.getElementById("statusCopy");
-  const badge = document.getElementById("statusBadge");
+  let d=q.filter(x=>x.q=="due").length;
 
-  if(overdue){
-    title.textContent = `${overdue} task${overdue===1?"":"s"} overdue`;
-    copy.textContent = due ? `${due} more currently due.` : "Nothing else is waiting.";
-    badge.textContent = overdue;
-    badge.style.background = "var(--danger-soft)";
-    badge.style.color = "var(--danger)";
-  }else if(due){
-    title.textContent = `${due} task${due===1?"":"s"} due`;
-    copy.textContent = "Nothing is overdue.";
-    badge.textContent = due;
-    badge.style.background = "var(--warn-soft)";
-    badge.style.color = "var(--warn)";
+  let p=q.filter(x=>x.q=="pending").length;
+
+  if(o){
+
+    $("headline").textContent=
+
+      o+" task"+(o==1?"":"s")+" overdue";
+
+    $("summary").textContent=
+
+      (d+p)
+
+      ?(d+p)+" more waiting."
+
+      :"Nothing else is waiting.";
+
+    $("count").textContent=o;
+
+  }else if(d){
+
+    $("headline").textContent=
+
+      d+" task"+(d==1?"":"s")+" due";
+
+    $("summary").textContent=
+
+      p
+
+      ?p+" more pending."
+
+      :"Nothing is overdue.";
+
+    $("count").textContent=d;
+
   }else{
-    title.textContent = "No tasks due";
-    copy.textContent = "The field is clear.";
-    badge.textContent = "✓";
-    badge.style.background = "var(--accent-soft)";
-    badge.style.color = "var(--accent)";
+
+    $("headline").textContent="No tasks due";
+
+    $("summary").textContent=
+
+      p
+
+      ?p+" task"+(p==1?" is":"s are")+" pending."
+
+      :"The field is clear.";
+
+    $("count").textContent="✓";
+
   }
+
 }
 
-function setDone(id, done){
-  const task = state.tasks.find(t=>t.id===id);
-  if(!task) return;
-  if(done){
-    const priorStatus = taskStatus(task).state;
-    const now = Date.now();
+$("add").onclick=()=>{
 
-    if(task.recurrenceMode === "since_completion") {
-      task.dueAt = now + task.intervalMs;
-    } else {
-      task.dueAt = nextScheduledDue(task, now);
-    }
+  $("form").reset();
 
-    task.doneAt = now;
-    task.totalCompletions += 1;
-    if(priorStatus !== "overdue") task.currentStreak += 1;
-    else task.currentStreak = 1;
-    task.bestStreak = Math.max(task.bestStreak, task.currentStreak);
-    task.streakBrokenForCycle = false;
-    toast(`${task.name} marked done`);
-  }else{
-    task.doneAt = null;
-    if(task.recurrenceMode === "since_completion") task.dueAt = null;
-    task.streakBrokenForCycle = false;
-    toast(`${task.name} marked pending`);
-  }
-  saveState();
-  render();
+  $("tid").value="";
+
+  $("title").textContent="Add task";
+
+  $("del").hidden=true;
+
+  $("dlg").showModal();
+
+};
+
+$("cancel").onclick=()=>$("dlg").close();
+
+function edit(t){
+
+  $("tid").value=t.id;
+
+  $("title").textContent="Edit task";
+
+  $("nm").value=t.name;
+
+  $("iv").value=t.intervalValue;
+
+  $("iu").value=t.intervalUnit;
+
+  $("mode").value=t.mode;
+
+  $("lv").value=t.leadValue||0;
+
+  $("lu").value=t.leadUnit||"hours";
+
+  $("gv").value=t.graceValue;
+
+  $("gu").value=t.graceUnit;
+
+  $("del").hidden=false;
+
+  $("dlg").showModal();
+
 }
 
-const dialog = document.getElementById("taskDialog");
-const form = document.getElementById("taskForm");
+$("form").onsubmit=e=>{
 
-document.getElementById("addTaskBtn").addEventListener("click",()=>{
-  form.reset();
-  document.getElementById("taskId").value = "";
-  document.getElementById("dialogTitle").textContent = "Add task";
-  document.getElementById("intervalValue").value = 1;
-  document.getElementById("intervalUnit").value = "days";
-  document.getElementById("recurrenceMode").value = "scheduled";
-  document.getElementById("graceValue").value = 6;
-  document.getElementById("graceUnit").value = "hours";
-  document.getElementById("deleteBtn").hidden = true;
-  dialog.showModal();
-});
-
-function openEdit(id){
-  const task = state.tasks.find(t=>t.id===id);
-  if(!task) return;
-  document.getElementById("taskId").value = task.id;
-  document.getElementById("dialogTitle").textContent = "Edit task";
-  document.getElementById("taskName").value = task.name;
-  document.getElementById("intervalValue").value = task.intervalValue;
-  document.getElementById("intervalUnit").value = task.intervalUnit;
-  document.getElementById("recurrenceMode").value = task.recurrenceMode || "scheduled";
-  document.getElementById("graceValue").value = task.graceValue;
-  document.getElementById("graceUnit").value = task.graceUnit;
-  document.getElementById("deleteBtn").hidden = false;
-  dialog.showModal();
-}
-
-form.addEventListener("submit", e=>{
   e.preventDefault();
-  const id = document.getElementById("taskId").value;
-  const name = document.getElementById("taskName").value.trim();
-  const intervalValue = Number(document.getElementById("intervalValue").value);
-  const intervalUnit = document.getElementById("intervalUnit").value;
-  const recurrenceMode = document.getElementById("recurrenceMode").value;
-  const graceValue = Number(document.getElementById("graceValue").value);
-  const graceUnit = document.getElementById("graceUnit").value;
-  if(!name || intervalValue <= 0 || graceValue < 0) return;
 
-  if(id){
-    const task = state.tasks.find(t=>t.id===id);
-    Object.assign(task,{
-      name, intervalValue, intervalUnit, graceValue, graceUnit, recurrenceMode,
-      intervalMs: intervalValue * MS[intervalUnit],
-      graceMs: graceValue * MS[graceUnit]
+  let t=S.tasks.find(x=>x.id==$("tid").value);
+
+  let n=$("nm").value.trim();
+
+  let i=+$("iv").value;
+
+  let u=$("iu").value;
+
+  let l=+$("lv").value;
+
+  let lu=$("lu").value;
+
+  let g=+$("gv").value;
+
+  let gu=$("gu").value;
+
+  let m=$("mode").value;
+
+  if(!n||i<=0||l<0||g<0)
+
+    return;
+
+  if(t){
+
+    Object.assign(t,{
+
+      name:n,
+
+      intervalValue:i,
+
+      intervalUnit:u,
+
+      intervalMs:i*M[u],
+
+      leadValue:l,
+
+      leadUnit:lu,
+
+      leadMs:l*M[lu],
+
+      graceValue:g,
+
+      graceUnit:gu,
+
+      graceMs:g*M[gu],
+
+      mode:m
+
     });
-    toast("Task updated");
+
   }else{
-    state.tasks.push(makeTask(name,intervalValue,intervalUnit,graceValue,graceUnit,recurrenceMode));
-    toast("Task added");
-  }
-  saveState();
-  dialog.close();
-  render();
-});
 
-document.getElementById("deleteBtn").addEventListener("click",()=>{
-  const id = document.getElementById("taskId").value;
-  const task = state.tasks.find(t=>t.id===id);
-  if(task && confirm(`Delete "${task.name}"?`)){
-    state.tasks = state.tasks.filter(t=>t.id!==id);
-    saveState();
-    dialog.close();
-    toast("Task deleted");
+    S.tasks.push(
+
+      mk(n,i,u,g,gu,l,lu,m)
+
+    );
+
+  }
+
+  save();
+
+  $("dlg").close();
+
+  render();
+
+};
+
+$("del").onclick=()=>{
+
+  let t=S.tasks.find(
+
+    x=>x.id==$("tid").value
+
+  );
+
+  if(t&&confirm('Delete "'+t.name+'"?')){
+
+    S.tasks=S.tasks.filter(
+
+      x=>x.id!=t.id
+
+    );
+
+    save();
+
+    $("dlg").close();
+
     render();
+
   }
-});
 
-document.getElementById("sortSelect").value = state.sort;
-document.getElementById("sortSelect").addEventListener("change",e=>{
-  state.sort = e.target.value;
-  saveState();
-  render();
-});
+};
 
-function toast(message){
-  const el = document.getElementById("toast");
-  el.textContent = message;
-  el.classList.add("show");
-  clearTimeout(window.__toastTimer);
-  window.__toastTimer = setTimeout(()=>el.classList.remove("show"),1400);
-}
-
-function escapeHtml(str){
-  return str.replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
-}
+save();
 
 render();
-setInterval(render, 60000);
 
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
-}
+setInterval(render,60000);
+
+if("serviceWorker" in navigator)
+
+  navigator.serviceWorker
+
+    .register("./service-worker.js")
+
+    .catch(()=>{});
+
 </script>
+
 </body>
+
 </html>
