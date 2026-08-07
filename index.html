@@ -12,8 +12,6 @@
 
 <title>Chores</title>
 
-<link rel="manifest" href="manifest.webmanifest">
-
 <style>
 
 :root{
@@ -30,45 +28,81 @@
 
   --green:#315f4a;
 
+  --green-soft:#dfece5;
+
   --amber:#8a5b16;
 
-  --red:#8d3d37
+  --amber-soft:#f5ead5;
+
+  --red:#8d3d37;
+
+  --red-soft:#f5dfdd;
 
 }
 
 *{box-sizing:border-box}
 
-body{
+html,body{
 
   margin:0;
+
+  min-height:100%;
 
   background:var(--bg);
 
   color:var(--ink);
 
-  font-family:system-ui,-apple-system,sans-serif
+}
+
+body{
+
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 
 }
 
-.app{max-width:800px;margin:auto;padding:22px 16px 50px}
+button,input,select{font:inherit}
 
-header,.top,.row,.bottom{
+.app{
+
+  width:min(820px,100%);
+
+  margin:auto;
+
+  padding:22px 16px 56px;
+
+}
+
+header,.status,.task-top,.task-bottom,.modal-actions{
 
   display:flex;
 
-  justify-content:space-between;
-
   align-items:center;
 
-  gap:12px
+  justify-content:space-between;
+
+  gap:12px;
 
 }
 
-h1{font-size:42px;margin:0}
+h1{
 
-.muted{color:var(--muted);font-size:14px}
+  margin:0;
 
-button,select,input{font:inherit}
+  font-size:42px;
+
+  letter-spacing:-.045em;
+
+}
+
+.date{
+
+  color:var(--muted);
+
+  font-size:14px;
+
+  margin-top:3px;
+
+}
 
 .add,.save{
 
@@ -82,11 +116,11 @@ button,select,input{font:inherit}
 
   padding:11px 15px;
 
-  font-weight:700
+  font-weight:700;
 
 }
 
-.top,.task{
+.status,.task{
 
   background:var(--card);
 
@@ -94,19 +128,115 @@ button,select,input{font:inherit}
 
   border-radius:18px;
 
-  padding:18px;
-
-  margin:14px 0
+  box-shadow:0 8px 26px rgba(20,30,24,.055);
 
 }
 
-.top h2{margin:0;font-size:27px}
+.status{
 
-.tasks{display:grid;gap:11px}
+  padding:19px;
 
-.task{margin:0}
+  margin:18px 0;
 
-.name{font-size:20px;font-weight:750}
+}
+
+.status h2{
+
+  font-size:28px;
+
+  letter-spacing:-.03em;
+
+  margin:0;
+
+}
+
+.status-copy{
+
+  color:var(--muted);
+
+  font-size:14px;
+
+  margin-top:4px;
+
+}
+
+.badge{
+
+  min-width:54px;
+
+  height:54px;
+
+  border-radius:50%;
+
+  display:grid;
+
+  place-items:center;
+
+  background:var(--green-soft);
+
+  color:var(--green);
+
+  font-weight:800;
+
+  font-size:18px;
+
+}
+
+.section-title{
+
+  color:var(--muted);
+
+  font-size:13px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.12em;
+
+  margin:18px 0 10px;
+
+}
+
+.tasks{
+
+  display:grid;
+
+  gap:11px;
+
+}
+
+.task{
+
+  padding:18px;
+
+}
+
+.task.overdue{
+
+  border-color:#e3b5b1;
+
+}
+
+.task-name{
+
+  font-size:20px;
+
+  font-weight:750;
+
+  letter-spacing:-.02em;
+
+}
+
+.meta{
+
+  color:var(--muted);
+
+  font-size:14px;
+
+  margin-top:4px;
+
+  line-height:1.35;
+
+}
 
 .bar{
 
@@ -118,27 +248,53 @@ button,select,input{font:inherit}
 
   overflow:hidden;
 
-  margin:14px 0
+  margin:14px 0;
 
 }
 
-.bar i{
-
-  display:block;
+.bar>div{
 
   height:100%;
 
-  background:var(--green)
+  background:var(--green);
+
+  border-radius:inherit;
 
 }
 
-.pending .bar i,.due .bar i{background:var(--amber)}
+.pending .bar>div,
 
-.overdue{border-color:#e3b5b1}
+.due .bar>div{
 
-.overdue .bar i{background:var(--red)}
+  background:var(--amber);
 
-.bottom{font-size:12px;color:var(--muted)}
+}
+
+.overdue .bar>div{
+
+  background:var(--red);
+
+}
+
+.task-bottom{
+
+  font-size:12px;
+
+  color:var(--muted);
+
+  flex-wrap:wrap;
+
+}
+
+.stats{
+
+  display:flex;
+
+  gap:13px;
+
+  flex-wrap:wrap;
+
+}
 
 .edit{
 
@@ -146,13 +302,35 @@ button,select,input{font:inherit}
 
   background:none;
 
-  text-decoration:underline
+  color:var(--ink);
+
+  text-decoration:underline;
+
+  text-underline-offset:3px;
 
 }
 
-.switch{position:relative;width:62px;height:34px}
+.switch{
 
-.switch input{opacity:0}
+  position:relative;
+
+  width:64px;
+
+  height:34px;
+
+  flex:0 0 auto;
+
+}
+
+.switch input{
+
+  opacity:0;
+
+  width:0;
+
+  height:0;
+
+}
 
 .switch span{
 
@@ -162,7 +340,7 @@ button,select,input{font:inherit}
 
   background:#cfd4cf;
 
-  border-radius:99px
+  border-radius:99px;
 
 }
 
@@ -184,35 +362,83 @@ button,select,input{font:inherit}
 
   border-radius:50%;
 
-  transition:.2s;
+  box-shadow:0 2px 6px #0002;
 
-  box-shadow:0 2px 6px #0002
+  transition:.18s;
 
 }
 
-.switch input:checked+span{background:var(--green)}
+.switch input:checked+span{
 
-.switch input:checked+span:before{transform:translateX(28px)}
+  background:var(--green);
+
+}
+
+.switch input:checked+span:before{
+
+  transform:translateX(30px);
+
+}
+
+.empty{
+
+  padding:34px;
+
+  text-align:center;
+
+  color:var(--muted);
+
+  border:1px dashed var(--line);
+
+  border-radius:18px;
+
+}
 
 dialog{
+
+  width:min(520px,calc(100% - 24px));
 
   border:0;
 
   border-radius:20px;
 
-  width:min(520px,calc(100% - 24px));
-
   padding:0;
 
-  box-shadow:0 25px 80px #0004
+  box-shadow:0 25px 80px #0004;
 
 }
 
-dialog::backdrop{background:#0004}
+dialog::backdrop{
 
-.modal{padding:21px}
+  background:#0004;
 
-.field{display:grid;gap:6px;margin:12px 0}
+  backdrop-filter:blur(2px);
+
+}
+
+.modal{
+
+  padding:21px;
+
+}
+
+.modal h2{
+
+  margin:0 0 16px;
+
+  font-size:25px;
+
+}
+
+.field{
+
+  display:grid;
+
+  gap:6px;
+
+  margin:12px 0;
+
+}
 
 .field label{
 
@@ -220,7 +446,7 @@ dialog::backdrop{background:#0004}
 
   color:var(--muted);
 
-  font-weight:700
+  font-weight:700;
 
 }
 
@@ -230,7 +456,7 @@ dialog::backdrop{background:#0004}
 
   grid-template-columns:1fr 1fr;
 
-  gap:10px
+  gap:10px;
 
 }
 
@@ -244,33 +470,11 @@ input,select{
 
   border-radius:11px;
 
-  background:white
+  background:white;
+
+  color:var(--ink);
 
 }
-
-.actions{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  margin-top:18px
-
-}
-
-.ghost,.del{
-
-  border:1px solid var(--line);
-
-  border-radius:999px;
-
-  padding:10px 13px;
-
-  background:white
-
-}
-
-.del{color:var(--red)}
 
 .fine{
 
@@ -278,7 +482,47 @@ input,select{
 
   color:var(--muted);
 
-  line-height:1.4
+  line-height:1.45;
+
+  margin:10px 0 0;
+
+}
+
+.modal-actions{
+
+  margin-top:18px;
+
+}
+
+.right-actions{
+
+  display:flex;
+
+  gap:8px;
+
+}
+
+.ghost,.delete{
+
+  border:1px solid var(--line);
+
+  border-radius:999px;
+
+  padding:10px 13px;
+
+  background:white;
+
+}
+
+.delete{
+
+  color:var(--red);
+
+}
+
+.hidden{
+
+  display:none!important;
 
 }
 
@@ -287,6 +531,8 @@ input,select{
   h1{font-size:36px}
 
   .pair{grid-template-columns:1fr}
+
+  .status{align-items:flex-start}
 
 }
 
@@ -304,165 +550,211 @@ input,select{
 
     <h1>Chores</h1>
 
-    <div class="muted" id="date"></div>
+    <div class="date" id="date"></div>
 
   </div>
 
-  <button class="add" id="add">＋ Add task</button>
+  <button class="add" id="addBtn">＋ Add task</button>
 
 </header>
 
-<section class="top">
+<section class="status">
 
   <div>
 
-    <h2 id="headline">No tasks due</h2>
+    <h2 id="statusTitle">No tasks due</h2>
 
-    <div class="muted" id="summary">The field is clear.</div>
+    <div class="status-copy" id="statusCopy">
+
+      The field is clear.
+
+    </div>
 
   </div>
 
-  <strong id="count">✓</strong>
+  <div class="badge" id="statusBadge">✓</div>
 
 </section>
 
-<section class="tasks" id="tasks"></section>
+<div class="section-title">Your tasks</div>
+
+<section class="tasks" id="taskList"></section>
 
 </main>
 
-<dialog id="dlg">
+<dialog id="taskDialog">
 
-<form class="modal" id="form">
+<form class="modal" id="taskForm">
 
-<h2 id="title">Add task</h2>
+<h2 id="dialogTitle">Add task</h2>
 
-<input type="hidden" id="tid">
+<input type="hidden" id="taskId">
 
 <div class="field">
 
-<label>Task</label>
+  <label for="taskName">Task</label>
 
-<input id="nm" required>
+  <input
+
+    id="taskName"
+
+    maxlength="80"
+
+    required
+
+    placeholder="e.g. Laundry">
+
+</div>
+
+<div class="field">
+
+  <label for="taskType">Type</label>
+
+  <select id="taskType">
+
+    <option value="daily">Daily</option>
+
+    <option value="interval">Every N days</option>
+
+  </select>
+
+</div>
+
+<div id="intervalFields" class="hidden">
+
+<div class="pair">
+
+  <div class="field">
+
+    <label for="pendingAfter">
+
+      Reset to Pending after
+
+    </label>
+
+    <input
+
+      id="pendingAfter"
+
+      type="number"
+
+      min="1"
+
+      step="1"
+
+      value="5">
+
+  </div>
+
+  <div class="field">
+
+    <label>Unit</label>
+
+    <input
+
+      value="days"
+
+      disabled>
+
+  </div>
 
 </div>
 
 <div class="pair">
 
-<div class="field">
+  <div class="field">
 
-<label>Reset after</label>
+    <label for="maxDays">
 
-<input id="iv" type="number" min=".25" step=".25" value="1">
+      Maximum allowable
 
-</div>
+    </label>
 
-<div class="field">
+    <input
 
-<label>Unit</label>
+      id="maxDays"
 
-<select id="iu">
+      type="number"
 
-<option value="hours">Hours</option>
+      min="1"
 
-<option value="days" selected>Days</option>
+      step="1"
 
-<option value="weeks">Weeks</option>
+      value="7">
 
-</select>
+  </div>
 
-</div>
+  <div class="field">
 
-</div>
+    <label>Unit</label>
 
-<div class="field">
+    <input
 
-<label>Recurrence</label>
+      value="days"
 
-<select id="mode">
+      disabled>
 
-<option value="scheduled">Scheduled — keep cadence</option>
-
-<option value="since">Since completion — restart timer</option>
-
-</select>
-
-</div>
-
-<div class="pair">
-
-<div class="field">
-
-<label>Reset to Pending</label>
-
-<input id="lv" type="number" min="0" step=".25" value="6">
-
-</div>
-
-<div class="field">
-
-<label>Unit</label>
-
-<select id="lu">
-
-<option value="hours" selected>Hours</option>
-
-<option value="days">Days</option>
-
-<option value="weeks">Weeks</option>
-
-</select>
-
-</div>
-
-</div>
-
-<div class="pair">
-
-<div class="field">
-
-<label>Grace period</label>
-
-<input id="gv" type="number" min="0" step=".25" value="6">
-
-</div>
-
-<div class="field">
-
-<label>Unit</label>
-
-<select id="gu">
-
-<option value="hours" selected>Hours</option>
-
-<option value="days">Days</option>
-
-<option value="weeks">Weeks</option>
-
-</select>
-
-</div>
+  </div>
 
 </div>
 
 <p class="fine">
 
-Done → Pending when the lead window opens → Due at the scheduled time →
+Example: Pending after 5 days, Maximum 7 days.
 
-Overdue after the grace period. Scheduled chores keep their cadence when
+If completed Monday, it becomes Pending Saturday,
 
-completed early.
+Due the following Monday, and Overdue Tuesday.
 
 </p>
 
-<div class="actions">
+</div>
 
-<button type="button" class="del" id="del" hidden>Delete</button>
+<div id="dailyNote" class="fine">
 
-<div>
+Daily tasks reset to Pending automatically at midnight.
 
-<button type="button" class="ghost" id="cancel">Cancel</button>
+Completing the task at any time during the day counts
 
-<button class="save">Save</button>
+for that calendar day.
+
+</div>
+
+<div class="modal-actions">
+
+<button
+
+  type="button"
+
+  class="delete"
+
+  id="deleteBtn"
+
+  hidden>
+
+  Delete
+
+</button>
+
+<div class="right-actions">
+
+<button
+
+  type="button"
+
+  class="ghost"
+
+  id="cancelBtn">
+
+  Cancel
+
+</button>
+
+<button class="save">
+
+  Save
+
+</button>
 
 </div>
 
@@ -474,59 +766,105 @@ completed early.
 
 <script>
 
-const K="chores-app-v1";
+const STORAGE_KEY = "chores2-v2";
 
-const M={
+const $ = id =>
 
-  hours:3600000,
+  document.getElementById(id);
 
-  days:86400000,
+const uid = () =>
 
-  weeks:604800000
+  crypto.randomUUID();
 
-};
+function localDateKey(date = new Date()){
 
-const $=x=>document.getElementById(x);
+  const y = date.getFullYear();
 
-const uid=()=>crypto.randomUUID();
+  const m =
 
-function mk(n,i,u,g,gu,l,lu,m="scheduled"){
+    String(date.getMonth()+1)
+
+    .padStart(2,"0");
+
+  const d =
+
+    String(date.getDate())
+
+    .padStart(2,"0");
+
+  return `${y}-${m}-${d}`;
+
+}
+
+function dateFromKey(key){
+
+  const [y,m,d] =
+
+    key.split("-").map(Number);
+
+  return new Date(y,m-1,d);
+
+}
+
+function addDaysKey(key,days){
+
+  const d = dateFromKey(key);
+
+  d.setDate(
+
+    d.getDate()+days
+
+  );
+
+  return localDateKey(d);
+
+}
+
+function diffCalendarDays(fromKey,toKey){
+
+  const a = dateFromKey(fromKey);
+
+  const b = dateFromKey(toKey);
+
+  return Math.round(
+
+    (b-a)/86400000
+
+  );
+
+}
+
+function makeTask(
+
+  name,
+
+  type="daily",
+
+  pendingAfter=5,
+
+  maxDays=7
+
+){
 
   return{
 
     id:uid(),
 
-    name:n,
+    name,
 
-    intervalValue:i,
+    type,
 
-    intervalUnit:u,
+    pendingAfter,
 
-    intervalMs:i*M[u],
+    maxDays,
 
-    graceValue:g,
+    lastDoneDate:null,
 
-    graceUnit:gu,
+    currentStreak:0,
 
-    graceMs:g*M[gu],
+    bestStreak:0,
 
-    leadValue:l,
-
-    leadUnit:lu,
-
-    leadMs:l*M[lu],
-
-    mode:m,
-
-    doneAt:null,
-
-    dueAt:null,
-
-    streak:0,
-
-    best:0,
-
-    total:0,
+    totalCompletions:0,
 
     createdAt:Date.now()
 
@@ -534,27 +872,85 @@ function mk(n,i,u,g,gu,l,lu,m="scheduled"){
 
 }
 
-let S;
+let state = loadState();
 
-try{
+function loadState(){
 
-  S=JSON.parse(localStorage.getItem(K));
+  try{
 
-}catch(e){}
+    const parsed =
 
-if(!S||!Array.isArray(S.tasks)){
+      JSON.parse(
 
-  S={
+        localStorage.getItem(
+
+          STORAGE_KEY
+
+        )
+
+      );
+
+    if(
+
+      parsed &&
+
+      Array.isArray(parsed.tasks)
+
+    ){
+
+      return parsed;
+
+    }
+
+  }catch(e){}
+
+  return{
 
     tasks:[
 
-      mk("Shave",1,"days",6,"hours",8,"hours"),
+      makeTask(
 
-      mk("Laundry",1,"weeks",1,"days",2,"days"),
+        "Shave",
 
-      mk("Wash hair",3,"days",12,"hours",1,"days"),
+        "daily"
 
-      mk("Trim fingernails",2,"weeks",2,"days",3,"days")
+      ),
+
+      makeTask(
+
+        "Laundry",
+
+        "interval",
+
+        5,
+
+        7
+
+      ),
+
+      makeTask(
+
+        "Wash hair",
+
+        "interval",
+
+        2,
+
+        3
+
+      ),
+
+      makeTask(
+
+        "Trim fingernails",
+
+        "interval",
+
+        10,
+
+        14
+
+      )
 
     ]
 
@@ -562,225 +958,373 @@ if(!S||!Array.isArray(S.tasks)){
 
 }
 
-for(const t of S.tasks){
+function saveState(){
 
-  t.mode=t.mode||t.recurrenceMode||"scheduled";
+  localStorage.setItem(
 
-  if(t.streak==null)
+    STORAGE_KEY,
 
-    t.streak=t.currentStreak||0;
+    JSON.stringify(state)
 
-  if(t.best==null)
-
-    t.best=t.bestStreak||0;
-
-  if(t.total==null)
-
-    t.total=t.totalCompletions||0;
-
-  if(t.dueAt===undefined)
-
-    t.dueAt=t.doneAt?t.doneAt+t.intervalMs:null;
-
-  if(t.leadMs===undefined){
-
-    t.leadValue=0;
-
-    t.leadUnit="hours";
-
-    t.leadMs=0;
-
-  }
+  );
 
 }
 
-const save=()=>localStorage.setItem(K,JSON.stringify(S));
+function status(task){
 
-function st(t,n=Date.now()){
+  const today =
 
-  if(!t.doneAt)
+    localDateKey();
 
-    return{q:"pending",r:0,x:0};
+  if(task.type === "daily"){
 
-  let d=t.dueAt||t.doneAt+t.intervalMs;
+    if(
 
-  let p=d-t.leadMs;
+      task.lastDoneDate === today
 
-  let o=d+t.graceMs;
+    ){
 
-  if(n<p)
+      return{
 
-    return{
+        state:"done",
 
-      q:"done",
+        progress:1,
 
-      r:1-(n-(d-t.intervalMs))/Math.max(1,p-(d-t.intervalMs)),
+        detail:"Done for today"
 
-      x:p-n
+      };
 
-    };
-
-  if(n<d)
+    }
 
     return{
 
-      q:"pending",
+      state:"pending",
 
-      r:(d-n)/Math.max(1,t.leadMs),
+      progress:0,
 
-      x:d-n
+      detail:"Pending today"
 
     };
 
-  if(n<o)
+  }
+
+  if(!task.lastDoneDate){
 
     return{
 
-      q:"due",
+      state:"pending",
 
-      r:t.graceMs?1-(n-d)/t.graceMs:0,
+      progress:0,
 
-      x:o-n
+      detail:
+
+        "Pending — not yet completed"
 
     };
+
+  }
+
+  const days =
+
+    diffCalendarDays(
+
+      task.lastDoneDate,
+
+      today
+
+    );
+
+  if(days < task.pendingAfter){
+
+    const remaining =
+
+      task.pendingAfter-days;
+
+    return{
+
+      state:"done",
+
+      progress:
+
+        Math.max(
+
+          0,
+
+          1-days/
+
+          Math.max(
+
+            1,
+
+            task.pendingAfter
+
+          )
+
+        ),
+
+      detail:
+
+        "Done · pending in " +
+
+        remaining +
+
+        " day" +
+
+        (remaining===1 ? "" : "s")
+
+    };
+
+  }
+
+  if(days < task.maxDays){
+
+    const remaining =
+
+      task.maxDays-days;
+
+    return{
+
+      state:"pending",
+
+      progress:
+
+        Math.max(
+
+          0,
+
+          remaining /
+
+          Math.max(
+
+            1,
+
+            task.maxDays -
+
+            task.pendingAfter
+
+          )
+
+        ),
+
+      detail:
+
+        "Pending · due in " +
+
+        remaining +
+
+        " day" +
+
+        (remaining===1 ? "" : "s")
+
+    };
+
+  }
+
+  if(days === task.maxDays){
+
+    return{
+
+      state:"due",
+
+      progress:0,
+
+      detail:"Due today"
+
+    };
+
+  }
+
+  const late =
+
+    days-task.maxDays;
 
   return{
 
-    q:"overdue",
+    state:"overdue",
 
-    r:0,
+    progress:0,
 
-    x:n-o
+    detail:
+
+      "Overdue by " +
+
+      late +
+
+      " day" +
+
+      (late===1 ? "" : "s")
 
   };
 
 }
 
-function dur(x){
+function markDone(task){
 
-  let h=Math.abs(x)/M.hours;
+  const today =
 
-  let d=Math.abs(x)/M.days;
+    localDateKey();
 
-  if(h<1)
+  if(
 
-    return Math.max(1,Math.round(Math.abs(x)/60000))+" min";
+    task.lastDoneDate === today
 
-  if(h<24)
+  ){
 
-    return Math.round(h)+" hr";
-
-  if(d<14){
-
-    let z=Math.round(d);
-
-    return z+" day"+(z==1?"":"s");
+    return;
 
   }
 
-  let w=Math.round(d/7);
+  const before =
 
-  return w+" week"+(w==1?"":"s");
+    status(task).state;
 
-}
+  if(task.type === "daily"){
 
-function text(t){
+    const yesterday =
 
-  let s=st(t);
+      addDaysKey(
 
-  if(!t.doneAt)
+        today,
 
-    return "Pending — not yet completed";
+        -1
 
-  if(s.q=="done")
+      );
 
-    return "Done · pending in "+dur(s.x);
+    if(
 
-  if(s.q=="pending")
+      task.lastDoneDate === yesterday
 
-    return "Pending · due in "+dur(s.x);
+    ){
 
-  if(s.q=="due")
-
-    return "Due now · grace ends in "+dur(s.x);
-
-  return "Overdue by "+dur(s.x);
-
-}
-
-function mark(t,on){
-
-  let before=st(t).q;
-
-  let n=Date.now();
-
-  if(on){
-
-    if(t.mode=="since"){
-
-      t.dueAt=n+t.intervalMs;
+      task.currentStreak++;
 
     }else{
 
-      if(!t.dueAt)
-
-        t.dueAt=n+t.intervalMs;
-
-      while(t.dueAt<=n)
-
-        t.dueAt+=t.intervalMs;
+      task.currentStreak=1;
 
     }
 
-    t.doneAt=n;
-
-    t.total++;
-
-    t.streak=before=="overdue"?1:t.streak+1;
-
-    t.best=Math.max(t.best,t.streak);
-
   }else{
 
-    t.doneAt=null;
+    if(before === "overdue"){
 
-    if(t.mode=="since")
+      task.currentStreak=1;
 
-      t.dueAt=null;
+    }else{
+
+      task.currentStreak++;
+
+    }
 
   }
 
-  save();
+  task.lastDoneDate=today;
+
+  task.bestStreak=
+
+    Math.max(
+
+      task.bestStreak,
+
+      task.currentStreak
+
+    );
+
+  task.totalCompletions++;
+
+  saveState();
 
   render();
 
 }
 
-function safeName(s){
+function markPending(task){
 
-  return s
+  const today =
 
-    .replaceAll("&","&amp;")
+    localDateKey();
 
-    .replaceAll("<","&lt;");
+  if(
+
+    task.lastDoneDate === today
+
+  ){
+
+    task.lastDoneDate=null;
+
+    if(task.currentStreak>0){
+
+      task.currentStreak--;
+
+    }
+
+    if(task.totalCompletions>0){
+
+      task.totalCompletions--;
+
+    }
+
+  }else{
+
+    task.lastDoneDate=null;
+
+  }
+
+  saveState();
+
+  render();
+
+}
+
+function escapeHtml(text){
+
+  return text.replace(
+
+    /[&<>"']/g,
+
+    c=>({
+
+      "&":"&amp;",
+
+      "<":"&lt;",
+
+      ">":"&gt;",
+
+      "\"":"&quot;",
+
+      "'":"&#039;"
+
+    }[c])
+
+  );
 
 }
 
 function render(){
 
-  $("date").textContent=
+  $("date").textContent =
 
     new Intl.DateTimeFormat(
 
       undefined,
 
-      {weekday:"long",month:"long",day:"numeric"}
+      {
 
-    ).format(new Date());
+        weekday:"long",
 
-  $("tasks").innerHTML="";
+        month:"long",
 
-  let rank={
+        day:"numeric"
+
+      }
+
+    ).format(
+
+      new Date()
+
+    );
+
+  const rank = {
 
     overdue:0,
 
@@ -792,291 +1336,729 @@ function render(){
 
   };
 
-  let a=[...S.tasks].sort(
+  const tasks =
 
-    (x,y)=>rank[st(x).q]-rank[st(y).q]
+    [...state.tasks]
 
-  );
+    .sort(
 
-  for(const t of a){
+      (a,b)=>{
 
-    let s=st(t);
+        const sa=status(a);
 
-    let e=document.createElement("article");
+        const sb=status(b);
 
-    e.className="task "+s.q;
+        if(
 
-    e.innerHTML=
+          rank[sa.state] !==
 
-      '<div class="row">'+
+          rank[sb.state]
 
-        '<div>'+
+        ){
 
-          '<div class="name">'+safeName(t.name)+'</div>'+
+          return
 
-          '<div class="muted">'+text(t)+'</div>'+
+            rank[sa.state] -
 
-        '</div>'+
+            rank[sb.state];
 
-        '<label class="switch">'+
+        }
 
-          '<input type="checkbox" '+(s.q=="done"?"checked":"")+'>'+
+        return
 
-          '<span></span>'+
+          a.createdAt -
 
-        '</label>'+
+          b.createdAt;
 
-      '</div>'+
+      }
 
-      '<div class="bar">'+
+    );
 
-        '<i style="width:'+
+  const list =
 
-        Math.max(0,Math.min(100,s.r*100))+
+    $("taskList");
 
-        '%"></i>'+
+  list.innerHTML="";
 
-      '</div>'+
+  if(!tasks.length){
 
-      '<div class="bottom">'+
+    list.innerHTML =
 
-        '<span>Streak '+t.streak+
+      '<div class="empty">' +
 
-        ' · Best '+t.best+
-
-        ' · Total '+t.total+
-
-        '</span>'+
-
-        '<button class="edit">Edit</button>'+
+      'No tasks yet.' +
 
       '</div>';
 
-    e.querySelector("input").onchange=
+  }
 
-      x=>mark(t,x.target.checked);
+  for(const task of tasks){
 
-    e.querySelector(".edit").onclick=
+    const s =
 
-      ()=>edit(t);
+      status(task);
 
-    $("tasks").appendChild(e);
+    const card =
+
+      document.createElement(
+
+        "article"
+
+      );
+
+    card.className =
+
+      "task " + s.state;
+
+    card.innerHTML = `
+
+      <div class="task-top">
+
+        <div>
+
+          <div class="task-name">
+
+            ${escapeHtml(task.name)}
+
+          </div>
+
+          <div class="meta">
+
+            ${s.detail}
+
+          </div>
+
+        </div>
+
+        <label class="switch">
+
+          <input
+
+            type="checkbox"
+
+            ${s.state==="done"
+
+              ? "checked"
+
+              : ""}>
+
+          <span></span>
+
+        </label>
+
+      </div>
+
+      <div class="bar">
+
+        <div
+
+          style="width:
+
+          ${Math.round(
+
+            Math.max(
+
+              0,
+
+              Math.min(
+
+                1,
+
+                s.progress
+
+              )
+
+            )*100
+
+          )}%">
+
+        </div>
+
+      </div>
+
+      <div class="task-bottom">
+
+        <div class="stats">
+
+          <span>
+
+            Streak
+
+            ${task.currentStreak}
+
+          </span>
+
+          <span>
+
+            Best
+
+            ${task.bestStreak}
+
+          </span>
+
+          <span>
+
+            Total
+
+            ${task.totalCompletions}
+
+          </span>
+
+        </div>
+
+        <button class="edit">
+
+          Edit
+
+        </button>
+
+      </div>
+
+    `;
+
+    card
+
+      .querySelector("input")
+
+      .addEventListener(
+
+        "change",
+
+        e=>{
+
+          if(e.target.checked){
+
+            markDone(task);
+
+          }else{
+
+            markPending(task);
+
+          }
+
+        }
+
+      );
+
+    card
+
+      .querySelector(".edit")
+
+      .addEventListener(
+
+        "click",
+
+        ()=>openEdit(task)
+
+      );
+
+    list.appendChild(card);
 
   }
 
-  let q=S.tasks.map(st);
-
-  let o=q.filter(x=>x.q=="overdue").length;
-
-  let d=q.filter(x=>x.q=="due").length;
-
-  let p=q.filter(x=>x.q=="pending").length;
-
-  if(o){
-
-    $("headline").textContent=
-
-      o+" task"+(o==1?"":"s")+" overdue";
-
-    $("summary").textContent=
-
-      (d+p)
-
-      ?(d+p)+" more waiting."
-
-      :"Nothing else is waiting.";
-
-    $("count").textContent=o;
-
-  }else if(d){
-
-    $("headline").textContent=
-
-      d+" task"+(d==1?"":"s")+" due";
-
-    $("summary").textContent=
-
-      p
-
-      ?p+" more pending."
-
-      :"Nothing is overdue.";
-
-    $("count").textContent=d;
-
-  }else{
-
-    $("headline").textContent="No tasks due";
-
-    $("summary").textContent=
-
-      p
-
-      ?p+" task"+(p==1?" is":"s are")+" pending."
-
-      :"The field is clear.";
-
-    $("count").textContent="✓";
-
-  }
+  updateSummary();
 
 }
 
-$("add").onclick=()=>{
+function updateSummary(){
 
-  $("form").reset();
+  const states =
 
-  $("tid").value="";
+    state.tasks.map(
 
-  $("title").textContent="Add task";
-
-  $("del").hidden=true;
-
-  $("dlg").showModal();
-
-};
-
-$("cancel").onclick=()=>$("dlg").close();
-
-function edit(t){
-
-  $("tid").value=t.id;
-
-  $("title").textContent="Edit task";
-
-  $("nm").value=t.name;
-
-  $("iv").value=t.intervalValue;
-
-  $("iu").value=t.intervalUnit;
-
-  $("mode").value=t.mode;
-
-  $("lv").value=t.leadValue||0;
-
-  $("lu").value=t.leadUnit||"hours";
-
-  $("gv").value=t.graceValue;
-
-  $("gu").value=t.graceUnit;
-
-  $("del").hidden=false;
-
-  $("dlg").showModal();
-
-}
-
-$("form").onsubmit=e=>{
-
-  e.preventDefault();
-
-  let t=S.tasks.find(x=>x.id==$("tid").value);
-
-  let n=$("nm").value.trim();
-
-  let i=+$("iv").value;
-
-  let u=$("iu").value;
-
-  let l=+$("lv").value;
-
-  let lu=$("lu").value;
-
-  let g=+$("gv").value;
-
-  let gu=$("gu").value;
-
-  let m=$("mode").value;
-
-  if(!n||i<=0||l<0||g<0)
-
-    return;
-
-  if(t){
-
-    Object.assign(t,{
-
-      name:n,
-
-      intervalValue:i,
-
-      intervalUnit:u,
-
-      intervalMs:i*M[u],
-
-      leadValue:l,
-
-      leadUnit:lu,
-
-      leadMs:l*M[lu],
-
-      graceValue:g,
-
-      graceUnit:gu,
-
-      graceMs:g*M[gu],
-
-      mode:m
-
-    });
-
-  }else{
-
-    S.tasks.push(
-
-      mk(n,i,u,g,gu,l,lu,m)
+      t=>status(t).state
 
     );
 
+  const overdue =
+
+    states.filter(
+
+      x=>x==="overdue"
+
+    ).length;
+
+  const due =
+
+    states.filter(
+
+      x=>x==="due"
+
+    ).length;
+
+  const pending =
+
+    states.filter(
+
+      x=>x==="pending"
+
+    ).length;
+
+  if(overdue){
+
+    $("statusTitle").textContent =
+
+      overdue +
+
+      " task" +
+
+      (overdue===1 ? "" : "s") +
+
+      " overdue";
+
+    $("statusCopy").textContent =
+
+      (due+pending)
+
+      ? (due+pending) +
+
+        " more waiting."
+
+      : "Nothing else is waiting.";
+
+    $("statusBadge").textContent =
+
+      overdue;
+
+    $("statusBadge").style.background =
+
+      "var(--red-soft)";
+
+    $("statusBadge").style.color =
+
+      "var(--red)";
+
   }
 
-  save();
+  else if(due){
 
-  $("dlg").close();
+    $("statusTitle").textContent =
 
-  render();
+      due +
 
-};
+      " task" +
 
-$("del").onclick=()=>{
+      (due===1 ? "" : "s") +
 
-  let t=S.tasks.find(
+      " due";
 
-    x=>x.id==$("tid").value
+    $("statusCopy").textContent =
+
+      pending
+
+      ? pending +
+
+        " more pending."
+
+      : "Nothing is overdue.";
+
+    $("statusBadge").textContent =
+
+      due;
+
+    $("statusBadge").style.background =
+
+      "var(--amber-soft)";
+
+    $("statusBadge").style.color =
+
+      "var(--amber)";
+
+  }
+
+  else{
+
+    $("statusTitle").textContent =
+
+      "No tasks due";
+
+    $("statusCopy").textContent =
+
+      pending
+
+      ? pending +
+
+        " task" +
+
+        (pending===1
+
+          ? " is"
+
+          : "s are") +
+
+        " pending."
+
+      : "The field is clear.";
+
+    $("statusBadge").textContent =
+
+      "✓";
+
+    $("statusBadge").style.background =
+
+      "var(--green-soft)";
+
+    $("statusBadge").style.color =
+
+      "var(--green)";
+
+  }
+
+}
+
+const dialog =
+
+  $("taskDialog");
+
+const form =
+
+  $("taskForm");
+
+function updateTypeFields(){
+
+  const interval =
+
+    $("taskType").value ===
+
+    "interval";
+
+  $("intervalFields")
+
+    .classList
+
+    .toggle(
+
+      "hidden",
+
+      !interval
+
+    );
+
+  $("dailyNote")
+
+    .classList
+
+    .toggle(
+
+      "hidden",
+
+      interval
+
+    );
+
+}
+
+$("taskType")
+
+  .addEventListener(
+
+    "change",
+
+    updateTypeFields
 
   );
 
-  if(t&&confirm('Delete "'+t.name+'"?')){
+$("addBtn")
 
-    S.tasks=S.tasks.filter(
+  .addEventListener(
 
-      x=>x.id!=t.id
+    "click",
 
-    );
+    ()=>{
 
-    save();
+      form.reset();
 
-    $("dlg").close();
+      $("taskId").value="";
+
+      $("dialogTitle")
+
+        .textContent =
+
+        "Add task";
+
+      $("taskType").value =
+
+        "daily";
+
+      $("pendingAfter").value =
+
+        5;
+
+      $("maxDays").value =
+
+        7;
+
+      $("deleteBtn").hidden =
+
+        true;
+
+      updateTypeFields();
+
+      dialog.showModal();
+
+    }
+
+  );
+
+$("cancelBtn")
+
+  .addEventListener(
+
+    "click",
+
+    ()=>dialog.close()
+
+  );
+
+function openEdit(task){
+
+  $("taskId").value =
+
+    task.id;
+
+  $("dialogTitle")
+
+    .textContent =
+
+    "Edit task";
+
+  $("taskName").value =
+
+    task.name;
+
+  $("taskType").value =
+
+    task.type;
+
+  $("pendingAfter").value =
+
+    task.pendingAfter ?? 5;
+
+  $("maxDays").value =
+
+    task.maxDays ?? 7;
+
+  $("deleteBtn").hidden =
+
+    false;
+
+  updateTypeFields();
+
+  dialog.showModal();
+
+}
+
+form.addEventListener(
+
+  "submit",
+
+  e=>{
+
+    e.preventDefault();
+
+    const id =
+
+      $("taskId").value;
+
+    const name =
+
+      $("taskName")
+
+      .value
+
+      .trim();
+
+    const type =
+
+      $("taskType").value;
+
+    const pendingAfter =
+
+      Number(
+
+        $("pendingAfter").value
+
+      );
+
+    const maxDays =
+
+      Number(
+
+        $("maxDays").value
+
+      );
+
+    if(!name){
+
+      return;
+
+    }
+
+    if(
+
+      type === "interval" &&
+
+      (
+
+        !Number.isInteger(
+
+          pendingAfter
+
+        ) ||
+
+        !Number.isInteger(
+
+          maxDays
+
+        ) ||
+
+        pendingAfter < 1 ||
+
+        maxDays < 1 ||
+
+        pendingAfter > maxDays
+
+      )
+
+    ){
+
+      alert(
+
+        "Reset to Pending must " +
+
+        "be a whole number of days " +
+
+        "and cannot exceed the " +
+
+        "Maximum allowable days."
+
+      );
+
+      return;
+
+    }
+
+    if(id){
+
+      const task =
+
+        state.tasks.find(
+
+          t=>t.id===id
+
+        );
+
+      task.name =
+
+        name;
+
+      task.type =
+
+        type;
+
+      task.pendingAfter =
+
+        pendingAfter;
+
+      task.maxDays =
+
+        maxDays;
+
+    }
+
+    else{
+
+      state.tasks.push(
+
+        makeTask(
+
+          name,
+
+          type,
+
+          pendingAfter,
+
+          maxDays
+
+        )
+
+      );
+
+    }
+
+    saveState();
+
+    dialog.close();
 
     render();
 
   }
 
-};
+);
 
-save();
+$("deleteBtn")
+
+  .addEventListener(
+
+    "click",
+
+    ()=>{
+
+      const id =
+
+        $("taskId").value;
+
+      const task =
+
+        state.tasks.find(
+
+          t=>t.id===id
+
+        );
+
+      if(
+
+        task &&
+
+        confirm(
+
+          `Delete "${task.name}"?`
+
+        )
+
+      ){
+
+        state.tasks =
+
+          state.tasks.filter(
+
+            t=>t.id!==id
+
+          );
+
+        saveState();
+
+        dialog.close();
+
+        render();
+
+      }
+
+    }
+
+  );
+
+saveState();
 
 render();
 
-setInterval(render,60000);
+setInterval(
 
-if("serviceWorker" in navigator)
+  render,
 
-  navigator.serviceWorker
+  60000
 
-    .register("./service-worker.js")
-
-    .catch(()=>{});
+);
 
 </script>
 
