@@ -30,11 +30,11 @@
 
   --green-soft:#dfece5;
 
-  --amber:#8a5b16;
+  --yellow:#d6a72d;
 
-  --amber-soft:#f5ead5;
+  --yellow-soft:#f6edcc;
 
-  --red:#8d3d37;
+  --red:#a7463f;
 
   --red-soft:#f5dfdd;
 
@@ -56,7 +56,17 @@ html,body{
 
 body{
 
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-family:
+
+    system-ui,
+
+    -apple-system,
+
+    BlinkMacSystemFont,
+
+    "Segoe UI",
+
+    sans-serif;
 
 }
 
@@ -72,7 +82,15 @@ button,input,select{font:inherit}
 
 }
 
-header,.status,.task-top,.task-bottom,.modal-actions{
+header,
+
+.status,
+
+.task-top,
+
+.task-bottom,
+
+.modal-actions{
 
   display:flex;
 
@@ -212,7 +230,7 @@ h1{
 
 .task.overdue{
 
-  border-color:#e3b5b1;
+  border-color:#e0b2ae;
 
 }
 
@@ -256,17 +274,21 @@ h1{
 
   height:100%;
 
-  background:var(--green);
-
   border-radius:inherit;
+
+  background:var(--green);
 
 }
 
-.pending .bar>div,
+.pending .bar>div{
+
+  background:#b8bdb8;
+
+}
 
 .due .bar>div{
 
-  background:var(--amber);
+  background:var(--yellow);
 
 }
 
@@ -342,6 +364,8 @@ h1{
 
   border-radius:99px;
 
+  transition:.18s;
+
 }
 
 .switch span:before{
@@ -368,15 +392,41 @@ h1{
 
 }
 
-.switch input:checked+span{
+/* DONE */
+
+.done .switch span{
 
   background:var(--green);
 
 }
 
-.switch input:checked+span:before{
+.done .switch span:before{
 
   transform:translateX(30px);
+
+}
+
+/* PENDING */
+
+.pending .switch span{
+
+  background:#aeb4af;
+
+}
+
+/* DUE TODAY */
+
+.due .switch span{
+
+  background:var(--yellow);
+
+}
+
+/* OVERDUE */
+
+.overdue .switch span{
+
+  background:var(--red);
 
 }
 
@@ -554,7 +604,11 @@ input,select{
 
   </div>
 
-  <button class="add" id="addBtn">＋ Add task</button>
+  <button class="add" id="addBtn">
+
+    ＋ Add task
+
+  </button>
 
 </header>
 
@@ -562,9 +616,17 @@ input,select{
 
   <div>
 
-    <h2 id="statusTitle">No tasks due</h2>
+    <h2 id="statusTitle">
 
-    <div class="status-copy" id="statusCopy">
+      No tasks overdue
+
+    </h2>
+
+    <div
+
+      class="status-copy"
+
+      id="statusCopy">
 
       The field is clear.
 
@@ -572,151 +634,209 @@ input,select{
 
   </div>
 
-  <div class="badge" id="statusBadge">✓</div>
+  <div
+
+    class="badge"
+
+    id="statusBadge">
+
+    ✓
+
+  </div>
 
 </section>
 
-<div class="section-title">Your tasks</div>
+<div class="section-title">
 
-<section class="tasks" id="taskList"></section>
+  Your tasks
+
+</div>
+
+<section
+
+  class="tasks"
+
+  id="taskList">
+
+</section>
 
 </main>
 
 <dialog id="taskDialog">
 
-<form class="modal" id="taskForm">
+<form
 
-<h2 id="dialogTitle">Add task</h2>
+  class="modal"
 
-<input type="hidden" id="taskId">
+  id="taskForm">
 
-<div class="field">
+<h2 id="dialogTitle">
 
-  <label for="taskName">Task</label>
+  Add task
 
-  <input
+</h2>
 
-    id="taskName"
+<input
 
-    maxlength="80"
+  type="hidden"
 
-    required
-
-    placeholder="e.g. Laundry">
-
-</div>
+  id="taskId">
 
 <div class="field">
 
-  <label for="taskType">Type</label>
+<label for="taskName">
 
-  <select id="taskType">
+  Task
 
-    <option value="daily">Daily</option>
+</label>
 
-    <option value="interval">Every N days</option>
+<input
 
-  </select>
+  id="taskName"
 
-</div>
+  maxlength="80"
 
-<div id="intervalFields" class="hidden">
+  required
 
-<div class="pair">
-
-  <div class="field">
-
-    <label for="pendingAfter">
-
-      Reset to Pending after
-
-    </label>
-
-    <input
-
-      id="pendingAfter"
-
-      type="number"
-
-      min="1"
-
-      step="1"
-
-      value="5">
-
-  </div>
-
-  <div class="field">
-
-    <label>Unit</label>
-
-    <input
-
-      value="days"
-
-      disabled>
-
-  </div>
+  placeholder="e.g. Laundry">
 
 </div>
 
+<div class="field">
+
+<label for="taskType">
+
+  Type
+
+</label>
+
+<select id="taskType">
+
+  <option value="daily">
+
+    Daily
+
+  </option>
+
+  <option value="interval">
+
+    Every N days
+
+  </option>
+
+</select>
+
+</div>
+
+<div
+
+  id="intervalFields"
+
+  class="hidden">
+
 <div class="pair">
 
-  <div class="field">
+<div class="field">
 
-    <label for="maxDays">
+<label for="maxDays">
 
-      Maximum allowable
+  Maximum days between completions
 
-    </label>
+</label>
 
-    <input
+<input
 
-      id="maxDays"
+  id="maxDays"
 
-      type="number"
+  type="number"
 
-      min="1"
+  min="1"
 
-      step="1"
+  step="1"
 
-      value="7">
+  value="7">
 
-  </div>
+</div>
 
-  <div class="field">
+<div class="field">
 
-    <label>Unit</label>
+<label>Unit</label>
 
-    <input
+<input
 
-      value="days"
+  value="days"
 
-      disabled>
+  disabled>
 
-  </div>
+</div>
+
+</div>
+
+<div class="pair">
+
+<div class="field">
+
+<label for="pendingWindow">
+
+  Pending window
+
+</label>
+
+<input
+
+  id="pendingWindow"
+
+  type="number"
+
+  min="1"
+
+  step="1"
+
+  value="2">
+
+</div>
+
+<div class="field">
+
+<label>Unit</label>
+
+<input
+
+  value="days"
+
+  disabled>
+
+</div>
 
 </div>
 
 <p class="fine">
 
-Example: Pending after 5 days, Maximum 7 days.
+Example: Maximum 7 days and Pending window 2 days.
 
-If completed Monday, it becomes Pending Saturday,
+If completed Monday, it remains Done through Saturday,
 
-Due the following Monday, and Overdue Tuesday.
+is Pending Sunday, is Due Today the following Monday,
+
+and becomes Overdue Tuesday.
 
 </p>
 
 </div>
 
-<div id="dailyNote" class="fine">
+<div
 
-Daily tasks reset to Pending automatically at midnight.
+  id="dailyNote"
 
-Completing the task at any time during the day counts
+  class="fine">
 
-for that calendar day.
+Daily tasks have no timing settings.
+
+If completed today they are Done.
+
+If completed yesterday they are Pending.
+
+Otherwise they are Overdue.
 
 </div>
 
@@ -766,31 +886,47 @@ for that calendar day.
 
 <script>
 
-const STORAGE_KEY = "chores2-v2";
+const STORAGE_KEY =
 
-const $ = id =>
+  "chores2-v2";
+
+const $ =
+
+  id =>
 
   document.getElementById(id);
 
-const uid = () =>
+const uid =
+
+  () =>
 
   crypto.randomUUID();
 
-function localDateKey(date = new Date()){
+function localDateKey(
 
-  const y = date.getFullYear();
+  date = new Date()
+
+){
+
+  const y =
+
+    date.getFullYear();
 
   const m =
 
-    String(date.getMonth()+1)
+    String(
 
-    .padStart(2,"0");
+      date.getMonth()+1
+
+    ).padStart(2,"0");
 
   const d =
 
-    String(date.getDate())
+    String(
 
-    .padStart(2,"0");
+      date.getDate()
+
+    ).padStart(2,"0");
 
   return `${y}-${m}-${d}`;
 
@@ -800,15 +936,35 @@ function dateFromKey(key){
 
   const [y,m,d] =
 
-    key.split("-").map(Number);
+    key
 
-  return new Date(y,m-1,d);
+    .split("-")
+
+    .map(Number);
+
+  return new Date(
+
+    y,
+
+    m-1,
+
+    d
+
+  );
 
 }
 
-function addDaysKey(key,days){
+function addDaysKey(
 
-  const d = dateFromKey(key);
+  key,
+
+  days
+
+){
+
+  const d =
+
+    dateFromKey(key);
 
   d.setDate(
 
@@ -820,11 +976,21 @@ function addDaysKey(key,days){
 
 }
 
-function diffCalendarDays(fromKey,toKey){
+function diffCalendarDays(
 
-  const a = dateFromKey(fromKey);
+  fromKey,
 
-  const b = dateFromKey(toKey);
+  toKey
+
+){
+
+  const a =
+
+    dateFromKey(fromKey);
+
+  const b =
+
+    dateFromKey(toKey);
 
   return Math.round(
 
@@ -840,9 +1006,9 @@ function makeTask(
 
   type="daily",
 
-  pendingAfter=5,
+  maxDays=7,
 
-  maxDays=7
+  pendingWindow=2
 
 ){
 
@@ -854,11 +1020,13 @@ function makeTask(
 
     type,
 
-    pendingAfter,
-
     maxDays,
 
+    pendingWindow,
+
     lastDoneDate:null,
+
+    previousDoneDate:null,
 
     currentStreak:0,
 
@@ -872,13 +1040,17 @@ function makeTask(
 
 }
 
-let state = loadState();
+let state =
+
+  loadState();
 
 function loadState(){
 
+  let parsed=null;
+
   try{
 
-    const parsed =
+    parsed =
 
       JSON.parse(
 
@@ -890,19 +1062,143 @@ function loadState(){
 
       );
 
-    if(
+  }catch(e){}
 
-      parsed &&
+  if(
 
-      Array.isArray(parsed.tasks)
+    parsed &&
+
+    Array.isArray(
+
+      parsed.tasks
+
+    )
+
+  ){
+
+    for(
+
+      const task
+
+      of parsed.tasks
 
     ){
 
-      return parsed;
+      /*
+
+        Migration from older version:
+
+        old pendingAfter -> new pendingWindow.
+
+      */
+
+      if(
+
+        task.pendingWindow == null
+
+      ){
+
+        if(
+
+          task.type === "interval"
+
+        ){
+
+          const oldPendingAfter =
+
+            Number(
+
+              task.pendingAfter ?? 5
+
+            );
+
+          const maximum =
+
+            Number(
+
+              task.maxDays ?? 7
+
+            );
+
+          /*
+
+            Example:
+
+            max 7,
+
+            old pending after 5
+
+            means new pending window 2.
+
+          */
+
+          task.pendingWindow =
+
+            Math.max(
+
+              1,
+
+              maximum -
+
+              oldPendingAfter
+
+            );
+
+        }else{
+
+          task.pendingWindow=1;
+
+        }
+
+      }
+
+      if(
+
+        task.previousDoneDate ===
+
+        undefined
+
+      ){
+
+        task.previousDoneDate=null;
+
+      }
+
+      if(
+
+        task.currentStreak == null
+
+      ){
+
+        task.currentStreak=0;
+
+      }
+
+      if(
+
+        task.bestStreak == null
+
+      ){
+
+        task.bestStreak=0;
+
+      }
+
+      if(
+
+        task.totalCompletions == null
+
+      ){
+
+        task.totalCompletions=0;
+
+      }
 
     }
 
-  }catch(e){}
+    return parsed;
+
+  }
 
   return{
 
@@ -922,9 +1218,9 @@ function loadState(){
 
         "interval",
 
-        5,
+        7,
 
-        7
+        2
 
       ),
 
@@ -934,9 +1230,9 @@ function loadState(){
 
         "interval",
 
-        2,
+        3,
 
-        3
+        1
 
       ),
 
@@ -946,9 +1242,9 @@ function loadState(){
 
         "interval",
 
-        10,
+        14,
 
-        14
+        4
 
       )
 
@@ -970,17 +1266,35 @@ function saveState(){
 
 }
 
+/*
+
+  STATE CALCULATION
+
+*/
+
 function status(task){
 
   const today =
 
     localDateKey();
 
-  if(task.type === "daily"){
+  /*
+
+    DAILY TASKS
+
+  */
+
+  if(
+
+    task.type === "daily"
+
+  ){
 
     if(
 
-      task.lastDoneDate === today
+      task.lastDoneDate ===
+
+      today
 
     ){
 
@@ -990,7 +1304,71 @@ function status(task){
 
         progress:1,
 
-        detail:"Done for today"
+        detail:
+
+          "Done for today"
+
+      };
+
+    }
+
+    const yesterday =
+
+      addDaysKey(
+
+        today,
+
+        -1
+
+      );
+
+    if(
+
+      task.lastDoneDate ===
+
+      yesterday
+
+    ){
+
+      return{
+
+        state:"pending",
+
+        progress:0,
+
+        detail:
+
+          "Pending today"
+
+      };
+
+    }
+
+    /*
+
+      Brand-new daily tasks
+
+      start Pending.
+
+    */
+
+    if(
+
+      !task.lastDoneDate &&
+
+      task.totalCompletions === 0
+
+    ){
+
+      return{
+
+        state:"pending",
+
+        progress:0,
+
+        detail:
+
+          "Pending today"
 
       };
 
@@ -998,17 +1376,29 @@ function status(task){
 
     return{
 
-      state:"pending",
+      state:"overdue",
 
       progress:0,
 
-      detail:"Pending today"
+      detail:
+
+        "Overdue"
 
     };
 
   }
 
-  if(!task.lastDoneDate){
+  /*
+
+    MULTI-DAY TASKS
+
+  */
+
+  if(
+
+    !task.lastDoneDate
+
+  ){
 
     return{
 
@@ -1024,7 +1414,7 @@ function status(task){
 
   }
 
-  const days =
+  const daysSince =
 
     diffCalendarDays(
 
@@ -1034,53 +1424,139 @@ function status(task){
 
     );
 
-  if(days < task.pendingAfter){
+  /*
 
-    const remaining =
+    The due date occurs
 
-      task.pendingAfter-days;
+    maxDays calendar days
+
+    after completion.
+
+  */
+
+  const daysUntilDue =
+
+    task.maxDays -
+
+    daysSince;
+
+  /*
+
+    PAST DUE DATE
+
+  */
+
+  if(
+
+    daysUntilDue < 0
+
+  ){
+
+    const late =
+
+      Math.abs(
+
+        daysUntilDue
+
+      );
 
     return{
 
-      state:"done",
+      state:"overdue",
 
-      progress:
-
-        Math.max(
-
-          0,
-
-          1-days/
-
-          Math.max(
-
-            1,
-
-            task.pendingAfter
-
-          )
-
-        ),
+      progress:0,
 
       detail:
 
-        "Done · pending in " +
+        "Overdue — " +
 
-        remaining +
+        late +
 
         " day" +
 
-        (remaining===1 ? "" : "s")
+        (
+
+          late === 1
+
+          ? ""
+
+          : "s"
+
+        ) +
+
+        " late"
 
     };
 
   }
 
-  if(days < task.maxDays){
+  /*
 
-    const remaining =
+    DUE DATE ITSELF
 
-      task.maxDays-days;
+  */
+
+  if(
+
+    daysUntilDue === 0
+
+  ){
+
+    return{
+
+      state:"due",
+
+      progress:0,
+
+      detail:
+
+        "Due Today"
+
+    };
+
+  }
+
+  /*
+
+    User's displayed counting is inclusive.
+
+    If due Monday:
+
+    Sunday = 2 days left
+
+    Saturday = 3 days left
+
+    Thursday = 5 days left
+
+  */
+
+  const displayedDaysLeft =
+
+    daysUntilDue + 1;
+
+  /*
+
+    PENDING WINDOW
+
+    Pending window = 2:
+
+    Sunday displays 2 days left
+
+    and is Pending.
+
+    Saturday displays 3 days left
+
+    and remains Done.
+
+  */
+
+  if(
+
+    displayedDaysLeft <=
+
+    task.pendingWindow
+
+  ){
 
     return{
 
@@ -1092,15 +1568,19 @@ function status(task){
 
           0,
 
-          remaining /
-
-          Math.max(
+          Math.min(
 
             1,
 
-            task.maxDays -
+            displayedDaysLeft /
 
-            task.pendingAfter
+            Math.max(
+
+              1,
+
+              task.pendingWindow
+
+            )
 
           )
 
@@ -1108,51 +1588,81 @@ function status(task){
 
       detail:
 
-        "Pending · due in " +
+        "Pending — " +
 
-        remaining +
+        displayedDaysLeft +
 
         " day" +
 
-        (remaining===1 ? "" : "s")
+        (
+
+          displayedDaysLeft === 1
+
+          ? ""
+
+          : "s"
+
+        ) +
+
+        " left"
 
     };
 
   }
 
-  if(days === task.maxDays){
+  /*
 
-    return{
+    OTHERWISE DONE
 
-      state:"due",
-
-      progress:0,
-
-      detail:"Due today"
-
-    };
-
-  }
-
-  const late =
-
-    days-task.maxDays;
+  */
 
   return{
 
-    state:"overdue",
+    state:"done",
 
-    progress:0,
+    progress:
+
+      Math.max(
+
+        0,
+
+        Math.min(
+
+          1,
+
+          displayedDaysLeft /
+
+          Math.max(
+
+            1,
+
+            task.maxDays + 1
+
+          )
+
+        )
+
+      ),
 
     detail:
 
-      "Overdue by " +
+      "Done — " +
 
-      late +
+      displayedDaysLeft +
 
       " day" +
 
-      (late===1 ? "" : "s")
+      (
+
+        displayedDaysLeft === 1
+
+        ? ""
+
+        : "s"
+
+      ) +
+
+      " left"
 
   };
 
@@ -1166,7 +1676,9 @@ function markDone(task){
 
   if(
 
-    task.lastDoneDate === today
+    task.lastDoneDate ===
+
+    today
 
   ){
 
@@ -1178,7 +1690,21 @@ function markDone(task){
 
     status(task).state;
 
-  if(task.type === "daily"){
+  task.previousDoneDate =
+
+    task.lastDoneDate;
+
+  /*
+
+    DAILY STREAKS
+
+  */
+
+  if(
+
+    task.type === "daily"
+
+  ){
 
     const yesterday =
 
@@ -1192,7 +1718,9 @@ function markDone(task){
 
     if(
 
-      task.lastDoneDate === yesterday
+      task.lastDoneDate ===
+
+      yesterday
 
     ){
 
@@ -1204,9 +1732,29 @@ function markDone(task){
 
     }
 
-  }else{
+  }
 
-    if(before === "overdue"){
+  /*
+
+    MULTI-DAY STREAKS
+
+    Completing before Overdue
+
+    continues streak.
+
+    Completing while Overdue
+
+    starts a new streak.
+
+  */
+
+  else{
+
+    if(
+
+      before === "overdue"
+
+    ){
 
       task.currentStreak=1;
 
@@ -1218,9 +1766,11 @@ function markDone(task){
 
   }
 
-  task.lastDoneDate=today;
+  task.lastDoneDate =
 
-  task.bestStreak=
+    today;
+
+  task.bestStreak =
 
     Math.max(
 
@@ -1238,7 +1788,7 @@ function markDone(task){
 
 }
 
-function markPending(task){
+function undoDone(task){
 
   const today =
 
@@ -1246,27 +1796,41 @@ function markPending(task){
 
   if(
 
-    task.lastDoneDate === today
+    task.lastDoneDate !==
+
+    today
 
   ){
 
-    task.lastDoneDate=null;
+    return;
 
-    if(task.currentStreak>0){
+  }
 
-      task.currentStreak--;
+  task.lastDoneDate =
 
-    }
+    task.previousDoneDate;
 
-    if(task.totalCompletions>0){
+  task.previousDoneDate =
 
-      task.totalCompletions--;
+    null;
 
-    }
+  if(
 
-  }else{
+    task.currentStreak > 0
 
-    task.lastDoneDate=null;
+  ){
+
+    task.currentStreak--;
+
+  }
+
+  if(
+
+    task.totalCompletions > 0
+
+  ){
+
+    task.totalCompletions--;
 
   }
 
@@ -1324,6 +1888,20 @@ function render(){
 
     );
 
+  /*
+
+    Urgency sorting:
+
+    overdue first,
+
+    then due today,
+
+    then pending,
+
+    then done.
+
+  */
+
   const rank = {
 
     overdue:0,
@@ -1344,9 +1922,13 @@ function render(){
 
       (a,b)=>{
 
-        const sa=status(a);
+        const sa =
 
-        const sb=status(b);
+          status(a);
+
+        const sb =
+
+          status(b);
 
         if(
 
@@ -1356,19 +1938,23 @@ function render(){
 
         ){
 
-          return
+          return (
 
             rank[sa.state] -
 
-            rank[sb.state];
+            rank[sb.state]
+
+          );
 
         }
 
-        return
+        return (
 
           a.createdAt -
 
-          b.createdAt;
+          b.createdAt
+
+        );
 
       }
 
@@ -1380,7 +1966,11 @@ function render(){
 
   list.innerHTML="";
 
-  if(!tasks.length){
+  if(
+
+    !tasks.length
+
+  ){
 
     list.innerHTML =
 
@@ -1392,7 +1982,13 @@ function render(){
 
   }
 
-  for(const task of tasks){
+  for(
+
+    const task
+
+    of tasks
+
+  ){
 
     const s =
 
@@ -1408,7 +2004,9 @@ function render(){
 
     card.className =
 
-      "task " + s.state;
+      "task " +
+
+      s.state;
 
     card.innerHTML = `
 
@@ -1436,11 +2034,15 @@ function render(){
 
             type="checkbox"
 
-            ${s.state==="done"
+            ${
+
+              s.state === "done"
 
               ? "checked"
 
-              : ""}>
+              : ""
+
+            }>
 
           <span></span>
 
@@ -1452,25 +2054,35 @@ function render(){
 
         <div
 
-          style="width:
+          style="
 
-          ${Math.round(
+            width:
 
-            Math.max(
+            ${
 
-              0,
+              Math.round(
 
-              Math.min(
+                Math.max(
 
-                1,
+                  0,
 
-                s.progress
+                  Math.min(
+
+                    1,
+
+                    s.progress
+
+                  )
+
+                )
+
+                *100
 
               )
 
-            )*100
+            }%
 
-          )}%">
+          ">
 
         </div>
 
@@ -1524,15 +2136,19 @@ function render(){
 
         "change",
 
-        e=>{
+        event=>{
 
-          if(e.target.checked){
+          if(
+
+            event.target.checked
+
+          ){
 
             markDone(task);
 
           }else{
 
-            markPending(task);
+            undoDone(task);
 
           }
 
@@ -1552,7 +2168,11 @@ function render(){
 
       );
 
-    list.appendChild(card);
+    list.appendChild(
+
+      card
+
+    );
 
   }
 
@@ -1566,7 +2186,9 @@ function updateSummary(){
 
     state.tasks.map(
 
-      t=>status(t).state
+      task =>
+
+      status(task).state
 
     );
 
@@ -1574,7 +2196,7 @@ function updateSummary(){
 
     states.filter(
 
-      x=>x==="overdue"
+      x => x === "overdue"
 
     ).length;
 
@@ -1582,7 +2204,7 @@ function updateSummary(){
 
     states.filter(
 
-      x=>x==="due"
+      x => x === "due"
 
     ).length;
 
@@ -1590,59 +2212,115 @@ function updateSummary(){
 
     states.filter(
 
-      x=>x==="pending"
+      x => x === "pending"
 
     ).length;
 
-  if(overdue){
+  /*
 
-    $("statusTitle").textContent =
+    OVERDUE EXISTS
+
+  */
+
+  if(
+
+    overdue
+
+  ){
+
+    $("statusTitle")
+
+      .textContent =
 
       overdue +
 
       " task" +
 
-      (overdue===1 ? "" : "s") +
+      (
+
+        overdue === 1
+
+        ? ""
+
+        : "s"
+
+      ) +
 
       " overdue";
 
-    $("statusCopy").textContent =
+    let waiting =
 
-      (due+pending)
+      due + pending;
 
-      ? (due+pending) +
+    $("statusCopy")
+
+      .textContent =
+
+      waiting
+
+      ? waiting +
 
         " more waiting."
 
       : "Nothing else is waiting.";
 
-    $("statusBadge").textContent =
+    $("statusBadge")
+
+      .textContent =
 
       overdue;
 
-    $("statusBadge").style.background =
+    $("statusBadge")
+
+      .style.background =
 
       "var(--red-soft)";
 
-    $("statusBadge").style.color =
+    $("statusBadge")
+
+      .style.color =
 
       "var(--red)";
 
+    return;
+
   }
 
-  else if(due){
+  /*
 
-    $("statusTitle").textContent =
+    DUE TODAY EXISTS
+
+  */
+
+  if(
+
+    due
+
+  ){
+
+    $("statusTitle")
+
+      .textContent =
 
       due +
 
       " task" +
 
-      (due===1 ? "" : "s") +
+      (
 
-      " due";
+        due === 1
 
-    $("statusCopy").textContent =
+        ? ""
+
+        : "s"
+
+      ) +
+
+      " due today";
+
+    $("statusCopy")
+
+      .textContent =
 
       pending
 
@@ -1652,57 +2330,123 @@ function updateSummary(){
 
       : "Nothing is overdue.";
 
-    $("statusBadge").textContent =
+    $("statusBadge")
+
+      .textContent =
 
       due;
 
-    $("statusBadge").style.background =
+    $("statusBadge")
 
-      "var(--amber-soft)";
+      .style.background =
 
-    $("statusBadge").style.color =
+      "var(--yellow-soft)";
 
-      "var(--amber)";
+    $("statusBadge")
+
+      .style.color =
+
+      "var(--yellow)";
+
+    return;
 
   }
 
-  else{
+  /*
 
-    $("statusTitle").textContent =
+    PENDING EXISTS
 
-      "No tasks due";
+  */
 
-    $("statusCopy").textContent =
+  if(
 
-      pending
+    pending
 
-      ? pending +
+  ){
 
-        " task" +
+    $("statusTitle")
 
-        (pending===1
+      .textContent =
 
-          ? " is"
+      "No tasks overdue";
 
-          : "s are") +
+    $("statusCopy")
 
-        " pending."
+      .textContent =
 
-      : "The field is clear.";
+      pending +
 
-    $("statusBadge").textContent =
+      " task" +
+
+      (
+
+        pending === 1
+
+        ? " is"
+
+        : "s are"
+
+      ) +
+
+      " pending.";
+
+    $("statusBadge")
+
+      .textContent =
 
       "✓";
 
-    $("statusBadge").style.background =
+    $("statusBadge")
+
+      .style.background =
 
       "var(--green-soft)";
 
-    $("statusBadge").style.color =
+    $("statusBadge")
+
+      .style.color =
 
       "var(--green)";
 
+    return;
+
   }
+
+  /*
+
+    EVERYTHING DONE
+
+  */
+
+  $("statusTitle")
+
+    .textContent =
+
+    "No tasks pending";
+
+  $("statusCopy")
+
+    .textContent =
+
+    "The field is clear.";
+
+  $("statusBadge")
+
+    .textContent =
+
+    "✓";
+
+  $("statusBadge")
+
+    .style.background =
+
+    "var(--green-soft)";
+
+  $("statusBadge")
+
+    .style.color =
+
+    "var(--green)";
 
 }
 
@@ -1780,13 +2524,13 @@ $("addBtn")
 
         "daily";
 
-      $("pendingAfter").value =
-
-        5;
-
       $("maxDays").value =
 
         7;
+
+      $("pendingWindow").value =
+
+        2;
 
       $("deleteBtn").hidden =
 
@@ -1830,13 +2574,13 @@ function openEdit(task){
 
     task.type;
 
-  $("pendingAfter").value =
-
-    task.pendingAfter ?? 5;
-
   $("maxDays").value =
 
     task.maxDays ?? 7;
+
+  $("pendingWindow").value =
+
+    task.pendingWindow ?? 2;
 
   $("deleteBtn").hidden =
 
@@ -1852,9 +2596,9 @@ form.addEventListener(
 
   "submit",
 
-  e=>{
+  event=>{
 
-    e.preventDefault();
+    event.preventDefault();
 
     const id =
 
@@ -1872,19 +2616,19 @@ form.addEventListener(
 
       $("taskType").value;
 
-    const pendingAfter =
-
-      Number(
-
-        $("pendingAfter").value
-
-      );
-
     const maxDays =
 
       Number(
 
         $("maxDays").value
+
+      );
+
+    const pendingWindow =
+
+      Number(
+
+        $("pendingWindow").value
 
       );
 
@@ -1896,15 +2640,11 @@ form.addEventListener(
 
     if(
 
-      type === "interval" &&
+      type === "interval"
 
-      (
+    ){
 
-        !Number.isInteger(
-
-          pendingAfter
-
-        ) ||
+      if(
 
         !Number.isInteger(
 
@@ -1912,29 +2652,41 @@ form.addEventListener(
 
         ) ||
 
-        pendingAfter < 1 ||
+        !Number.isInteger(
+
+          pendingWindow
+
+        ) ||
 
         maxDays < 1 ||
 
-        pendingAfter > maxDays
+        pendingWindow < 1 ||
 
-      )
+        pendingWindow >
 
-    ){
+        maxDays
 
-      alert(
+      ){
 
-        "Reset to Pending must " +
+        alert(
 
-        "be a whole number of days " +
+          "Maximum days and " +
 
-        "and cannot exceed the " +
+          "Pending window must " +
 
-        "Maximum allowable days."
+          "be whole numbers, " +
 
-      );
+          "and Pending window " +
 
-      return;
+          "cannot exceed " +
+
+          "Maximum days."
+
+        );
+
+        return;
+
+      }
 
     }
 
@@ -1944,7 +2696,9 @@ form.addEventListener(
 
         state.tasks.find(
 
-          t=>t.id===id
+          task =>
+
+          task.id === id
 
         );
 
@@ -1956,13 +2710,13 @@ form.addEventListener(
 
         type;
 
-      task.pendingAfter =
-
-        pendingAfter;
-
       task.maxDays =
 
         maxDays;
+
+      task.pendingWindow =
+
+        pendingWindow;
 
     }
 
@@ -1976,9 +2730,9 @@ form.addEventListener(
 
           type,
 
-          pendingAfter,
+          maxDays,
 
-          maxDays
+          pendingWindow
 
         )
 
@@ -2012,7 +2766,9 @@ $("deleteBtn")
 
         state.tasks.find(
 
-          t=>t.id===id
+          task =>
+
+          task.id === id
 
         );
 
@@ -2032,7 +2788,9 @@ $("deleteBtn")
 
           state.tasks.filter(
 
-            t=>t.id!==id
+            item =>
+
+            item.id !== id
 
           );
 
