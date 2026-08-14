@@ -42,7 +42,11 @@
 
 }
 
-*{box-sizing:border-box}
+*{
+
+  box-sizing:border-box;
+
+}
 
 html,body{
 
@@ -72,9 +76,17 @@ body{
 
 }
 
-button,input,select{font:inherit}
+button,input,select{
 
-button{cursor:pointer}
+  font:inherit;
+
+}
+
+button{
+
+  cursor:pointer;
+
+}
 
 .app{
 
@@ -138,7 +150,9 @@ h1{
 
 }
 
-.add,.save{
+.add,
+
+.save{
 
   border:0;
 
@@ -172,7 +186,11 @@ h1{
 
 }
 
-.status,.task,.award-card,.next-award{
+.status,
+
+.task,
+
+.award-task{
 
   background:var(--card);
 
@@ -482,7 +500,7 @@ h1{
 
 }
 
-/* DONE */
+/* Done */
 
 .done .switch span{
 
@@ -496,7 +514,7 @@ h1{
 
 }
 
-/* PENDING */
+/* Pending */
 
 .pending .switch span{
 
@@ -504,7 +522,7 @@ h1{
 
 }
 
-/* DUE TODAY */
+/* Due today */
 
 .due .switch span{
 
@@ -512,7 +530,7 @@ h1{
 
 }
 
-/* OVERDUE */
+/* Overdue */
 
 .overdue .switch span{
 
@@ -534,13 +552,13 @@ h1{
 
 }
 
-/* AWARDS PAGE */
-
 .hidden{
 
   display:none!important;
 
 }
+
+/* ---------------- AWARDS PAGE ---------------- */
 
 .awards-header{
 
@@ -554,73 +572,43 @@ h1{
 
 }
 
-.next-award{
-
-  padding:18px;
-
-  margin-bottom:16px;
-
-}
-
-.next-award-title{
-
-  font-size:20px;
-
-  font-weight:750;
-
-  margin-bottom:4px;
-
-}
-
-.next-award-copy{
-
-  color:var(--muted);
-
-  font-size:14px;
-
-}
-
-.award-grid{
+.awards-list{
 
   display:grid;
 
-  grid-template-columns:repeat(2,minmax(0,1fr));
-
-  gap:12px;
+  gap:14px;
 
 }
 
-.award-card{
+.award-task{
 
-  padding:16px;
+  padding:18px;
+
+}
+
+.award-task-top{
 
   display:flex;
 
-  align-items:center;
+  justify-content:space-between;
 
-  gap:14px;
+  gap:12px;
 
-  transition:.2s;
+  align-items:flex-start;
 
-}
-
-.award-card.locked{
-
-  opacity:.4;
-
-  filter:grayscale(.65);
+  margin-bottom:14px;
 
 }
 
-.award-card-title{
+.award-task-name{
 
-  font-size:18px;
+  font-size:22px;
 
   font-weight:750;
 
 }
 
-.award-card-copy{
+.award-task-streak{
 
   color:var(--muted);
 
@@ -630,31 +618,89 @@ h1{
 
 }
 
+.next-target{
+
+  background:var(--green-soft);
+
+  color:var(--green);
+
+  border-radius:12px;
+
+  padding:8px 10px;
+
+  font-size:12px;
+
+  font-weight:700;
+
+  text-align:right;
+
+}
+
+.award-row{
+
+  display:grid;
+
+  grid-template-columns:repeat(5,1fr);
+
+  gap:8px;
+
+}
+
+.award-item{
+
+  text-align:center;
+
+}
+
 .award-art{
 
-  width:84px;
+  width:100%;
 
-  height:84px;
+  aspect-ratio:1;
 
-  flex:0 0 auto;
-
-  border-radius:14px;
+  border-radius:12px;
 
   background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
 
   background-repeat:no-repeat;
 
-  box-shadow:0 3px 10px #0002;
+  box-shadow:0 2px 8px #0002;
+
+  transition:.2s;
+
+}
+
+.award-item.locked .award-art{
+
+  opacity:.25;
+
+  filter:grayscale(.8);
+
+}
+
+.award-number{
+
+  margin-top:5px;
+
+  font-size:12px;
+
+  font-weight:750;
+
+}
+
+.award-state{
+
+  color:var(--muted);
+
+  font-size:10px;
+
+  margin-top:1px;
 
 }
 
 /*
 
-  Medal sheet cropping.
-
-  Top row: 10 / 20 / 50
-
-  Bottom row: 100 / 200
+  Medal-sheet crops
 
 */
 
@@ -708,7 +754,7 @@ h1{
 
 }
 
-/* EDIT DIALOG */
+/* ---------------- DIALOG ---------------- */
 
 dialog{
 
@@ -776,7 +822,9 @@ dialog::backdrop{
 
 }
 
-input,select{
+input,
+
+select{
 
   width:100%;
 
@@ -818,7 +866,9 @@ input,select{
 
 }
 
-.ghost,.delete{
+.ghost,
+
+.delete{
 
   border:1px solid var(--line);
 
@@ -864,17 +914,21 @@ input,select{
 
   }
 
-  .award-grid{
+  .award-row{
 
-    grid-template-columns:1fr;
+    gap:5px;
 
   }
 
-  .award-art{
+  .award-number{
 
-    width:76px;
+    font-size:11px;
 
-    height:76px;
+  }
+
+  .award-state{
+
+    font-size:9px;
 
   }
 
@@ -886,7 +940,7 @@ input,select{
 
 <body>
 
-<!-- MAIN CHORES PAGE -->
+<!-- MAIN PAGE -->
 
 <main class="app" id="mainView">
 
@@ -896,13 +950,7 @@ input,select{
 
     <h1>Chores</h1>
 
-    <div
-
-      class="date"
-
-      id="date">
-
-    </div>
+    <div class="date" id="date"></div>
 
   </div>
 
@@ -998,7 +1046,7 @@ input,select{
 
       <div class="date">
 
-        Keep a task from becoming overdue to build its streak.
+        Every task has its own trophy case.
 
       </div>
 
@@ -1018,17 +1066,9 @@ input,select{
 
   <section
 
-    class="next-award"
+    class="awards-list"
 
-    id="nextAward">
-
-  </section>
-
-  <section
-
-    class="award-grid"
-
-    id="awardGrid">
+    id="awardsList">
 
   </section>
 
@@ -1260,9 +1300,13 @@ Otherwise they are Overdue.
 
 <script>
 
-const STORAGE_KEY = "chores2-v2";
+const STORAGE_KEY =
 
-const AWARDS = [10,20,50,100,200];
+  "chores2-v2";
+
+const AWARDS =
+
+  [10,20,50,100,200];
 
 const $ =
 
@@ -1404,19 +1448,13 @@ function makeTask(
 
     totalCompletions:0,
 
-    /*
-
-      streakStartDate is the first day
-
-      of the current uninterrupted streak.
-
-    */
-
     streakStartDate:null,
 
     previousStreakStartDate:null,
 
     bestStreakDays:0,
+
+    unlockedAwards:[],
 
     createdAt:Date.now()
 
@@ -1460,20 +1498,6 @@ function loadState(){
 
   ){
 
-    if(
-
-      !Array.isArray(
-
-        parsed.unlockedAwards
-
-      )
-
-    ){
-
-      parsed.unlockedAwards=[];
-
-    }
-
     for(
 
       const task
@@ -1484,9 +1508,7 @@ function loadState(){
 
       /*
 
-        Migration from older
-
-        Pending setting.
+        Migrate old Pending setting.
 
       */
 
@@ -1562,21 +1584,19 @@ function loadState(){
 
       /*
 
-        MIGRATION OF OLD STREAKS
+        Convert old streak data.
 
-        Old interval streaks counted
+        For daily tasks we can approximate
 
-        completions, not days, so they
+        the old daily streak accurately.
 
-        cannot be reconstructed exactly.
+        For multi-day tasks, old streaks
 
-        We begin their new day-streak
+        counted completions, so the new
 
-        from the most recent completion.
+        calendar-day streak begins at the
 
-        Daily streaks can be approximated
-
-        from the old count.
+        latest completion.
 
       */
 
@@ -1670,15 +1690,95 @@ function loadState(){
 
       }
 
+      /*
+
+        Every task gets its OWN
+
+        permanent award collection.
+
+      */
+
+      if(
+
+        !Array.isArray(
+
+          task.unlockedAwards
+
+        )
+
+      ){
+
+        task.unlockedAwards=[];
+
+      }
+
+      /*
+
+        If historical per-task best
+
+        already qualifies for medals,
+
+        grant them now.
+
+      */
+
+      for(
+
+        const milestone
+
+        of AWARDS
+
+      ){
+
+        if(
+
+          Number(
+
+            task.bestStreakDays ?? 0
+
+          ) >= milestone &&
+
+          !task.unlockedAwards.includes(
+
+            milestone
+
+          )
+
+        ){
+
+          task.unlockedAwards.push(
+
+            milestone
+
+          );
+
+        }
+
+      }
+
+      task.unlockedAwards.sort(
+
+        (a,b)=>a-b
+
+      );
+
     }
+
+    /*
+
+      Old global award field is no
+
+      longer used.
+
+    */
+
+    delete parsed.unlockedAwards;
 
     return parsed;
 
   }
 
   return{
-
-    unlockedAwards:[],
 
     tasks:[
 
@@ -1744,11 +1844,7 @@ function saveState(){
 
 }
 
-/*
-
-  TASK STATE
-
-*/
+/* ---------------- TASK STATUS ---------------- */
 
 function status(task){
 
@@ -1758,7 +1854,7 @@ function status(task){
 
   /*
 
-    DAILY TASKS
+    DAILY TASK
 
   */
 
@@ -1822,14 +1918,6 @@ function status(task){
 
     }
 
-    /*
-
-      Brand-new daily task:
-
-      Pending, not Overdue.
-
-    */
-
     if(
 
       !task.lastDoneDate &&
@@ -1868,7 +1956,7 @@ function status(task){
 
   /*
 
-    MULTI-DAY TASKS
+    MULTI-DAY TASK
 
   */
 
@@ -1907,12 +1995,6 @@ function status(task){
     task.maxDays -
 
     daysSince;
-
-  /*
-
-    OVERDUE
-
-  */
 
   if(
 
@@ -1958,12 +2040,6 @@ function status(task){
 
   }
 
-  /*
-
-    DUE TODAY
-
-  */
-
   if(
 
     daysUntilDue === 0
@@ -1986,9 +2062,9 @@ function status(task){
 
   /*
 
-    Inclusive display:
+    Inclusive visible count.
 
-    if due Monday,
+    Due Monday:
 
     Sunday = 2 days left.
 
@@ -1997,12 +2073,6 @@ function status(task){
   const displayedDaysLeft =
 
     daysUntilDue + 1;
-
-  /*
-
-    PENDING WINDOW
-
-  */
 
   if(
 
@@ -2064,12 +2134,6 @@ function status(task){
 
   }
 
-  /*
-
-    DONE
-
-  */
-
   return{
 
     state:"done",
@@ -2122,19 +2186,7 @@ function status(task){
 
 }
 
-/*
-
-  STREAKS
-
-  A streak means consecutive
-
-  CALENDAR DAYS during which
-
-  the task never became Overdue.
-
-  It does NOT count completions.
-
-*/
+/* ---------------- STREAKS ---------------- */
 
 function lastGoodDate(task){
 
@@ -2156,11 +2208,13 @@ function lastGoodDate(task){
 
     /*
 
-      A daily task remains alive
+      If last completed Monday,
 
-      through the day after its
+      Tuesday is Pending and still
 
-      most recent completion.
+      part of the unbroken streak.
+
+      Wednesday is Overdue.
 
     */
 
@@ -2176,9 +2230,9 @@ function lastGoodDate(task){
 
   /*
 
-    Interval streak remains alive
+    Multi-day streak survives
 
-    through its Due Today date.
+    through Due Today.
 
   */
 
@@ -2316,21 +2370,95 @@ function reconcileStreaks(){
 
 }
 
-function updateAwards(){
+/*
+
+  Permanently unlock medals
+
+  for each individual task.
+
+*/
+
+function updateTaskAwards(task){
 
   if(
 
     !Array.isArray(
 
-      state.unlockedAwards
+      task.unlockedAwards
 
     )
 
   ){
 
-    state.unlockedAwards=[];
+    task.unlockedAwards=[];
 
   }
+
+  const current =
+
+    currentStreakDays(task);
+
+  task.bestStreakDays =
+
+    Math.max(
+
+      Number(
+
+        task.bestStreakDays ?? 0
+
+      ),
+
+      current
+
+    );
+
+  for(
+
+    const milestone
+
+    of AWARDS
+
+  ){
+
+    if(
+
+      task.bestStreakDays >=
+
+      milestone
+
+    ){
+
+      if(
+
+        !task.unlockedAwards.includes(
+
+          milestone
+
+        )
+
+      ){
+
+        task.unlockedAwards.push(
+
+          milestone
+
+        );
+
+      }
+
+    }
+
+  }
+
+  task.unlockedAwards.sort(
+
+    (a,b)=>a-b
+
+  );
+
+}
+
+function updateAllTaskAwards(){
 
   for(
 
@@ -2340,77 +2468,17 @@ function updateAwards(){
 
   ){
 
-    const current =
+    updateTaskAwards(
 
-      currentStreakDays(task);
+      task
 
-    task.bestStreakDays =
-
-      Math.max(
-
-        Number(
-
-          task.bestStreakDays ?? 0
-
-        ),
-
-        current
-
-      );
-
-    for(
-
-      const milestone
-
-      of AWARDS
-
-    ){
-
-      if(
-
-        task.bestStreakDays >=
-
-        milestone
-
-      ){
-
-        if(
-
-          !state.unlockedAwards.includes(
-
-            milestone
-
-          )
-
-        ){
-
-          state.unlockedAwards.push(
-
-            milestone
-
-          );
-
-        }
-
-      }
-
-    }
+    );
 
   }
 
-  state.unlockedAwards.sort(
-
-    (a,b)=>a-b
-
-  );
-
 }
 
-/*
-
-  COMPLETE / UNDO
-
-*/
+/* ---------------- COMPLETION ---------------- */
 
 function markDone(task){
 
@@ -2432,9 +2500,11 @@ function markDone(task){
 
   /*
 
-    First record any streak
+    Record any streak that has
 
-    that has already broken.
+    already expired before
+
+    starting a fresh one.
 
   */
 
@@ -2447,14 +2517,6 @@ function markDone(task){
   task.previousStreakStartDate =
 
     task.streakStartDate;
-
-  /*
-
-    If there is no active streak,
-
-    this completion starts one.
-
-  */
 
   if(
 
@@ -2474,21 +2536,11 @@ function markDone(task){
 
   task.totalCompletions++;
 
-  task.bestStreakDays =
+  updateTaskAwards(
 
-    Math.max(
+    task
 
-      Number(
-
-        task.bestStreakDays ?? 0
-
-      ),
-
-      currentStreakDays(task)
-
-    );
-
-  updateAwards();
+  );
 
   saveState();
 
@@ -2540,11 +2592,21 @@ function undoDone(task){
 
   }
 
+  /*
+
+    Awards are deliberately NOT
+
+    removed. Once earned, earned.
+
+  */
+
   saveState();
 
   render();
 
 }
+
+/* ---------------- DISPLAY HELPERS ---------------- */
 
 function escapeHtml(text){
 
@@ -2570,12 +2632,6 @@ function escapeHtml(text){
 
 }
 
-/*
-
-  MEDAL HTML
-
-*/
-
 function medalClass(days){
 
   return "medal" + days;
@@ -2584,17 +2640,31 @@ function medalClass(days){
 
 function medalsForTask(task){
 
-  const streak =
+  if(
 
-    currentStreakDays(task);
+    !Array.isArray(
 
-  return AWARDS
+      task.unlockedAwards
+
+    )
+
+  ){
+
+    return "";
+
+  }
+
+  return task.unlockedAwards
 
     .filter(
 
       milestone =>
 
-      streak >= milestone
+      AWARDS.includes(
+
+        milestone
+
+      )
 
     )
 
@@ -2606,7 +2676,7 @@ function medalsForTask(task){
 
         class="mini-medal ${medalClass(milestone)}"
 
-        title="${milestone}-day streak">
+        title="${milestone}-day award">
 
       </div>`
 
@@ -2616,17 +2686,13 @@ function medalsForTask(task){
 
 }
 
-/*
-
-  MAIN PAGE
-
-*/
+/* ---------------- MAIN SCREEN ---------------- */
 
 function render(){
 
   reconcileStreaks();
 
-  updateAwards();
+  updateAllTaskAwards();
 
   $("date").textContent =
 
@@ -2745,20 +2811,6 @@ function render(){
     const streak =
 
       currentStreakDays(task);
-
-    task.bestStreakDays =
-
-      Math.max(
-
-        Number(
-
-          task.bestStreakDays ?? 0
-
-        ),
-
-        streak
-
-      );
 
     const card =
 
@@ -2968,11 +3020,7 @@ function render(){
 
 }
 
-/*
-
-  TOP SUMMARY
-
-*/
+/* ---------------- TOP SUMMARY ---------------- */
 
 function updateSummary(){
 
@@ -2990,7 +3038,9 @@ function updateSummary(){
 
     states.filter(
 
-      x => x === "overdue"
+      x =>
+
+      x === "overdue"
 
     ).length;
 
@@ -2998,7 +3048,9 @@ function updateSummary(){
 
     states.filter(
 
-      x => x === "due"
+      x =>
+
+      x === "due"
 
     ).length;
 
@@ -3006,7 +3058,9 @@ function updateSummary(){
 
     states.filter(
 
-      x => x === "pending"
+      x =>
+
+      x === "pending"
 
     ).length;
 
@@ -3220,137 +3274,113 @@ function updateSummary(){
 
 }
 
-/*
-
-  AWARDS PAGE
-
-*/
+/* ---------------- AWARDS PAGE ---------------- */
 
 function renderAwards(){
 
   reconcileStreaks();
 
-  updateAwards();
+  updateAllTaskAwards();
 
-  const unlocked =
+  const list =
 
-    state.unlockedAwards;
+    $("awardsList");
 
-  const bestCurrent =
-
-    Math.max(
-
-      0,
-
-      ...state.tasks.map(
-
-        task =>
-
-        currentStreakDays(task)
-
-      )
-
-    );
-
-  const next =
-
-    AWARDS.find(
-
-      milestone =>
-
-      !unlocked.includes(
-
-        milestone
-
-      )
-
-    );
+  list.innerHTML="";
 
   if(
 
-    next
+    !state.tasks.length
 
   ){
 
-    const remaining =
+    list.innerHTML =
 
-      Math.max(
+      '<div class="empty">' +
 
-        0,
+      'No tasks yet.' +
 
-        next - bestCurrent
+      '</div>';
 
-      );
-
-    $("nextAward")
-
-      .innerHTML = `
-
-        <div class="next-award-title">
-
-          Next award: ${next} days
-
-        </div>
-
-        <div class="next-award-copy">
-
-          ${
-
-            bestCurrent > 0
-
-            ? `Your longest active streak is ${bestCurrent} days. ${remaining} day${remaining===1?"":"s"} to go.`
-
-            : `Build a ${next}-day streak without letting a task become overdue.`
-
-          }
-
-        </div>
-
-      `;
-
-  }else{
-
-    $("nextAward")
-
-      .innerHTML = `
-
-        <div class="next-award-title">
-
-          All current awards earned
-
-        </div>
-
-        <div class="next-award-copy">
-
-          You have reached the 200-day mark. We will have to invent something more extravagant.
-
-        </div>
-
-      `;
+    return;
 
   }
 
-  const grid =
-
-    $("awardGrid");
-
-  grid.innerHTML="";
-
   for(
 
-    const milestone
+    const task
 
-    of AWARDS
+    of state.tasks
 
   ){
 
-    const earned =
+    const streak =
 
-      unlocked.includes(
+      currentStreakDays(task);
 
-        milestone
+    const next =
+
+      AWARDS.find(
+
+        milestone =>
+
+        !task.unlockedAwards.includes(
+
+          milestone
+
+        )
 
       );
+
+    let nextText;
+
+    if(
+
+      next
+
+    ){
+
+      const remaining =
+
+        Math.max(
+
+          0,
+
+          next - streak
+
+        );
+
+      nextText =
+
+        remaining === 0
+
+        ? "Award ready"
+
+        : remaining +
+
+          " day" +
+
+          (
+
+            remaining === 1
+
+            ? ""
+
+            : "s"
+
+          ) +
+
+          " to " +
+
+          next;
+
+    }else{
+
+      nextText =
+
+        "All awards earned";
+
+    }
 
     const card =
 
@@ -3362,53 +3392,115 @@ function renderAwards(){
 
     card.className =
 
-      "award-card " +
+      "award-task";
 
-      (
+    const awardItems =
 
-        earned
+      AWARDS.map(
 
-        ? ""
+        milestone =>{
 
-        : "locked"
+          const earned =
 
-      );
+            task.unlockedAwards.includes(
+
+              milestone
+
+            );
+
+          return `
+
+            <div
+
+              class="award-item ${
+
+                earned
+
+                ? ""
+
+                : "locked"
+
+              }">
+
+              <div
+
+                class="award-art art${milestone}">
+
+              </div>
+
+              <div class="award-number">
+
+                ${milestone}
+
+              </div>
+
+              <div class="award-state">
+
+                ${
+
+                  earned
+
+                  ? "Earned"
+
+                  : "Locked"
+
+                }
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+
+      ).join("");
 
     card.innerHTML = `
 
-      <div
+      <div class="award-task-top">
 
-        class="award-art art${milestone}">
+        <div>
+
+          <div class="award-task-name">
+
+            ${escapeHtml(task.name)}
+
+          </div>
+
+          <div class="award-task-streak">
+
+            Current streak:
+
+            ${streak}
+
+            day${streak===1?"":"s"}
+
+            · Best:
+
+            ${task.bestStreakDays}
+
+          </div>
+
+        </div>
+
+        <div class="next-target">
+
+          ${nextText}
+
+        </div>
 
       </div>
 
-      <div>
+      <div class="award-row">
 
-        <div class="award-card-title">
-
-          ${milestone}-day streak
-
-        </div>
-
-        <div class="award-card-copy">
-
-          ${
-
-            earned
-
-            ? "Earned"
-
-            : `Keep any task from becoming overdue for ${milestone} consecutive days.`
-
-          }
-
-        </div>
+        ${awardItems}
 
       </div>
 
     `;
 
-    grid.appendChild(
+    list.appendChild(
 
       card
 
@@ -3504,11 +3596,7 @@ $("backBtn")
 
   );
 
-/*
-
-  TASK EDITOR
-
-*/
+/* ---------------- TASK EDITOR ---------------- */
 
 const dialog =
 
