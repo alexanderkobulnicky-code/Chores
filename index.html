@@ -28,15 +28,33 @@
 
   --line:#dfe3dd;
 
-  --green:#315f4a;
+  --done-slider:#315f4a;
+
+  --done-bg:#dfe8e2;
+
+  --done-border:#c4d2c8;
+
+  --pending-slider:#c6a52e;
+
+  --pending-bg:#f3ecd0;
+
+  --pending-border:#ddd09b;
+
+  --due-slider:#d77b2f;
+
+  --due-bg:#f3dfcf;
+
+  --due-border:#dfb58f;
+
+  --overdue-slider:#a7463f;
+
+  --overdue-bg:#f0d9d7;
+
+  --overdue-border:#d9aaa6;
 
   --green-soft:#dfece5;
 
-  --yellow:#d6a72d;
-
-  --yellow-soft:#f6edcc;
-
-  --red:#a7463f;
+  --orange-soft:#f6e3d1;
 
   --red-soft:#f5dfdd;
 
@@ -188,8 +206,6 @@ h1{
 
 .status,
 
-.task,
-
 .award-task{
 
   background:var(--card);
@@ -244,7 +260,7 @@ h1{
 
   background:var(--green-soft);
 
-  color:var(--green);
+  color:var(--done-slider);
 
   font-weight:800;
 
@@ -278,11 +294,51 @@ h1{
 
   padding:18px;
 
+  border:1px solid var(--line);
+
+  border-radius:18px;
+
+  box-shadow:0 8px 26px rgba(20,30,24,.055);
+
+  transition:
+
+    background .2s ease,
+
+    border-color .2s ease;
+
+}
+
+/* STATE CARD COLORS */
+
+.task.done{
+
+  background:var(--done-bg);
+
+  border-color:var(--done-border);
+
+}
+
+.task.pending{
+
+  background:var(--pending-bg);
+
+  border-color:var(--pending-border);
+
+}
+
+.task.due{
+
+  background:var(--due-bg);
+
+  border-color:var(--due-border);
+
 }
 
 .task.overdue{
 
-  border-color:#e0b2ae;
+  background:var(--overdue-bg);
+
+  border-color:var(--overdue-border);
 
 }
 
@@ -368,7 +424,7 @@ h1{
 
   height:8px;
 
-  background:#e9ece8;
+  background:rgba(255,255,255,.5);
 
   border-radius:99px;
 
@@ -384,25 +440,29 @@ h1{
 
   border-radius:inherit;
 
-  background:var(--green);
+}
+
+.done .bar>div{
+
+  background:var(--done-slider);
 
 }
 
 .pending .bar>div{
 
-  background:#b8bdb8;
+  background:var(--pending-slider);
 
 }
 
 .due .bar>div{
 
-  background:var(--yellow);
+  background:var(--due-slider);
 
 }
 
 .overdue .bar>div{
 
-  background:var(--red);
+  background:var(--overdue-slider);
 
 }
 
@@ -468,8 +528,6 @@ h1{
 
   inset:0;
 
-  background:#cfd4cf;
-
   border-radius:99px;
 
   transition:.18s;
@@ -504,7 +562,7 @@ h1{
 
 .done .switch span{
 
-  background:var(--green);
+  background:var(--done-slider);
 
 }
 
@@ -518,7 +576,7 @@ h1{
 
 .pending .switch span{
 
-  background:#aeb4af;
+  background:var(--pending-slider);
 
 }
 
@@ -526,7 +584,7 @@ h1{
 
 .due .switch span{
 
-  background:var(--yellow);
+  background:var(--due-slider);
 
 }
 
@@ -534,7 +592,7 @@ h1{
 
 .overdue .switch span{
 
-  background:var(--red);
+  background:var(--overdue-slider);
 
 }
 
@@ -622,7 +680,7 @@ h1{
 
   background:var(--green-soft);
 
-  color:var(--green);
+  color:var(--done-slider);
 
   border-radius:12px;
 
@@ -878,7 +936,7 @@ select{
 
 .delete{
 
-  color:var(--red);
+  color:var(--overdue-slider);
 
 }
 
@@ -2026,14 +2084,6 @@ function status(task){
 
       now.getDay();
 
-    /*
-
-      Locate the beginning of
-
-      the current weekly window.
-
-    */
-
     const daysSinceReset =
 
       (
@@ -2088,16 +2138,6 @@ function status(task){
 
       );
 
-    /*
-
-      If done at any point since
-
-      this week's reset, the weekly
-
-      task is finished for this week.
-
-    */
-
     const doneThisWeek =
 
       task.lastDoneDate &&
@@ -2124,16 +2164,6 @@ function status(task){
 
     }
 
-    /*
-
-      Determine whether this task
-
-      existed during the preceding
-
-      weekly window.
-
-    */
-
     const createdKey =
 
       localDateKey(
@@ -2152,14 +2182,6 @@ function status(task){
 
       currentWeekStart;
 
-    /*
-
-      Was it done at least once
-
-      during the preceding week?
-
-    */
-
     const completedLastWeek =
 
       task.lastDoneDate &&
@@ -2171,18 +2193,6 @@ function status(task){
       task.lastDoneDate <=
 
         previousWeekEnd;
-
-    /*
-
-      If last week's window passed
-
-      without completion, the task
-
-      is now Overdue and remains so
-
-      until completed.
-
-    */
 
     if(
 
@@ -2203,12 +2213,6 @@ function status(task){
       };
 
     }
-
-    /*
-
-      Final day of this weekly window.
-
-    */
 
     const dueWeekday =
 
@@ -2239,24 +2243,6 @@ function status(task){
       };
 
     }
-
-    /*
-
-      Inclusive countdown.
-
-      Monday reset:
-
-      Monday = 7 days left
-
-      Tuesday = 6
-
-      ...
-
-      Saturday = 2
-
-      Sunday = Due Today
-
-    */
 
     const ordinaryDaysUntilDue =
 
@@ -2552,8 +2538,6 @@ function lastGoodDate(task){
 
   }
 
-  /* Daily */
-
   if(
 
     task.type === "daily"
@@ -2569,8 +2553,6 @@ function lastGoodDate(task){
     );
 
   }
-
-  /* Weekly */
 
   if(
 
@@ -2606,14 +2588,6 @@ function lastGoodDate(task){
 
       ) % 7;
 
-    /*
-
-      Week in which the most recent
-
-      completion occurred.
-
-    */
-
     const completionWeekStart =
 
       addDaysKey(
@@ -2624,26 +2598,6 @@ function lastGoodDate(task){
 
       );
 
-    /*
-
-      Completing a weekly task
-
-      satisfies that week.
-
-      The following week's deadline
-
-      can then be reached without
-
-      breaking the streak.
-
-      Therefore a missed recurrence
-
-      breaks only after the end of
-
-      the following weekly window.
-
-    */
-
     return addDaysKey(
 
       completionWeekStart,
@@ -2653,8 +2607,6 @@ function lastGoodDate(task){
     );
 
   }
-
-  /* Every N days */
 
   return addDaysKey(
 
@@ -2997,12 +2949,6 @@ function undoDone(task){
     task.totalCompletions--;
 
   }
-
-  /*
-
-    Earned awards remain earned.
-
-  */
 
   saveState();
 
@@ -3538,7 +3484,7 @@ function updateSummary(){
 
       .style.color =
 
-      "var(--red)";
+      "var(--overdue-slider)";
 
     return;
 
@@ -3592,13 +3538,13 @@ function updateSummary(){
 
       .style.background =
 
-      "var(--yellow-soft)";
+      "var(--orange-soft)";
 
     $("statusBadge")
 
       .style.color =
 
-      "var(--yellow)";
+      "var(--due-slider)";
 
     return;
 
@@ -3652,7 +3598,7 @@ function updateSummary(){
 
       .style.color =
 
-      "var(--green)";
+      "var(--done-slider)";
 
     return;
 
@@ -3686,7 +3632,7 @@ function updateSummary(){
 
     .style.color =
 
-    "var(--green)";
+    "var(--done-slider)";
 
 }
 
