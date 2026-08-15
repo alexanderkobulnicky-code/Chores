@@ -500,7 +500,7 @@ h1{
 
 }
 
-/* Done */
+/* DONE */
 
 .done .switch span{
 
@@ -514,7 +514,7 @@ h1{
 
 }
 
-/* Pending */
+/* PENDING */
 
 .pending .switch span{
 
@@ -522,7 +522,7 @@ h1{
 
 }
 
-/* Due today */
+/* DUE TODAY */
 
 .due .switch span{
 
@@ -530,7 +530,7 @@ h1{
 
 }
 
-/* Overdue */
+/* OVERDUE */
 
 .overdue .switch span{
 
@@ -698,11 +698,7 @@ h1{
 
 }
 
-/*
-
-  Medal-sheet crops
-
-*/
+/* Medal sheet crops */
 
 .medal10,
 
@@ -1132,6 +1128,12 @@ select{
 
   </option>
 
+  <option value="weekly">
+
+    Weekly
+
+  </option>
+
   <option value="interval">
 
     Every N days
@@ -1141,6 +1143,84 @@ select{
 </select>
 
 </div>
+
+<!-- WEEKLY SETTINGS -->
+
+<div
+
+  id="weeklyFields"
+
+  class="hidden">
+
+<div class="field">
+
+<label for="resetWeekday">
+
+  Resets to Pending
+
+</label>
+
+<select id="resetWeekday">
+
+  <option value="0">
+
+    Sunday
+
+  </option>
+
+  <option value="1" selected>
+
+    Monday
+
+  </option>
+
+  <option value="2">
+
+    Tuesday
+
+  </option>
+
+  <option value="3">
+
+    Wednesday
+
+  </option>
+
+  <option value="4">
+
+    Thursday
+
+  </option>
+
+  <option value="5">
+
+    Friday
+
+  </option>
+
+  <option value="6">
+
+    Saturday
+
+  </option>
+
+</select>
+
+</div>
+
+<p class="fine">
+
+The task may be completed at any time during the week.
+
+It is Due Today on the day before this setting.
+
+If you miss the weekly window, it becomes Overdue when the new week begins.
+
+</p>
+
+</div>
+
+<!-- EVERY-N-DAYS SETTINGS -->
 
 <div
 
@@ -1174,7 +1254,11 @@ select{
 
 <div class="field">
 
-<label>Unit</label>
+<label>
+
+  Unit
+
+</label>
 
 <input
 
@@ -1212,7 +1296,11 @@ select{
 
 <div class="field">
 
-<label>Unit</label>
+<label>
+
+  Unit
+
+</label>
 
 <input
 
@@ -1237,6 +1325,8 @@ and becomes Overdue Tuesday.
 </p>
 
 </div>
+
+<!-- DAILY NOTE -->
 
 <div
 
@@ -1442,6 +1532,8 @@ function makeTask(
 
     pendingWindow,
 
+    resetWeekday:1,
+
     lastDoneDate:null,
 
     previousDoneDate:null,
@@ -1506,12 +1598,6 @@ function loadState(){
 
     ){
 
-      /*
-
-        Migrate old Pending setting.
-
-      */
-
       if(
 
         task.pendingWindow == null
@@ -1562,6 +1648,18 @@ function loadState(){
 
       if(
 
+        task.resetWeekday ==
+
+        null
+
+      ){
+
+        task.resetWeekday=1;
+
+      }
+
+      if(
+
         task.previousDoneDate ===
 
         undefined
@@ -1574,31 +1672,15 @@ function loadState(){
 
       if(
 
-        task.totalCompletions == null
+        task.totalCompletions ==
+
+        null
 
       ){
 
         task.totalCompletions=0;
 
       }
-
-      /*
-
-        Convert old streak data.
-
-        For daily tasks we can approximate
-
-        the old daily streak accurately.
-
-        For multi-day tasks, old streaks
-
-        counted completions, so the new
-
-        calendar-day streak begins at the
-
-        latest completion.
-
-      */
 
       if(
 
@@ -1690,14 +1772,6 @@ function loadState(){
 
       }
 
-      /*
-
-        Every task gets its OWN
-
-        permanent award collection.
-
-      */
-
       if(
 
         !Array.isArray(
@@ -1711,16 +1785,6 @@ function loadState(){
         task.unlockedAwards=[];
 
       }
-
-      /*
-
-        If historical per-task best
-
-        already qualifies for medals,
-
-        grant them now.
-
-      */
 
       for(
 
@@ -1763,14 +1827,6 @@ function loadState(){
       );
 
     }
-
-    /*
-
-      Old global award field is no
-
-      longer used.
-
-    */
 
     delete parsed.unlockedAwards;
 
@@ -1844,7 +1900,11 @@ function saveState(){
 
 }
 
-/* ---------------- TASK STATUS ---------------- */
+/* ==================================================
+
+   TASK STATUS
+
+   ================================================== */
 
 function status(task){
 
@@ -1852,11 +1912,7 @@ function status(task){
 
     localDateKey();
 
-  /*
-
-    DAILY TASK
-
-  */
+  /* ---------- DAILY ---------- */
 
   if(
 
@@ -1878,9 +1934,7 @@ function status(task){
 
         progress:1,
 
-        detail:
-
-          "Done for today"
+        detail:"Done for today"
 
       };
 
@@ -1910,9 +1964,7 @@ function status(task){
 
         progress:0,
 
-        detail:
-
-          "Pending today"
+        detail:"Pending today"
 
       };
 
@@ -1932,9 +1984,7 @@ function status(task){
 
         progress:0,
 
-        detail:
-
-          "Pending today"
+        detail:"Pending today"
 
       };
 
@@ -1946,19 +1996,329 @@ function status(task){
 
       progress:0,
 
-      detail:
-
-        "Overdue"
+      detail:"Overdue"
 
     };
 
   }
 
-  /*
+  /* ---------- WEEKLY ---------- */
 
-    MULTI-DAY TASK
+  if(
 
-  */
+    task.type === "weekly"
+
+  ){
+
+    const resetDay =
+
+      Number(
+
+        task.resetWeekday ?? 1
+
+      );
+
+    const now =
+
+      new Date();
+
+    const todayWeekday =
+
+      now.getDay();
+
+    /*
+
+      Locate the beginning of
+
+      the current weekly window.
+
+    */
+
+    const daysSinceReset =
+
+      (
+
+        todayWeekday -
+
+        resetDay +
+
+        7
+
+      ) % 7;
+
+    const currentWeekStartDate =
+
+      new Date(
+
+        now.getFullYear(),
+
+        now.getMonth(),
+
+        now.getDate() -
+
+        daysSinceReset
+
+      );
+
+    const currentWeekStart =
+
+      localDateKey(
+
+        currentWeekStartDate
+
+      );
+
+    const previousWeekStart =
+
+      addDaysKey(
+
+        currentWeekStart,
+
+        -7
+
+      );
+
+    const previousWeekEnd =
+
+      addDaysKey(
+
+        currentWeekStart,
+
+        -1
+
+      );
+
+    /*
+
+      If done at any point since
+
+      this week's reset, the weekly
+
+      task is finished for this week.
+
+    */
+
+    const doneThisWeek =
+
+      task.lastDoneDate &&
+
+      task.lastDoneDate >=
+
+        currentWeekStart;
+
+    if(
+
+      doneThisWeek
+
+    ){
+
+      return{
+
+        state:"done",
+
+        progress:1,
+
+        detail:"Done for this week"
+
+      };
+
+    }
+
+    /*
+
+      Determine whether this task
+
+      existed during the preceding
+
+      weekly window.
+
+    */
+
+    const createdKey =
+
+      localDateKey(
+
+        new Date(
+
+          task.createdAt
+
+        )
+
+      );
+
+    const existedLastWeek =
+
+      createdKey <
+
+      currentWeekStart;
+
+    /*
+
+      Was it done at least once
+
+      during the preceding week?
+
+    */
+
+    const completedLastWeek =
+
+      task.lastDoneDate &&
+
+      task.lastDoneDate >=
+
+        previousWeekStart &&
+
+      task.lastDoneDate <=
+
+        previousWeekEnd;
+
+    /*
+
+      If last week's window passed
+
+      without completion, the task
+
+      is now Overdue and remains so
+
+      until completed.
+
+    */
+
+    if(
+
+      existedLastWeek &&
+
+      !completedLastWeek
+
+    ){
+
+      return{
+
+        state:"overdue",
+
+        progress:0,
+
+        detail:"Overdue — missed last week"
+
+      };
+
+    }
+
+    /*
+
+      Final day of this weekly window.
+
+    */
+
+    const dueWeekday =
+
+      (
+
+        resetDay +
+
+        6
+
+      ) % 7;
+
+    if(
+
+      todayWeekday ===
+
+      dueWeekday
+
+    ){
+
+      return{
+
+        state:"due",
+
+        progress:0,
+
+        detail:"Due Today"
+
+      };
+
+    }
+
+    /*
+
+      Inclusive countdown.
+
+      Monday reset:
+
+      Monday = 7 days left
+
+      Tuesday = 6
+
+      ...
+
+      Saturday = 2
+
+      Sunday = Due Today
+
+    */
+
+    const ordinaryDaysUntilDue =
+
+      (
+
+        dueWeekday -
+
+        todayWeekday +
+
+        7
+
+      ) % 7;
+
+    const displayedDaysLeft =
+
+      ordinaryDaysUntilDue + 1;
+
+    return{
+
+      state:"pending",
+
+      progress:
+
+        Math.max(
+
+          0,
+
+          Math.min(
+
+            1,
+
+            displayedDaysLeft / 7
+
+          )
+
+        ),
+
+      detail:
+
+        "Pending — " +
+
+        displayedDaysLeft +
+
+        " day" +
+
+        (
+
+          displayedDaysLeft === 1
+
+          ? ""
+
+          : "s"
+
+        ) +
+
+        " left"
+
+    };
+
+  }
+
+  /* ---------- EVERY N DAYS ---------- */
 
   if(
 
@@ -2052,23 +2412,11 @@ function status(task){
 
       progress:0,
 
-      detail:
-
-        "Due Today"
+      detail:"Due Today"
 
     };
 
   }
-
-  /*
-
-    Inclusive visible count.
-
-    Due Monday:
-
-    Sunday = 2 days left.
-
-  */
 
   const displayedDaysLeft =
 
@@ -2186,7 +2534,11 @@ function status(task){
 
 }
 
-/* ---------------- STREAKS ---------------- */
+/* ==================================================
+
+   STREAKS
+
+   ================================================== */
 
 function lastGoodDate(task){
 
@@ -2200,23 +2552,13 @@ function lastGoodDate(task){
 
   }
 
+  /* Daily */
+
   if(
 
     task.type === "daily"
 
   ){
-
-    /*
-
-      If last completed Monday,
-
-      Tuesday is Pending and still
-
-      part of the unbroken streak.
-
-      Wednesday is Overdue.
-
-    */
 
     return addDaysKey(
 
@@ -2228,13 +2570,91 @@ function lastGoodDate(task){
 
   }
 
-  /*
+  /* Weekly */
 
-    Multi-day streak survives
+  if(
 
-    through Due Today.
+    task.type === "weekly"
 
-  */
+  ){
+
+    const resetDay =
+
+      Number(
+
+        task.resetWeekday ?? 1
+
+      );
+
+    const doneDate =
+
+      dateFromKey(
+
+        task.lastDoneDate
+
+      );
+
+    const daysSinceReset =
+
+      (
+
+        doneDate.getDay() -
+
+        resetDay +
+
+        7
+
+      ) % 7;
+
+    /*
+
+      Week in which the most recent
+
+      completion occurred.
+
+    */
+
+    const completionWeekStart =
+
+      addDaysKey(
+
+        task.lastDoneDate,
+
+        -daysSinceReset
+
+      );
+
+    /*
+
+      Completing a weekly task
+
+      satisfies that week.
+
+      The following week's deadline
+
+      can then be reached without
+
+      breaking the streak.
+
+      Therefore a missed recurrence
+
+      breaks only after the end of
+
+      the following weekly window.
+
+    */
+
+    return addDaysKey(
+
+      completionWeekStart,
+
+      13
+
+    );
+
+  }
+
+  /* Every N days */
 
   return addDaysKey(
 
@@ -2370,13 +2790,11 @@ function reconcileStreaks(){
 
 }
 
-/*
+/* ==================================================
 
-  Permanently unlock medals
+   AWARDS
 
-  for each individual task.
-
-*/
+   ================================================== */
 
 function updateTaskAwards(task){
 
@@ -2424,27 +2842,21 @@ function updateTaskAwards(task){
 
       task.bestStreakDays >=
 
-      milestone
+      milestone &&
+
+      !task.unlockedAwards.includes(
+
+        milestone
+
+      )
 
     ){
 
-      if(
+      task.unlockedAwards.push(
 
-        !task.unlockedAwards.includes(
+        milestone
 
-          milestone
-
-        )
-
-      ){
-
-        task.unlockedAwards.push(
-
-          milestone
-
-        );
-
-      }
+      );
 
     }
 
@@ -2478,7 +2890,11 @@ function updateAllTaskAwards(){
 
 }
 
-/* ---------------- COMPLETION ---------------- */
+/* ==================================================
+
+   COMPLETE / UNDO
+
+   ================================================== */
 
 function markDone(task){
 
@@ -2497,16 +2913,6 @@ function markDone(task){
     return;
 
   }
-
-  /*
-
-    Record any streak that has
-
-    already expired before
-
-    starting a fresh one.
-
-  */
 
   reconcileStreaks();
 
@@ -2594,9 +3000,7 @@ function undoDone(task){
 
   /*
 
-    Awards are deliberately NOT
-
-    removed. Once earned, earned.
+    Earned awards remain earned.
 
   */
 
@@ -2606,7 +3010,11 @@ function undoDone(task){
 
 }
 
-/* ---------------- DISPLAY HELPERS ---------------- */
+/* ==================================================
+
+   HELPERS
+
+   ================================================== */
 
 function escapeHtml(text){
 
@@ -2686,7 +3094,11 @@ function medalsForTask(task){
 
 }
 
-/* ---------------- MAIN SCREEN ---------------- */
+/* ==================================================
+
+   MAIN SCREEN
+
+   ================================================== */
 
 function render(){
 
@@ -3020,7 +3432,11 @@ function render(){
 
 }
 
-/* ---------------- TOP SUMMARY ---------------- */
+/* ==================================================
+
+   TOP SUMMARY
+
+   ================================================== */
 
 function updateSummary(){
 
@@ -3274,7 +3690,11 @@ function updateSummary(){
 
 }
 
-/* ---------------- AWARDS PAGE ---------------- */
+/* ==================================================
+
+   AWARDS PAGE
+
+   ================================================== */
 
 function renderAwards(){
 
@@ -3596,7 +4016,11 @@ $("backBtn")
 
   );
 
-/* ---------------- TASK EDITOR ---------------- */
+/* ==================================================
+
+   TASK EDITOR
+
+   ================================================== */
 
 const dialog =
 
@@ -3608,11 +4032,21 @@ const form =
 
 function updateTypeFields(){
 
-  const interval =
+  const type =
 
-    $("taskType").value ===
+    $("taskType").value;
 
-    "interval";
+  $("weeklyFields")
+
+    .classList
+
+    .toggle(
+
+      "hidden",
+
+      type !== "weekly"
+
+    );
 
   $("intervalFields")
 
@@ -3622,7 +4056,7 @@ function updateTypeFields(){
 
       "hidden",
 
-      !interval
+      type !== "interval"
 
     );
 
@@ -3634,7 +4068,7 @@ function updateTypeFields(){
 
       "hidden",
 
-      interval
+      type !== "daily"
 
     );
 
@@ -3671,6 +4105,10 @@ $("addBtn")
       $("taskType").value =
 
         "daily";
+
+      $("resetWeekday").value =
+
+        1;
 
       $("maxDays").value =
 
@@ -3722,6 +4160,10 @@ function openEdit(task){
 
     task.type;
 
+  $("resetWeekday").value =
+
+    task.resetWeekday ?? 1;
+
   $("maxDays").value =
 
     task.maxDays ?? 7;
@@ -3763,6 +4205,14 @@ form.addEventListener(
     const type =
 
       $("taskType").value;
+
+    const resetWeekday =
+
+      Number(
+
+        $("resetWeekday").value
+
+      );
 
     const maxDays =
 
@@ -3856,6 +4306,10 @@ form.addEventListener(
 
         type;
 
+      task.resetWeekday =
+
+        resetWeekday;
+
       task.maxDays =
 
         maxDays;
@@ -3868,7 +4322,7 @@ form.addEventListener(
 
     else{
 
-      state.tasks.push(
+      const newTask =
 
         makeTask(
 
@@ -3880,7 +4334,15 @@ form.addEventListener(
 
           pendingWindow
 
-        )
+        );
+
+      newTask.resetWeekday =
+
+        resetWeekday;
+
+      state.tasks.push(
+
+        newTask
 
       );
 
