@@ -6,81 +6,41 @@
 
 <meta charset="utf-8">
 
-<meta
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-  name="viewport"
+<meta name="theme-color" content="#f4f4ef">
 
-  content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 
-<meta
+<meta http-equiv="Pragma" content="no-cache">
 
-  name="theme-color"
-
-  content="#f4f4ef">
+<meta http-equiv="Expires" content="0">
 
 <title>Chores</title>
 
-<link
-
-  rel="apple-touch-icon"
-
-  href="BE53A647-84C0-4476-9861-D24FE24B40C7.png">
+<link rel="apple-touch-icon" href="BE53A647-84C0-4476-9861-D24FE24B40C7.png">
 
 <style>
 
 :root{
 
-  --bg:#f4f4ef;
+  --bg:#f4f4ef; --card:#fff; --ink:#1d221f; --muted:#6d756f; --line:#dfe3dd;
 
-  --card:#ffffff;
+  --done-slider:#315f4a; --done-bg:#dfe8e2; --done-border:#c4d2c8;
 
-  --ink:#1d221f;
+  --pending-slider:#c6a52e; --pending-bg:#f3ecd0; --pending-border:#ddd09b;
 
-  --muted:#6d756f;
+  --due-slider:#d77b2f; --due-bg:#f3dfcf; --due-border:#dfb58f;
 
-  --line:#dfe3dd;
+  --overdue-slider:#a7463f; --overdue-bg:#f0d9d7; --overdue-border:#d9aaa6;
 
-  --done-slider:#315f4a;
-
-  --done-bg:#dfe8e2;
-
-  --done-border:#c4d2c8;
-
-  --pending-slider:#c6a52e;
-
-  --pending-bg:#f3ecd0;
-
-  --pending-border:#ddd09b;
-
-  --due-slider:#d77b2f;
-
-  --due-bg:#f3dfcf;
-
-  --due-border:#dfb58f;
-
-  --overdue-slider:#a7463f;
-
-  --overdue-bg:#f0d9d7;
-
-  --overdue-border:#d9aaa6;
-
-  --green-soft:#dfece5;
-
-  --orange-soft:#f6e3d1;
-
-  --red-soft:#f5dfdd;
+  --green-soft:#dfece5; --orange-soft:#f6e3d1; --red-soft:#f5dfdd;
 
 }
 
-*{
+*{box-sizing:border-box}
 
-  box-sizing:border-box;
-
-}
-
-html,
-
-body{
+html,body{
 
   margin:0;
 
@@ -94,35 +54,13 @@ body{
 
 body{
 
-  font-family:
-
-    system-ui,
-
-    -apple-system,
-
-    BlinkMacSystemFont,
-
-    "Segoe UI",
-
-    sans-serif;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 
 }
 
-button,
+button,input,select{font:inherit}
 
-input,
-
-select{
-
-  font:inherit;
-
-}
-
-button{
-
-  cursor:pointer;
-
-}
+button{cursor:pointer}
 
 .app{
 
@@ -190,9 +128,7 @@ h1{
 
 }
 
-.add,
-
-.save{
+.add,.save{
 
   border:0;
 
@@ -226,8 +162,6 @@ h1{
 
 }
 
-/* ---------------- TOP STATUS ---------------- */
-
 .status,
 
 .award-task,
@@ -242,11 +176,7 @@ h1{
 
   border-radius:18px;
 
-  box-shadow:
-
-    0 8px 26px
-
-    rgba(20,30,24,.055);
+  box-shadow:0 8px 26px rgba(20,30,24,.055);
 
 }
 
@@ -300,6 +230,26 @@ h1{
 
 }
 
+.recovery{
+
+  display:none;
+
+  margin:-7px 0 15px;
+
+  padding:10px 13px;
+
+  border-radius:12px;
+
+  background:#fff8d8;
+
+  border:1px solid #e4d395;
+
+  font-size:12px;
+
+  color:#625925;
+
+}
+
 .section-title{
 
   color:var(--muted);
@@ -313,8 +263,6 @@ h1{
   margin:18px 0 10px;
 
 }
-
-/* ---------------- TASK CARDS ---------------- */
 
 .tasks{
 
@@ -332,17 +280,9 @@ h1{
 
   border-radius:18px;
 
-  box-shadow:
+  box-shadow:0 8px 26px rgba(20,30,24,.055);
 
-    0 8px 26px
-
-    rgba(20,30,24,.055);
-
-  transition:
-
-    background .2s ease,
-
-    border-color .2s ease;
+  transition:background .2s,border-color .2s;
 
 }
 
@@ -446,21 +386,11 @@ h1{
 
   border-radius:7px;
 
-  border:
+  border:1px solid #ffffffaa;
 
-    1px solid
+  box-shadow:0 1px 4px #0002;
 
-    #ffffffaa;
-
-  box-shadow:
-
-    0 1px 4px
-
-    #0002;
-
-  background-image:
-
-    url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
+  background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
 
   background-repeat:no-repeat;
 
@@ -470,9 +400,7 @@ h1{
 
   height:8px;
 
-  background:
-
-    rgba(255,255,255,.5);
+  background:rgba(255,255,255,.5);
 
   border-radius:99px;
 
@@ -490,29 +418,13 @@ h1{
 
 }
 
-.done .bar>div{
+.done .bar>div{background:var(--done-slider)}
 
-  background:var(--done-slider);
+.pending .bar>div{background:var(--pending-slider)}
 
-}
+.due .bar>div{background:var(--due-slider)}
 
-.pending .bar>div{
-
-  background:var(--pending-slider);
-
-}
-
-.due .bar>div{
-
-  background:var(--due-slider);
-
-}
-
-.overdue .bar>div{
-
-  background:var(--overdue-slider);
-
-}
+.overdue .bar>div{background:var(--overdue-slider)}
 
 .task-bottom{
 
@@ -547,8 +459,6 @@ h1{
   text-underline-offset:3px;
 
 }
-
-/* ---------------- SWITCH ---------------- */
 
 .switch{
 
@@ -602,9 +512,7 @@ h1{
 
   border-radius:50%;
 
-  box-shadow:
-
-    0 2px 6px #0002;
+  box-shadow:0 2px 6px #0002;
 
   transition:.18s;
 
@@ -640,8 +548,6 @@ h1{
 
 }
 
-/* ---------------- GENERIC ---------------- */
-
 .empty{
 
   padding:34px;
@@ -650,11 +556,7 @@ h1{
 
   color:var(--muted);
 
-  border:
-
-    1px dashed
-
-    var(--line);
+  border:1px dashed var(--line);
 
   border-radius:18px;
 
@@ -666,11 +568,7 @@ h1{
 
 }
 
-/* ==================================================
-
-   AWARDS PAGE
-
-   ================================================== */
+/* AWARDS */
 
 .page-header{
 
@@ -752,9 +650,7 @@ h1{
 
   display:grid;
 
-  grid-template-columns:
-
-    repeat(5,1fr);
+  grid-template-columns:repeat(5,1fr);
 
   gap:8px;
 
@@ -774,17 +670,11 @@ h1{
 
   border-radius:12px;
 
-  background-image:
-
-    url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
+  background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
 
   background-repeat:no-repeat;
 
-  box-shadow:
-
-    0 2px 8px #0002;
-
-  transition:.2s;
+  box-shadow:0 2px 8px #0002;
 
 }
 
@@ -816,83 +706,47 @@ h1{
 
 }
 
-/* Medal-sheet crops */
+.medal10,.art10{
 
-.medal10,
+  background-size:300% 200%;
 
-.art10{
-
-  background-size:
-
-    300% 200%;
-
-  background-position:
-
-    0% 0%;
+  background-position:0 0;
 
 }
 
-.medal20,
+.medal20,.art20{
 
-.art20{
+  background-size:300% 200%;
 
-  background-size:
-
-    300% 200%;
-
-  background-position:
-
-    50% 0%;
+  background-position:50% 0;
 
 }
 
-.medal50,
+.medal50,.art50{
 
-.art50{
+  background-size:300% 200%;
 
-  background-size:
-
-    300% 200%;
-
-  background-position:
-
-    100% 0%;
+  background-position:100% 0;
 
 }
 
-.medal100,
+.medal100,.art100{
 
-.art100{
+  background-size:200% 200%;
 
-  background-size:
-
-    200% 200%;
-
-  background-position:
-
-    0% 100%;
+  background-position:0 100%;
 
 }
 
-.medal200,
+.medal200,.art200{
 
-.art200{
+  background-size:200% 200%;
 
-  background-size:
-
-    200% 200%;
-
-  background-position:
-
-    100% 100%;
+  background-position:100% 100%;
 
 }
 
-/* ==================================================
-
-   CALENDAR PAGE
-
-   ================================================== */
+/* CALENDAR */
 
 .calendar-card{
 
@@ -926,11 +780,7 @@ h1{
 
 .month-button{
 
-  border:
-
-    1px solid
-
-    var(--line);
+  border:1px solid var(--line);
 
   background:white;
 
@@ -952,9 +802,7 @@ h1{
 
   display:grid;
 
-  grid-template-columns:
-
-    repeat(7,1fr);
+  grid-template-columns:repeat(7,1fr);
 
   gap:5px;
 
@@ -978,11 +826,7 @@ h1{
 
   min-height:68px;
 
-  border:
-
-    1px solid
-
-    var(--line);
+  border:1px solid var(--line);
 
   border-radius:11px;
 
@@ -1000,11 +844,7 @@ h1{
 
 }
 
-.day-cell.future{
-
-  opacity:.35;
-
-}
+.day-cell.future,
 
 .day-cell.before-tracking{
 
@@ -1030,11 +870,7 @@ h1{
 
 .day-cell.today{
 
-  outline:
-
-    2px solid
-
-    var(--ink);
+  outline:2px solid var(--ink);
 
   outline-offset:-2px;
 
@@ -1056,9 +892,7 @@ h1{
 
   top:50%;
 
-  transform:
-
-    translate(-50%,-42%);
+  transform:translate(-50%,-42%);
 
   font-size:25px;
 
@@ -1096,7 +930,7 @@ h1{
 
 }
 
-/* ---------------- SPECIAL ACHIEVEMENTS ---------------- */
+/* SPECIAL ACHIEVEMENTS */
 
 .achievement-list{
 
@@ -1140,11 +974,7 @@ h1{
 
   color:var(--done-slider);
 
-  border:
-
-    1px solid
-
-    var(--done-border);
+  border:1px solid var(--done-border);
 
 }
 
@@ -1194,23 +1024,11 @@ h1{
 
 }
 
-/* ==================================================
-
-   TASK EDIT DIALOG
-
-   ================================================== */
+/* DIALOG */
 
 dialog{
 
-  width:
-
-    min(
-
-      520px,
-
-      calc(100% - 24px)
-
-    );
+  width:min(520px,calc(100% - 24px));
 
   border:0;
 
@@ -1218,9 +1036,7 @@ dialog{
 
   padding:0;
 
-  box-shadow:
-
-    0 25px 80px #0004;
+  box-shadow:0 25px 80px #0004;
 
 }
 
@@ -1270,27 +1086,19 @@ dialog::backdrop{
 
   display:grid;
 
-  grid-template-columns:
-
-    1fr 1fr;
+  grid-template-columns:1fr 1fr;
 
   gap:10px;
 
 }
 
-input,
-
-select{
+input,select{
 
   width:100%;
 
   padding:11px;
 
-  border:
-
-    1px solid
-
-    var(--line);
+  border:1px solid var(--line);
 
   border-radius:11px;
 
@@ -1326,15 +1134,9 @@ select{
 
 }
 
-.ghost,
+.ghost,.delete{
 
-.delete{
-
-  border:
-
-    1px solid
-
-    var(--line);
+  border:1px solid var(--line);
 
   border-radius:999px;
 
@@ -1349,12 +1151,6 @@ select{
   color:var(--overdue-slider);
 
 }
-
-/* ==================================================
-
-   MOBILE
-
-   ================================================== */
 
 @media(max-width:600px){
 
@@ -1424,101 +1220,99 @@ select{
 
 <body>
 
-<!-- ==================================================
-
-     MAIN CHORES PAGE
-
-     ================================================== -->
-
-<main
-
-  class="app"
-
-  id="mainView">
+<main class="app" id="mainView">
 
 <header>
 
-  <div>
+<div>
 
-    <h1>Chores</h1>
+<h1>Chores</h1>
 
-    <div
+<div
 
-      class="date"
+  class="date"
 
-      id="date">
+  id="date">
 
-    </div>
+</div>
 
-  </div>
+</div>
 
-  <div class="header-actions">
+<div class="header-actions">
 
-    <button
+<button
 
-      class="secondary-button"
+  class="secondary-button"
 
-      id="calendarBtn">
+  id="calendarBtn">
 
-      Calendar
+  Calendar
 
-    </button>
+</button>
 
-    <button
+<button
 
-      class="secondary-button"
+  class="secondary-button"
 
-      id="awardsBtn">
+  id="awardsBtn">
 
-      Awards
+  Awards
 
-    </button>
+</button>
 
-    <button
+<button
 
-      class="add"
+  class="add"
 
-      id="addBtn">
+  id="addBtn">
 
-      ＋ Add task
+  ＋ Add task
 
-    </button>
+</button>
 
-  </div>
+</div>
 
 </header>
 
+<div
+
+  class="recovery"
+
+  id="recoveryNotice">
+
+</div>
+
 <section class="status">
 
-  <div>
+<div>
 
-    <h2 id="statusTitle">
+<h2 id="statusTitle">
 
-      No tasks overdue
+  No tasks overdue
 
-    </h2>
+</h2>
 
-    <div
+<div
 
-      class="status-copy"
+  class="status-copy"
 
-      id="statusCopy">
+  id="statusCopy">
 
-      The field is clear.
+  The field is clear.
 
-    </div>
+</div>
 
-  </div>
+</div>
 
-  <div
+<div
 
-    class="badge"
+  class="badge"
 
-    id="statusBadge">
+  id="statusBadge">
 
-    ✓
+  ✓
 
-  </div>
+</div>
 
 </section>
 
@@ -1538,11 +1332,7 @@ select{
 
 </main>
 
-<!-- ==================================================
-
-     AWARDS PAGE
-
-     ================================================== -->
+<!-- AWARDS -->
 
 <main
 
@@ -1550,47 +1340,43 @@ select{
 
   id="awardsView">
 
-  <div class="page-header">
+<div class="page-header">
 
-    <div>
+<div>
 
-      <h1>Awards</h1>
+<h1>Awards</h1>
 
-      <div class="date">
+<div class="date">
 
-        Every task has its own trophy case.
+  Every task has its own trophy case.
 
-      </div>
+</div>
 
-    </div>
+</div>
 
-    <button
+<button
 
-      class="back-button"
+  class="back-button"
 
-      id="awardsBackBtn">
+  id="awardsBackBtn">
 
-      ← Chores
+  ← Chores
 
-    </button>
+</button>
 
-  </div>
+</div>
 
-  <section
+<section
 
-    class="awards-list"
+  class="awards-list"
 
-    id="awardsList">
+  id="awardsList">
 
-  </section>
+</section>
 
 </main>
 
-<!-- ==================================================
-
-     CALENDAR PAGE
-
-     ================================================== -->
+<!-- CALENDAR -->
 
 <main
 
@@ -1598,97 +1384,93 @@ select{
 
   id="calendarView">
 
-  <div class="page-header">
+<div class="page-header">
 
-    <div>
+<div>
 
-      <h1>Calendar</h1>
+<h1>Calendar</h1>
 
-      <div class="date">
+<div class="date">
 
-        A Clean Sweep means everything that actually had to be done that day got done.
+  A Clean Sweep means everything that actually had to be done that day got done.
 
-      </div>
+</div>
 
-    </div>
+</div>
 
-    <button
+<button
 
-      class="back-button"
+  class="back-button"
 
-      id="calendarBackBtn">
+  id="calendarBackBtn">
 
-      ← Chores
+  ← Chores
 
-    </button>
+</button>
 
-  </div>
+</div>
 
-  <section class="calendar-card">
+<section class="calendar-card">
 
-    <div class="calendar-toolbar">
+<div class="calendar-toolbar">
 
-      <button
+<button
 
-        class="month-button"
+  class="month-button"
 
-        id="previousMonthBtn">
+  id="previousMonthBtn">
 
-        ‹
+  ‹
 
-      </button>
+</button>
 
-      <div
+<div
 
-        class="calendar-month"
+  class="calendar-month"
 
-        id="calendarMonth">
+  id="calendarMonth">
 
-      </div>
+</div>
 
-      <button
+<button
 
-        class="month-button"
+  class="month-button"
 
-        id="nextMonthBtn">
+  id="nextMonthBtn">
 
-        ›
+  ›
 
-      </button>
+</button>
 
-    </div>
+</div>
 
-    <div
+<div
 
-      class="calendar-grid"
+  class="calendar-grid"
 
-      id="calendarGrid">
+  id="calendarGrid">
 
-    </div>
+</div>
 
-  </section>
+</section>
 
-  <div class="section-title">
+<div class="section-title">
 
-    Special achievements
+  Special achievements
 
-  </div>
+</div>
 
-  <section
+<section
 
-    class="achievement-list"
+  class="achievement-list"
 
-    id="achievementList">
+  id="achievementList">
 
-  </section>
+</section>
 
 </main>
 
-<!-- ==================================================
-
-     TASK EDITOR
-
-     ================================================== -->
+<!-- TASK EDITOR -->
 
 <dialog id="taskDialog">
 
@@ -1740,29 +1522,27 @@ select{
 
 <select id="taskType">
 
-  <option value="daily">
+<option value="daily">
 
-    Daily
+  Daily
 
-  </option>
+</option>
 
-  <option value="weekly">
+<option value="weekly">
 
-    Weekly
+  Weekly
 
-  </option>
+</option>
 
-  <option value="interval">
+<option value="interval">
 
-    Every N days
+  Every N days
 
-  </option>
+</option>
 
 </select>
 
 </div>
-
-<!-- WEEKLY -->
 
 <div
 
@@ -1780,51 +1560,19 @@ select{
 
 <select id="resetWeekday">
 
-  <option value="0">
+<option value="0">Sunday</option>
 
-    Sunday
+<option value="1" selected>Monday</option>
 
-  </option>
+<option value="2">Tuesday</option>
 
-  <option
+<option value="3">Wednesday</option>
 
-    value="1"
+<option value="4">Thursday</option>
 
-    selected>
+<option value="5">Friday</option>
 
-    Monday
-
-  </option>
-
-  <option value="2">
-
-    Tuesday
-
-  </option>
-
-  <option value="3">
-
-    Wednesday
-
-  </option>
-
-  <option value="4">
-
-    Thursday
-
-  </option>
-
-  <option value="5">
-
-    Friday
-
-  </option>
-
-  <option value="6">
-
-    Saturday
-
-  </option>
+<option value="6">Saturday</option>
 
 </select>
 
@@ -1841,8 +1589,6 @@ If you miss the weekly window, it becomes Overdue when the new week begins.
 </p>
 
 </div>
-
-<!-- EVERY N DAYS -->
 
 <div
 
@@ -1948,21 +1694,15 @@ and becomes Overdue Tuesday.
 
 </div>
 
-<!-- DAILY -->
-
 <div
 
   id="dailyNote"
 
   class="fine">
 
-Daily tasks have no timing settings.
+Daily tasks are Due Today until completed.
 
-If completed today they are Done.
-
-If completed yesterday they are Pending.
-
-Otherwise they are Overdue.
+If a whole day passes without completion, they become Overdue.
 
 </div>
 
@@ -2012,6 +1752,8 @@ Otherwise they are Overdue.
 
 <script>
 
+"use strict";
+
 /* ==================================================
 
    CONSTANTS
@@ -2021,6 +1763,16 @@ Otherwise they are Overdue.
 const STORAGE_KEY =
 
   "chores2-v2";
+
+const BACKUP_KEYS = [
+
+  "chores2-v2-backup-1",
+
+  "chores2-v2-backup-2",
+
+  "chores2-v2-backup-3"
+
+];
 
 const AWARDS =
 
@@ -2080,9 +1832,27 @@ const $ =
 
 const uid =
 
-  () =>
+  () => (
 
-  crypto.randomUUID();
+    globalThis.crypto &&
+
+    typeof globalThis.crypto.randomUUID === "function"
+
+  )
+
+  ? globalThis.crypto.randomUUID()
+
+  : "task-" +
+
+    Date.now() +
+
+    "-" +
+
+    Math.random()
+
+      .toString(36)
+
+      .slice(2);
 
 /* ==================================================
 
@@ -2212,6 +1982,42 @@ function prettyDate(key){
 
 }
 
+function weekStartKey(
+
+  dateKey,
+
+  resetDay
+
+){
+
+  const d =
+
+    dateFromKey(dateKey);
+
+  const delta =
+
+    (
+
+      d.getDay() -
+
+      Number(resetDay) +
+
+      7
+
+    ) % 7;
+
+  d.setDate(
+
+    d.getDate() -
+
+    delta
+
+  );
+
+  return localDateKey(d);
+
+}
+
 /* ==================================================
 
    TASK CREATION
@@ -2270,57 +2076,443 @@ function makeTask(
 
 /* ==================================================
 
-   LOAD + MIGRATE DATA
+   STORAGE RECOVERY
 
    ================================================== */
 
-let state =
-
-  loadState();
-
-function loadState(){
-
-  let parsed=null;
-
-  try{
-
-    parsed =
-
-      JSON.parse(
-
-        localStorage.getItem(
-
-          STORAGE_KEY
-
-        )
-
-      );
-
-  }catch(e){}
+function parseState(raw){
 
   if(
 
-    parsed &&
+    !raw
 
-    Array.isArray(
+  ){
 
-      parsed.tasks
+    return null;
+
+  }
+
+  try{
+
+    const x =
+
+      JSON.parse(raw);
+
+    return (
+
+      x &&
+
+      Array.isArray(
+
+        x.tasks
+
+      )
+
+    )
+
+    ? x
+
+    : null;
+
+  }
+
+  catch(e){
+
+    return null;
+
+  }
+
+}
+
+function candidateScore(x){
+
+  if(
+
+    !x ||
+
+    !Array.isArray(
+
+      x.tasks
 
     )
 
   ){
 
+    return -1;
+
+  }
+
+  let score =
+
+    x.tasks.length * 100;
+
+  for(
+
+    const task
+
+    of x.tasks
+
+  ){
+
     if(
 
-      !parsed.dailySnapshots ||
-
-      typeof parsed.dailySnapshots !==
-
-      "object"
+      task.lastDoneDate
 
     ){
 
-      parsed.dailySnapshots={};
+      score += 3;
+
+    }
+
+    if(
+
+      Number(
+
+        task.totalCompletions
+
+      ) > 0
+
+    ){
+
+      score += 1;
+
+    }
+
+  }
+
+  return score;
+
+}
+
+let recoverySource =
+
+  null;
+
+function findBestStoredState(){
+
+  const primary =
+
+    parseState(
+
+      localStorage.getItem(
+
+        STORAGE_KEY
+
+      )
+
+    );
+
+  /*
+
+    If the normal storage entry
+
+    contains actual tasks, use it.
+
+  */
+
+  if(
+
+    primary &&
+
+    primary.tasks.length > 0
+
+  ){
+
+    return primary;
+
+  }
+
+  let best =
+
+    primary;
+
+  let bestKey =
+
+    primary
+
+    ? STORAGE_KEY
+
+    : null;
+
+  let bestScore =
+
+    candidateScore(
+
+      primary
+
+    );
+
+  /*
+
+    Search the other localStorage
+
+    entries for something that looks
+
+    like a Chores state object.
+
+    This gives us a chance to recover
+
+    data from earlier keys/backups.
+
+  */
+
+  const keys=[];
+
+  for(
+
+    let i=0;
+
+    i<localStorage.length;
+
+    i++
+
+  ){
+
+    const key =
+
+      localStorage.key(i);
+
+    if(
+
+      key
+
+    ){
+
+      keys.push(
+
+        key
+
+      );
+
+    }
+
+  }
+
+  for(
+
+    const key
+
+    of keys
+
+  ){
+
+    if(
+
+      key ===
+
+      STORAGE_KEY
+
+    ){
+
+      continue;
+
+    }
+
+    const candidate =
+
+      parseState(
+
+        localStorage.getItem(
+
+          key
+
+        )
+
+      );
+
+    const score =
+
+      candidateScore(
+
+        candidate
+
+      );
+
+    if(
+
+      score >
+
+      bestScore
+
+    ){
+
+      best =
+
+        candidate;
+
+      bestScore =
+
+        score;
+
+      bestKey =
+
+        key;
+
+    }
+
+  }
+
+  if(
+
+    best &&
+
+    bestKey &&
+
+    bestKey !==
+
+    STORAGE_KEY
+
+  ){
+
+    recoverySource =
+
+      bestKey;
+
+  }
+
+  return best;
+
+}
+
+/* ==================================================
+
+   MIGRATION
+
+   ================================================== */
+
+function migrateState(parsed){
+
+  if(
+
+    !parsed.dailySnapshots ||
+
+    typeof parsed.dailySnapshots !==
+
+    "object"
+
+  ){
+
+    parsed.dailySnapshots={};
+
+  }
+
+  if(
+
+    !Array.isArray(
+
+      parsed.specialAchievements
+
+    )
+
+  ){
+
+    parsed.specialAchievements=[];
+
+  }
+
+  if(
+
+    !parsed.calendarTrackingStart
+
+  ){
+
+    parsed.calendarTrackingStart =
+
+      localDateKey();
+
+  }
+
+  for(
+
+    const task
+
+    of parsed.tasks
+
+  ){
+
+    if(
+
+      task.pendingWindow ==
+
+      null
+
+    ){
+
+      if(
+
+        task.type ===
+
+        "interval"
+
+      ){
+
+        const old =
+
+          Number(
+
+            task.pendingAfter ?? 5
+
+          );
+
+        const max =
+
+          Number(
+
+            task.maxDays ?? 7
+
+          );
+
+        task.pendingWindow =
+
+          Math.max(
+
+            1,
+
+            max-old
+
+          );
+
+      }else{
+
+        task.pendingWindow=1;
+
+      }
+
+    }
+
+    if(
+
+      task.resetWeekday ==
+
+      null
+
+    ){
+
+      task.resetWeekday=1;
+
+    }
+
+    if(
+
+      task.previousDoneDate ===
+
+      undefined
+
+    ){
+
+      task.previousDoneDate=null;
+
+    }
+
+    if(
+
+      task.totalCompletions ==
+
+      null
+
+    ){
+
+      task.totalCompletions=0;
 
     }
 
@@ -2328,335 +2520,199 @@ function loadState(){
 
       !Array.isArray(
 
-        parsed.specialAchievements
+        task.completionDates
 
       )
 
     ){
 
-      parsed.specialAchievements=[];
+      task.completionDates=[];
+
+      if(
+
+        task.lastDoneDate
+
+      ){
+
+        task.completionDates.push(
+
+          task.lastDoneDate
+
+        );
+
+      }
+
+    }
+
+    task.completionDates =
+
+      [
+
+        ...new Set(
+
+          task.completionDates
+
+          .filter(Boolean)
+
+        )
+
+      ]
+
+      .sort();
+
+    if(
+
+      !Array.isArray(
+
+        task.completionEvents
+
+      )
+
+    ){
+
+      task.completionEvents=[];
 
     }
 
     if(
 
-      !parsed.calendarTrackingStart
+      task.streakStartDate ===
+
+      undefined
 
     ){
 
-      parsed.calendarTrackingStart =
+      task.streakStartDate =
 
-        localDateKey();
+        task.lastDoneDate ||
+
+        null;
+
+    }
+
+    if(
+
+      task.previousStreakStartDate ===
+
+      undefined
+
+    ){
+
+      task.previousStreakStartDate =
+
+        null;
+
+    }
+
+    if(
+
+      task.bestStreakDays ===
+
+      undefined
+
+    ){
+
+      task.bestStreakDays =
+
+        Number(
+
+          task.bestStreak ?? 0
+
+        ) || 0;
+
+    }
+
+    if(
+
+      !Array.isArray(
+
+        task.unlockedAwards
+
+      )
+
+    ){
+
+      task.unlockedAwards=[];
 
     }
 
     for(
 
-      const task
+      const milestone
 
-      of parsed.tasks
+      of AWARDS
 
     ){
 
       if(
 
-        task.pendingWindow == null
+        Number(
 
-      ){
+          task.bestStreakDays
 
-        if(
+        ) >= milestone &&
 
-          task.type === "interval"
+        !task.unlockedAwards.includes(
 
-        ){
-
-          const oldPendingAfter =
-
-            Number(
-
-              task.pendingAfter ?? 5
-
-            );
-
-          const maximum =
-
-            Number(
-
-              task.maxDays ?? 7
-
-            );
-
-          task.pendingWindow =
-
-            Math.max(
-
-              1,
-
-              maximum -
-
-              oldPendingAfter
-
-            );
-
-        }else{
-
-          task.pendingWindow=1;
-
-        }
-
-      }
-
-      if(
-
-        task.resetWeekday ==
-
-        null
-
-      ){
-
-        task.resetWeekday=1;
-
-      }
-
-      if(
-
-        task.previousDoneDate ===
-
-        undefined
-
-      ){
-
-        task.previousDoneDate=null;
-
-      }
-
-      if(
-
-        task.totalCompletions ==
-
-        null
-
-      ){
-
-        task.totalCompletions=0;
-
-      }
-
-      /*
-
-        Completion history did not exist
-
-        in older versions.
-
-        Seed it with the latest known
-
-        completion. Going forward all
-
-        completions are retained.
-
-      */
-
-      if(
-
-        !Array.isArray(
-
-          task.completionDates
+          milestone
 
         )
 
       ){
 
-        task.completionDates=[];
+        task.unlockedAwards.push(
 
-        if(
+          milestone
 
-          task.lastDoneDate
-
-        ){
-
-          task.completionDates.push(
-
-            task.lastDoneDate
-
-          );
-
-        }
+        );
 
       }
-
-      task.completionDates =
-
-        [...new Set(
-
-          task.completionDates
-
-        )].sort();
-
-      if(
-
-        !Array.isArray(
-
-          task.completionEvents
-
-        )
-
-      ){
-
-        task.completionEvents=[];
-
-      }
-
-      if(
-
-        task.streakStartDate ===
-
-        undefined
-
-      ){
-
-        if(
-
-          task.lastDoneDate
-
-        ){
-
-          if(
-
-            task.type === "daily" &&
-
-            Number(task.currentStreak) > 1
-
-          ){
-
-            task.streakStartDate =
-
-              addDaysKey(
-
-                localDateKey(),
-
-                -(Number(task.currentStreak)-1)
-
-              );
-
-          }else{
-
-            task.streakStartDate =
-
-              task.lastDoneDate;
-
-          }
-
-        }else{
-
-          task.streakStartDate=null;
-
-        }
-
-      }
-
-      if(
-
-        task.previousStreakStartDate ===
-
-        undefined
-
-      ){
-
-        task.previousStreakStartDate=null;
-
-      }
-
-      if(
-
-        task.bestStreakDays ===
-
-        undefined
-
-      ){
-
-        if(
-
-          task.type === "daily"
-
-        ){
-
-          task.bestStreakDays =
-
-            Number(
-
-              task.bestStreak ?? 0
-
-            );
-
-        }else{
-
-          task.bestStreakDays=0;
-
-        }
-
-      }
-
-      if(
-
-        !Array.isArray(
-
-          task.unlockedAwards
-
-        )
-
-      ){
-
-        task.unlockedAwards=[];
-
-      }
-
-      for(
-
-        const milestone
-
-        of AWARDS
-
-      ){
-
-        if(
-
-          Number(
-
-            task.bestStreakDays ?? 0
-
-          ) >= milestone &&
-
-          !task.unlockedAwards.includes(
-
-            milestone
-
-          )
-
-        ){
-
-          task.unlockedAwards.push(
-
-            milestone
-
-          );
-
-        }
-
-      }
-
-      task.unlockedAwards.sort(
-
-        (a,b)=>a-b
-
-      );
 
     }
 
-    delete parsed.unlockedAwards;
+    task.unlockedAwards.sort(
 
-    return parsed;
+      (a,b)=>a-b
+
+    );
+
+    if(
+
+      !task.createdAt
+
+    ){
+
+      task.createdAt =
+
+        Date.now();
+
+    }
+
+    if(
+
+      !task.type
+
+    ){
+
+      task.type =
+
+        "daily";
+
+    }
 
   }
+
+  return parsed;
+
+}
+
+/* ==================================================
+
+   DEFAULT STATE
+
+   ================================================== */
+
+function defaultState(){
 
   return{
 
@@ -2720,7 +2776,85 @@ function loadState(){
 
 }
 
+let state =
+
+  migrateState(
+
+    findBestStoredState() ||
+
+    defaultState()
+
+  );
+
+/* ==================================================
+
+   SAVING + BACKUPS
+
+   ================================================== */
+
+function rotateBackups(){
+
+  const current =
+
+    localStorage.getItem(
+
+      STORAGE_KEY
+
+    );
+
+  if(
+
+    !current
+
+  ){
+
+    return;
+
+  }
+
+  try{
+
+    localStorage.setItem(
+
+      BACKUP_KEYS[2],
+
+      localStorage.getItem(
+
+        BACKUP_KEYS[1]
+
+      ) || ""
+
+    );
+
+    localStorage.setItem(
+
+      BACKUP_KEYS[1],
+
+      localStorage.getItem(
+
+        BACKUP_KEYS[0]
+
+      ) || ""
+
+    );
+
+    localStorage.setItem(
+
+      BACKUP_KEYS[0],
+
+      current
+
+    );
+
+  }
+
+  catch(e){}
+
+}
+
 function saveState(){
+
+  rotateBackups();
 
   localStorage.setItem(
 
@@ -2772,25 +2906,23 @@ function latestCompletionOnOrBefore(
 
 ){
 
-  if(
+  const arr =
 
-    !Array.isArray(
+    Array.isArray(
 
       task.completionDates
 
     )
 
-  ){
+    ? task.completionDates
 
-    return null;
-
-  }
+    : [];
 
   for(
 
     let i =
 
-      task.completionDates.length-1;
+      arr.length-1;
 
     i>=0;
 
@@ -2800,13 +2932,13 @@ function latestCompletionOnOrBefore(
 
     if(
 
-      task.completionDates[i] <=
+      arr[i] <=
 
       dateKey
 
     ){
 
-      return task.completionDates[i];
+      return arr[i];
 
     }
 
@@ -2818,7 +2950,7 @@ function latestCompletionOnOrBefore(
 
 /* ==================================================
 
-   STATUS FOR ANY CALENDAR DATE
+   STATUS
 
    ================================================== */
 
@@ -2831,10 +2963,6 @@ function statusAt(
   includeSameDay=true
 
 ){
-
-  const targetDate =
-
-    dateFromKey(dateKey);
 
   let latest =
 
@@ -2850,7 +2978,9 @@ function statusAt(
 
     !includeSameDay &&
 
-    latest === dateKey
+    latest ===
+
+    dateKey
 
   ){
 
@@ -2872,11 +3002,13 @@ function statusAt(
 
   }
 
-  /* ---------- DAILY ---------- */
+  /* DAILY */
 
   if(
 
-    task.type === "daily"
+    task.type ===
+
+    "daily"
 
   ){
 
@@ -2884,7 +3016,9 @@ function statusAt(
 
       includeSameDay &&
 
-      latest === dateKey
+      latest ===
+
+      dateKey
 
     ){
 
@@ -2912,17 +3046,19 @@ function statusAt(
 
     if(
 
-      latest === yesterday
+      latest ===
+
+      yesterday
 
     ){
 
       return{
 
-        state:"pending",
+        state:"due",
 
         progress:0,
 
-        detail:"Pending today"
+        detail:"Due Today"
 
       };
 
@@ -2942,7 +3078,9 @@ function statusAt(
 
     if(
 
-      dateKey <= createdKey &&
+      dateKey <=
+
+      createdKey &&
 
       !latest
 
@@ -2950,11 +3088,11 @@ function statusAt(
 
       return{
 
-        state:"pending",
+        state:"due",
 
         progress:0,
 
-        detail:"Pending today"
+        detail:"Due Today"
 
       };
 
@@ -2972,15 +3110,17 @@ function statusAt(
 
   }
 
-  /* ---------- WEEKLY ---------- */
+  /* WEEKLY */
 
   if(
 
-    task.type === "weekly"
+    task.type ===
+
+    "weekly"
 
   ){
 
-    const resetDay =
+    const reset =
 
       Number(
 
@@ -2988,67 +3128,47 @@ function statusAt(
 
       );
 
-    const weekday =
+    const currentStart =
 
-      targetDate.getDay();
-
-    const daysSinceReset =
-
-      (
-
-        weekday -
-
-        resetDay +
-
-        7
-
-      ) % 7;
-
-    const currentWeekStart =
-
-      addDaysKey(
+      weekStartKey(
 
         dateKey,
 
-        -daysSinceReset
+        reset
 
       );
 
-    const previousWeekStart =
+    const previousStart =
 
       addDaysKey(
 
-        currentWeekStart,
+        currentStart,
 
         -7
 
       );
 
-    const previousWeekEnd =
+    const previousEnd =
 
       addDaysKey(
 
-        currentWeekStart,
+        currentStart,
 
         -1
 
       );
 
-    const doneThisWeek =
+    if(
 
       latest &&
 
       latest >=
 
-        currentWeekStart &&
+        currentStart &&
 
       latest <=
 
-        dateKey;
-
-    if(
-
-      doneThisWeek
+        dateKey
 
     ){
 
@@ -3080,19 +3200,29 @@ function statusAt(
 
       createdKey <
 
-      currentWeekStart;
+      currentStart;
 
-    const lastWeekCompletion =
+    const arr =
 
-      task.completionDates
+      Array.isArray(
 
-      .some(
+        task.completionDates
+
+      )
+
+      ? task.completionDates
+
+      : [];
+
+    const completedLastWeek =
+
+      arr.some(
 
         d =>
 
-        d >= previousWeekStart &&
+        d >= previousStart &&
 
-        d <= previousWeekEnd
+        d <= previousEnd
 
       );
 
@@ -3100,7 +3230,7 @@ function statusAt(
 
       existedLastWeek &&
 
-      !lastWeekCompletion
+      !completedLastWeek
 
     ){
 
@@ -3116,21 +3246,21 @@ function statusAt(
 
     }
 
-    const dueWeekday =
+    const dueKey =
 
-      (
+      addDaysKey(
 
-        resetDay +
+        currentStart,
 
         6
 
-      ) % 7;
+      );
 
     if(
 
-      weekday ===
+      dateKey ===
 
-      dueWeekday
+      dueKey
 
     ){
 
@@ -3146,21 +3276,15 @@ function statusAt(
 
     }
 
-    const ordinaryDaysUntilDue =
+    const left =
 
-      (
+      diffCalendarDays(
 
-        dueWeekday -
+        dateKey,
 
-        weekday +
+        dueKey
 
-        7
-
-      ) % 7;
-
-    const displayedDaysLeft =
-
-      ordinaryDaysUntilDue + 1;
+      ) + 1;
 
     return{
 
@@ -3176,7 +3300,7 @@ function statusAt(
 
             1,
 
-            displayedDaysLeft / 7
+            left/7
 
           )
 
@@ -3184,29 +3308,13 @@ function statusAt(
 
       detail:
 
-        "Pending — " +
-
-        displayedDaysLeft +
-
-        " day" +
-
-        (
-
-          displayedDaysLeft === 1
-
-          ? ""
-
-          : "s"
-
-        ) +
-
-        " left"
+        `Pending — ${left} day${left===1?"":"s"} left`
 
     };
 
   }
 
-  /* ---------- EVERY N DAYS ---------- */
+  /* EVERY N DAYS */
 
   if(
 
@@ -3236,15 +3344,19 @@ function statusAt(
 
     );
 
-  const daysUntilDue =
+  const until =
 
-    task.maxDays -
+    Number(
+
+      task.maxDays
+
+    ) -
 
     daysSince;
 
   if(
 
-    daysUntilDue < 0
+    until < 0
 
   ){
 
@@ -3252,7 +3364,7 @@ function statusAt(
 
       Math.abs(
 
-        daysUntilDue
+        until
 
       );
 
@@ -3264,23 +3376,7 @@ function statusAt(
 
       detail:
 
-        "Overdue — " +
-
-        late +
-
-        " day" +
-
-        (
-
-          late === 1
-
-          ? ""
-
-          : "s"
-
-        ) +
-
-        " late"
+        `Overdue — ${late} day${late===1?"":"s"} late`
 
     };
 
@@ -3288,7 +3384,7 @@ function statusAt(
 
   if(
 
-    daysUntilDue === 0
+    until === 0
 
   ){
 
@@ -3304,15 +3400,19 @@ function statusAt(
 
   }
 
-  const displayedDaysLeft =
+  const left =
 
-    daysUntilDue + 1;
+    until+1;
 
   if(
 
-    displayedDaysLeft <=
+    left <=
 
-    task.pendingWindow
+    Number(
+
+      task.pendingWindow
+
+    )
 
   ){
 
@@ -3330,13 +3430,17 @@ function statusAt(
 
             1,
 
-            displayedDaysLeft /
+            left /
 
             Math.max(
 
               1,
 
-              task.pendingWindow
+              Number(
+
+                task.pendingWindow
+
+              )
 
             )
 
@@ -3346,23 +3450,7 @@ function statusAt(
 
       detail:
 
-        "Pending — " +
-
-        displayedDaysLeft +
-
-        " day" +
-
-        (
-
-          displayedDaysLeft === 1
-
-          ? ""
-
-          : "s"
-
-        ) +
-
-        " left"
+        `Pending — ${left} day${left===1?"":"s"} left`
 
     };
 
@@ -3382,13 +3470,17 @@ function statusAt(
 
           1,
 
-          displayedDaysLeft /
+          left /
 
           Math.max(
 
             1,
 
-            task.maxDays + 1
+            Number(
+
+              task.maxDays
+
+            ) + 1
 
           )
 
@@ -3398,23 +3490,7 @@ function statusAt(
 
     detail:
 
-      "Done — " +
-
-      displayedDaysLeft +
-
-      " day" +
-
-      (
-
-        displayedDaysLeft === 1
-
-        ? ""
-
-        : "s"
-
-      ) +
-
-      " left"
+      `Done — ${left} day${left===1?"":"s"} left`
 
   };
 
@@ -3436,7 +3512,7 @@ function status(task){
 
 /* ==================================================
 
-   CLEAN SWEEP LOGIC
+   CLEAN SWEEPS
 
    ================================================== */
 
@@ -3453,14 +3529,6 @@ function dayQualifiesForCleanSweep(
     of state.tasks
 
   ){
-
-    /*
-
-      Tasks created after the date
-
-      do not count against it.
-
-    */
 
     const createdKey =
 
@@ -3486,17 +3554,11 @@ function dayQualifiesForCleanSweep(
 
     }
 
-    /*
-
-      DAILY TASKS must actually
-
-      be completed that day.
-
-    */
-
     if(
 
-      task.type === "daily"
+      task.type ===
+
+      "daily"
 
     ){
 
@@ -3520,21 +3582,7 @@ function dayQualifiesForCleanSweep(
 
     }
 
-    /*
-
-      Weekly and interval tasks
-
-      may remain Pending.
-
-      But Due Today or Overdue
-
-      must have been cleared by
-
-      the end of the day.
-
-    */
-
-    const endStatus =
+    const s =
 
       statusAt(
 
@@ -3548,9 +3596,9 @@ function dayQualifiesForCleanSweep(
 
     if(
 
-      endStatus === "due" ||
+      s === "due" ||
 
-      endStatus === "overdue"
+      s === "overdue"
 
     ){
 
@@ -3572,49 +3620,31 @@ function dayHadOverdueAtStart(
 
   return state.tasks.some(
 
-    task =>{
+    task =>
 
-      const createdKey =
+      localDateKey(
 
-        localDateKey(
+        new Date(
 
-          new Date(
+          task.createdAt
 
-            task.createdAt
+        )
 
-          )
+      ) <= dateKey
 
-        );
+      &&
 
-      if(
+      statusAt(
 
-        createdKey >
+        task,
 
-        dateKey
+        dateKey,
 
-      ){
+        false
 
-        return false;
+      ).state ===
 
-      }
-
-      return (
-
-        statusAt(
-
-          task,
-
-          dateKey,
-
-          false
-
-        ).state ===
-
-        "overdue"
-
-      );
-
-    }
+      "overdue"
 
   );
 
@@ -3628,49 +3658,31 @@ function dayHasOverdueAtEnd(
 
   return state.tasks.some(
 
-    task =>{
+    task =>
 
-      const createdKey =
+      localDateKey(
 
-        localDateKey(
+        new Date(
 
-          new Date(
+          task.createdAt
 
-            task.createdAt
+        )
 
-          )
+      ) <= dateKey
 
-        );
+      &&
 
-      if(
+      statusAt(
 
-        createdKey >
+        task,
 
-        dateKey
+        dateKey,
 
-      ){
+        true
 
-        return false;
+      ).state ===
 
-      }
-
-      return (
-
-        statusAt(
-
-          task,
-
-          dateKey,
-
-          true
-
-        ).state ===
-
-        "overdue"
-
-      );
-
-    }
+      "overdue"
 
   );
 
@@ -3694,25 +3706,23 @@ function completedTypesOn(
 
   ){
 
-    if(
-
-      !Array.isArray(
-
-        task.completionEvents
-
-      )
-
-    ){
-
-      continue;
-
-    }
-
     for(
 
       const event
 
-      of task.completionEvents
+      of (
+
+        Array.isArray(
+
+          task.completionEvents
+
+        )
+
+        ? task.completionEvents
+
+        : []
+
+      )
 
     ){
 
@@ -3742,153 +3752,11 @@ function completedTypesOn(
 
 /* ==================================================
 
-   DAILY SNAPSHOTS
-
-   ================================================== */
-
-function finalizeDay(
-
-  dateKey
-
-){
-
-  if(
-
-    state.dailySnapshots[
-
-      dateKey
-
-    ]
-
-  ){
-
-    return;
-
-  }
-
-  const cleanSweep =
-
-    dayQualifiesForCleanSweep(
-
-      dateKey
-
-    );
-
-  const hadOverdueAtStart =
-
-    dayHadOverdueAtStart(
-
-      dateKey
-
-    );
-
-  const hasOverdueAtEnd =
-
-    dayHasOverdueAtEnd(
-
-      dateKey
-
-    );
-
-  const types =
-
-    completedTypesOn(
-
-      dateKey
-
-    );
-
-  state.dailySnapshots[
-
-    dateKey
-
-  ] = {
-
-    cleanSweep,
-
-    rescue:
-
-      (
-
-        hadOverdueAtStart &&
-
-        !hasOverdueAtEnd
-
-      ),
-
-    fullHouse:
-
-      (
-
-        types.has("daily") &&
-
-        types.has("weekly") &&
-
-        types.has("interval")
-
-      )
-
-  };
-
-  evaluateSpecialAchievements(
-
-    dateKey
-
-  );
-
-}
-
-function finalizePastDays(){
-
-  const today =
-
-    localDateKey();
-
-  let day =
-
-    state.calendarTrackingStart;
-
-  while(
-
-    day <
-
-    today
-
-  ){
-
-    finalizeDay(
-
-      day
-
-    );
-
-    day =
-
-      addDaysKey(
-
-        day,
-
-        1
-
-      );
-
-  }
-
-  saveState();
-
-}
-
-/* ==================================================
-
    SPECIAL ACHIEVEMENTS
 
    ================================================== */
 
-function achievementEarned(
-
-  id
-
-){
+function achievementEarned(id){
 
   return state.specialAchievements
 
@@ -3912,7 +3780,7 @@ function grantAchievement(
 
   if(
 
-    achievementEarned(
+    !achievementEarned(
 
       id
 
@@ -3920,21 +3788,19 @@ function grantAchievement(
 
   ){
 
-    return;
+    state.specialAchievements.push(
+
+      {
+
+        id,
+
+        date:dateKey
+
+      }
+
+    );
 
   }
-
-  state.specialAchievements.push(
-
-    {
-
-      id,
-
-      date:dateKey
-
-    }
-
-  );
 
 }
 
@@ -3962,12 +3828,6 @@ function evaluateSpecialAchievements(
 
   }
 
-  /*
-
-    RESCUE MISSION
-
-  */
-
   if(
 
     snapshot.rescue
@@ -3983,12 +3843,6 @@ function evaluateSpecialAchievements(
     );
 
   }
-
-  /*
-
-    FULL HOUSE
-
-  */
 
   if(
 
@@ -4006,13 +3860,9 @@ function evaluateSpecialAchievements(
 
   }
 
-  /*
+  let perfect =
 
-    PERFECT WEEK
-
-  */
-
-  let perfect=true;
+    true;
 
   for(
 
@@ -4024,21 +3874,17 @@ function evaluateSpecialAchievements(
 
   ){
 
-    const day =
-
-      addDaysKey(
-
-        dateKey,
-
-        -i
-
-      );
-
     if(
 
       !state.dailySnapshots[
 
-        day
+        addDaysKey(
+
+          dateKey,
+
+          -i
+
+        )
 
       ]?.cleanSweep
 
@@ -4072,6 +3918,154 @@ function evaluateSpecialAchievements(
 
 /* ==================================================
 
+   DAILY SNAPSHOTS
+
+   ================================================== */
+
+function finalizeDay(
+
+  dateKey
+
+){
+
+  if(
+
+    state.dailySnapshots[
+
+      dateKey
+
+    ]
+
+  ){
+
+    return;
+
+  }
+
+  const types =
+
+    completedTypesOn(
+
+      dateKey
+
+    );
+
+  state.dailySnapshots[
+
+    dateKey
+
+  ] = {
+
+    cleanSweep:
+
+      dayQualifiesForCleanSweep(
+
+        dateKey
+
+      ),
+
+    rescue:
+
+      (
+
+        dayHadOverdueAtStart(
+
+          dateKey
+
+        )
+
+        &&
+
+        !dayHasOverdueAtEnd(
+
+          dateKey
+
+        )
+
+      ),
+
+    fullHouse:
+
+      (
+
+        types.has(
+
+          "daily"
+
+        )
+
+        &&
+
+        types.has(
+
+          "weekly"
+
+        )
+
+        &&
+
+        types.has(
+
+          "interval"
+
+        )
+
+      )
+
+  };
+
+  evaluateSpecialAchievements(
+
+    dateKey
+
+  );
+
+}
+
+function finalizePastDays(){
+
+  const today =
+
+    localDateKey();
+
+  let day =
+
+    state.calendarTrackingStart;
+
+  let guard=0;
+
+  while(
+
+    day < today &&
+
+    guard < 4000
+
+  ){
+
+    finalizeDay(
+
+      day
+
+    );
+
+    day =
+
+      addDaysKey(
+
+        day,
+
+        1
+
+      );
+
+    guard++;
+
+  }
+
+}
+
+/* ==================================================
+
    STREAKS
 
    ================================================== */
@@ -4090,7 +4084,9 @@ function lastGoodDate(task){
 
   if(
 
-    task.type === "daily"
+    task.type ===
+
+    "daily"
 
   ){
 
@@ -4106,51 +4102,29 @@ function lastGoodDate(task){
 
   if(
 
-    task.type === "weekly"
+    task.type ===
+
+    "weekly"
 
   ){
 
-    const resetDay =
+    const start =
 
-      Number(
-
-        task.resetWeekday ?? 1
-
-      );
-
-    const doneDate =
-
-      dateFromKey(
-
-        task.lastDoneDate
-
-      );
-
-    const daysSinceReset =
-
-      (
-
-        doneDate.getDay() -
-
-        resetDay +
-
-        7
-
-      ) % 7;
-
-    const completionWeekStart =
-
-      addDaysKey(
+      weekStartKey(
 
         task.lastDoneDate,
 
-        -daysSinceReset
+        Number(
+
+          task.resetWeekday ?? 1
+
+        )
 
       );
 
     return addDaysKey(
 
-      completionWeekStart,
+      start,
 
       13
 
@@ -4162,7 +4136,11 @@ function lastGoodDate(task){
 
     task.lastDoneDate,
 
-    task.maxDays
+    Number(
+
+      task.maxDays
+
+    )
 
   );
 
@@ -4172,15 +4150,7 @@ function currentStreakDays(task){
 
   if(
 
-    !task.streakStartDate
-
-  ){
-
-    return 0;
-
-  }
-
-  if(
+    !task.streakStartDate ||
 
     status(task).state ===
 
@@ -4232,7 +4202,11 @@ function reconcileStreaks(){
 
       const end =
 
-        lastGoodDate(task);
+        lastGoodDate(
+
+          task
+
+        );
 
       if(
 
@@ -4240,7 +4214,7 @@ function reconcileStreaks(){
 
       ){
 
-        const finishedLength =
+        const len =
 
           Math.max(
 
@@ -4262,17 +4236,21 @@ function reconcileStreaks(){
 
             Number(
 
-              task.bestStreakDays ?? 0
+              task.bestStreakDays ||
+
+              0
 
             ),
 
-            finishedLength
+            len
 
           );
 
       }
 
-      task.streakStartDate=null;
+      task.streakStartDate =
+
+        null;
 
       changed=true;
 
@@ -4280,15 +4258,7 @@ function reconcileStreaks(){
 
   }
 
-  if(
-
-    changed
-
-  ){
-
-    saveState();
-
-  }
+  return changed;
 
 }
 
@@ -4316,7 +4286,11 @@ function updateTaskAwards(task){
 
   const current =
 
-    currentStreakDays(task);
+    currentStreakDays(
+
+      task
+
+    );
 
   task.bestStreakDays =
 
@@ -4324,7 +4298,9 @@ function updateTaskAwards(task){
 
       Number(
 
-        task.bestStreakDays ?? 0
+        task.bestStreakDays ||
+
+        0
 
       ),
 
@@ -4394,7 +4370,7 @@ function updateAllTaskAwards(){
 
 /* ==================================================
 
-   MARK DONE / UNDO
+   COMPLETE / UNDO
 
    ================================================== */
 
@@ -4458,9 +4434,9 @@ function markDone(task){
 
     );
 
-    task.completionDates.sort();
-
   }
+
+  task.completionDates.sort();
 
   task.completionEvents.push(
 
@@ -4474,7 +4450,15 @@ function markDone(task){
 
   );
 
-  task.totalCompletions++;
+  task.totalCompletions =
+
+    Number(
+
+      task.totalCompletions ||
+
+      0
+
+    ) + 1;
 
   updateTaskAwards(
 
@@ -4501,6 +4485,8 @@ function undoDone(task){
     today
 
   ){
+
+    render();
 
     return;
 
@@ -4534,37 +4520,37 @@ function undoDone(task){
 
     );
 
-  const eventIndex =
+  for(
 
-    task.completionEvents
+    let i =
 
-    .map(
+      task.completionEvents.length-1;
 
-      event =>
+    i>=0;
 
-      event.date
-
-    )
-
-    .lastIndexOf(
-
-      today
-
-    );
-
-  if(
-
-    eventIndex >= 0
+    i--
 
   ){
 
-    task.completionEvents.splice(
+    if(
 
-      eventIndex,
+      task.completionEvents[i].date ===
 
-      1
+      today
 
-    );
+    ){
+
+      task.completionEvents.splice(
+
+        i,
+
+        1
+
+      );
+
+      break;
+
+    }
 
   }
 
@@ -4592,79 +4578,67 @@ function undoDone(task){
 
 function escapeHtml(text){
 
-  return text.replace(
+  return String(text)
 
-    /[&<>"']/g,
+    .replace(
 
-    c=>({
+      /[&<>"']/g,
 
-      "&":"&amp;",
+      c=>({
 
-      "<":"&lt;",
+        "&":"&amp;",
 
-      ">":"&gt;",
+        "<":"&lt;",
 
-      "\"":"&quot;",
+        ">":"&gt;",
 
-      "'":"&#039;"
+        "\"":"&quot;",
 
-    }[c])
+        "'":"&#039;"
 
-  );
+      }[c])
 
-}
-
-function medalClass(days){
-
-  return "medal" + days;
+    );
 
 }
 
 function medalsForTask(task){
 
-  if(
+  return (
 
-    !Array.isArray(
+    task.unlockedAwards ||
 
-      task.unlockedAwards
+    []
 
-    )
+  )
 
-  ){
+  .filter(
 
-    return "";
+    milestone =>
 
-  }
+    AWARDS.includes(
 
-  return task.unlockedAwards
-
-    .filter(
-
-      milestone =>
-
-      AWARDS.includes(
-
-        milestone
-
-      )
+      milestone
 
     )
 
-    .map(
+  )
 
-      milestone =>
+  .map(
 
-      `<div
+    milestone =>
 
-        class="mini-medal ${medalClass(milestone)}"
+    `<div
 
-        title="${milestone}-day award">
+      class="mini-medal medal${milestone}"
 
-      </div>`
+      title="${milestone}-day award">
 
-    )
+    </div>`
 
-    .join("");
+  )
+
+  .join("");
 
 }
 
@@ -4678,7 +4652,9 @@ function render(){
 
   finalizePastDays();
 
-  reconcileStreaks();
+  const changed =
+
+    reconcileStreaks();
 
   updateAllTaskAwards();
 
@@ -4704,6 +4680,26 @@ function render(){
 
     );
 
+  if(
+
+    recoverySource
+
+  ){
+
+    const notice =
+
+      $("recoveryNotice");
+
+    notice.style.display =
+
+      "block";
+
+    notice.textContent =
+
+      `Recovered ${state.tasks.length} task${state.tasks.length===1?"":"s"} from local backup data (${recoverySource}).`;
+
+  }
+
   const rank = {
 
     overdue:0,
@@ -4722,43 +4718,33 @@ function render(){
 
     .sort(
 
-      (a,b)=>{
+      (a,b)=>
 
-        const sa =
+      rank[
 
-          status(a);
+        status(a).state
 
-        const sb =
+      ] -
 
-          status(b);
+      rank[
 
-        if(
+        status(b).state
 
-          rank[sa.state] !==
+      ]
 
-          rank[sb.state]
+      ||
 
-        ){
+      Number(
 
-          return (
+        a.createdAt
 
-            rank[sa.state] -
+      ) -
 
-            rank[sb.state]
+      Number(
 
-          );
+        b.createdAt
 
-        }
-
-        return (
-
-          a.createdAt -
-
-          b.createdAt
-
-        );
-
-      }
+      )
 
     );
 
@@ -4776,11 +4762,7 @@ function render(){
 
     list.innerHTML =
 
-      '<div class="empty">' +
-
-      'No tasks yet.' +
-
-      '</div>';
+      '<div class="empty">No tasks yet.</div>';
 
   }
 
@@ -4798,7 +4780,11 @@ function render(){
 
     const streak =
 
-      currentStreakDays(task);
+      currentStreakDays(
+
+        task
+
+      );
 
     const card =
 
@@ -4810,9 +4796,7 @@ function render(){
 
     card.className =
 
-      "task " +
-
-      s.state;
+      `task ${s.state}`;
 
     card.innerHTML = `
 
@@ -4864,15 +4848,7 @@ function render(){
 
           <div class="task-streak">
 
-            ${
-
-              streak === 1
-
-              ? "1-day streak"
-
-              : streak + "-day streak"
-
-            }
+            ${streak}-day streak
 
           </div>
 
@@ -4962,23 +4938,13 @@ function render(){
 
         "change",
 
-        event=>{
+        event=>
 
-          if(
+        event.target.checked
 
-            event.target.checked
+        ? markDone(task)
 
-          ){
-
-            markDone(task);
-
-          }else{
-
-            undoDone(task);
-
-          }
-
-        }
+        : undoDone(task)
 
       );
 
@@ -5002,9 +4968,17 @@ function render(){
 
   }
 
-  saveState();
-
   updateSummary();
+
+  if(
+
+    changed
+
+  ){
+
+    saveState();
+
+  }
 
 }
 
@@ -5030,9 +5004,9 @@ function updateSummary(){
 
     states.filter(
 
-      x =>
+      state =>
 
-      x === "overdue"
+      state === "overdue"
 
     ).length;
 
@@ -5040,9 +5014,9 @@ function updateSummary(){
 
     states.filter(
 
-      x =>
+      state =>
 
-      x === "due"
+      state === "due"
 
     ).length;
 
@@ -5050,9 +5024,9 @@ function updateSummary(){
 
     states.filter(
 
-      x =>
+      state =>
 
-      x === "pending"
+      state === "pending"
 
     ).length;
 
@@ -5066,35 +5040,21 @@ function updateSummary(){
 
       .textContent =
 
-      overdue +
-
-      " task" +
-
-      (
-
-        overdue === 1
-
-        ? ""
-
-        : "s"
-
-      ) +
-
-      " overdue";
-
-    const waiting =
-
-      due + pending;
+      `${overdue} task${overdue===1?"":"s"} overdue`;
 
     $("statusCopy")
 
       .textContent =
 
-      waiting
+      (
 
-      ? waiting +
+        due +
 
-        " more waiting."
+        pending
+
+      )
+
+      ? `${due+pending} more waiting.`
 
       : "Nothing else is waiting.";
 
@@ -5130,21 +5090,7 @@ function updateSummary(){
 
       .textContent =
 
-      due +
-
-      " task" +
-
-      (
-
-        due === 1
-
-        ? ""
-
-        : "s"
-
-      ) +
-
-      " due today";
+      `${due} task${due===1?"":"s"} due today`;
 
     $("statusCopy")
 
@@ -5152,9 +5098,7 @@ function updateSummary(){
 
       pending
 
-      ? pending +
-
-        " more pending."
+      ? `${pending} more pending.`
 
       : "Nothing is overdue.";
 
@@ -5196,21 +5140,7 @@ function updateSummary(){
 
       .textContent =
 
-      pending +
-
-      " task" +
-
-      (
-
-        pending === 1
-
-        ? " is"
-
-        : "s are"
-
-      ) +
-
-      " pending.";
+      `${pending} task${pending===1?" is":"s are"} pending.`;
 
     $("statusBadge")
 
@@ -5294,11 +5224,7 @@ function renderAwards(){
 
     list.innerHTML =
 
-      '<div class="empty">' +
-
-      'No tasks yet.' +
-
-      '</div>';
+      '<div class="empty">No tasks yet.</div>';
 
     return;
 
@@ -5314,7 +5240,11 @@ function renderAwards(){
 
     const streak =
 
-      currentStreakDays(task);
+      currentStreakDays(
+
+        task
+
+      );
 
     const next =
 
@@ -5322,7 +5252,13 @@ function renderAwards(){
 
         milestone =>
 
-        !task.unlockedAwards.includes(
+        !(
+
+          task.unlockedAwards ||
+
+          []
+
+        ).includes(
 
           milestone
 
@@ -5330,69 +5266,29 @@ function renderAwards(){
 
       );
 
-    let nextText;
-
-    if(
+    const remaining =
 
       next
 
-    ){
-
-      const remaining =
-
-        Math.max(
+      ? Math.max(
 
           0,
 
-          next - streak
+          next-streak
 
-        );
+        )
 
-      nextText =
+      : 0;
 
-        remaining === 0
+    const nextText =
 
-        ? "Award ready"
+      next
 
-        : remaining +
+      ? `${remaining} day${remaining===1?"":"s"} to ${next}`
 
-          " day" +
+      : "All awards earned";
 
-          (
-
-            remaining === 1
-
-            ? ""
-
-            : "s"
-
-          ) +
-
-          " to " +
-
-          next;
-
-    }else{
-
-      nextText =
-
-        "All awards earned";
-
-    }
-
-    const card =
-
-      document.createElement(
-
-        "article"
-
-      );
-
-    card.className =
-
-      "award-task";
-
-    const awardItems =
+    const items =
 
       AWARDS.map(
 
@@ -5400,7 +5296,13 @@ function renderAwards(){
 
           const earned =
 
-            task.unlockedAwards.includes(
+            (
+
+              task.unlockedAwards ||
+
+              []
+
+            ).includes(
 
               milestone
 
@@ -5454,6 +5356,18 @@ function renderAwards(){
 
       ).join("");
 
+    const card =
+
+      document.createElement(
+
+        "article"
+
+      );
+
+    card.className =
+
+      "award-task";
+
     card.innerHTML = `
 
       <div class="award-task-top">
@@ -5492,7 +5406,7 @@ function renderAwards(){
 
       <div class="award-row">
 
-        ${awardItems}
+        ${items}
 
       </div>
 
@@ -5505,8 +5419,6 @@ function renderAwards(){
     );
 
   }
-
-  saveState();
 
 }
 
@@ -5568,15 +5480,27 @@ function renderCalendar(){
 
   grid.innerHTML="";
 
-  const weekdayNames =
-
-    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-
   for(
 
     const name
 
-    of weekdayNames
+    of [
+
+      "Sun",
+
+      "Mon",
+
+      "Tue",
+
+      "Wed",
+
+      "Thu",
+
+      "Fri",
+
+      "Sat"
+
+    ]
 
   ){
 
@@ -5604,7 +5528,7 @@ function renderCalendar(){
 
   }
 
-  const firstDay =
+  const offset =
 
     new Date(
 
@@ -5614,13 +5538,9 @@ function renderCalendar(){
 
       1
 
-    );
+    ).getDay();
 
-  const startOffset =
-
-    firstDay.getDay();
-
-  const daysInMonth =
+  const days =
 
     new Date(
 
@@ -5636,7 +5556,7 @@ function renderCalendar(){
 
     let i=0;
 
-    i<startOffset;
+    i<offset;
 
     i++
 
@@ -5670,29 +5590,25 @@ function renderCalendar(){
 
     let day=1;
 
-    day<=daysInMonth;
+    day<=days;
 
     day++
 
   ){
 
-    const date =
-
-      new Date(
-
-        year,
-
-        month,
-
-        day
-
-      );
-
     const key =
 
       localDateKey(
 
-        date
+        new Date(
+
+          year,
+
+          month,
+
+          day
+
+        )
 
       );
 
@@ -5710,7 +5626,9 @@ function renderCalendar(){
 
     if(
 
-      key === today
+      key ===
+
+      today
 
     ){
 
@@ -5762,15 +5680,11 @@ function renderCalendar(){
 
     else if(
 
-      key === today
+      key ===
+
+      today
 
     ){
-
-      /*
-
-        Today's mark is provisional.
-
-      */
 
       if(
 
@@ -5878,7 +5792,7 @@ function renderCalendar(){
 
 /* ==================================================
 
-   SPECIAL ACHIEVEMENT DISPLAY
+   ACHIEVEMENTS DISPLAY
 
    ================================================== */
 
@@ -5988,15 +5902,13 @@ function renderAchievements(){
 
    ================================================== */
 
-function showOnly(
+function showOnly(id){
 
-  viewId
+  for(
 
-){
+    const view
 
-  const views =
-
-    [
+    of [
 
       "mainView",
 
@@ -6004,17 +5916,11 @@ function showOnly(
 
       "calendarView"
 
-    ];
-
-  for(
-
-    const id
-
-    of views
+    ]
 
   ){
 
-    $(id)
+    $(view)
 
       .classList
 
@@ -6022,7 +5928,7 @@ function showOnly(
 
         "hidden",
 
-        id !== viewId
+        view !== id
 
       );
 
@@ -6274,15 +6180,15 @@ $("addBtn")
 
       $("resetWeekday").value =
 
-        1;
+        "1";
 
       $("maxDays").value =
 
-        7;
+        "7";
 
       $("pendingWindow").value =
 
-        2;
+        "2";
 
       $("deleteBtn").hidden =
 
@@ -6328,15 +6234,27 @@ function openEdit(task){
 
   $("resetWeekday").value =
 
-    task.resetWeekday ?? 1;
+    String(
+
+      task.resetWeekday ?? 1
+
+    );
 
   $("maxDays").value =
 
-    task.maxDays ?? 7;
+    String(
+
+      task.maxDays ?? 7
+
+    );
 
   $("pendingWindow").value =
 
-    task.pendingWindow ?? 2;
+    String(
+
+      task.pendingWindow ?? 2
+
+    );
 
   $("deleteBtn").hidden =
 
@@ -6372,7 +6290,7 @@ form.addEventListener(
 
       $("taskType").value;
 
-    const resetWeekday =
+    const reset =
 
       Number(
 
@@ -6380,7 +6298,7 @@ form.addEventListener(
 
       );
 
-    const maxDays =
+    const max =
 
       Number(
 
@@ -6388,7 +6306,7 @@ form.addEventListener(
 
       );
 
-    const pendingWindow =
+    const pending =
 
       Number(
 
@@ -6408,43 +6326,47 @@ form.addEventListener(
 
     if(
 
-      type === "interval"
+      type === "interval" &&
+
+      (
+
+        !Number.isInteger(
+
+          max
+
+        )
+
+        ||
+
+        !Number.isInteger(
+
+          pending
+
+        )
+
+        ||
+
+        max < 1
+
+        ||
+
+        pending < 1
+
+        ||
+
+        pending > max
+
+      )
 
     ){
 
-      if(
+      alert(
 
-        !Number.isInteger(
+        "Maximum days and Pending window must be whole numbers, and Pending window cannot exceed Maximum days."
 
-          maxDays
+      );
 
-        ) ||
-
-        !Number.isInteger(
-
-          pendingWindow
-
-        ) ||
-
-        maxDays < 1 ||
-
-        pendingWindow < 1 ||
-
-        pendingWindow >
-
-        maxDays
-
-      ){
-
-        alert(
-
-          "Maximum days and Pending window must be whole numbers, and Pending window cannot exceed Maximum days."
-
-        );
-
-        return;
-
-      }
+      return;
 
     }
 
@@ -6464,6 +6386,16 @@ form.addEventListener(
 
         );
 
+      if(
+
+        !task
+
+      ){
+
+        return;
+
+      }
+
       task.name =
 
         name;
@@ -6474,21 +6406,21 @@ form.addEventListener(
 
       task.resetWeekday =
 
-        resetWeekday;
+        reset;
 
       task.maxDays =
 
-        maxDays;
+        max;
 
       task.pendingWindow =
 
-        pendingWindow;
+        pending;
 
     }
 
     else{
 
-      const newTask =
+      const task =
 
         makeTask(
 
@@ -6496,19 +6428,19 @@ form.addEventListener(
 
           type,
 
-          maxDays,
+          max,
 
-          pendingWindow
+          pending
 
         );
 
-      newTask.resetWeekday =
+      task.resetWeekday =
 
-        resetWeekday;
+        reset;
 
       state.tasks.push(
 
-        newTask
+        task
 
       );
 
@@ -6587,8 +6519,6 @@ $("deleteBtn")
    ================================================== */
 
 finalizePastDays();
-
-saveState();
 
 render();
 
