@@ -2864,114 +2864,105 @@ function statusAt(
 
           dateKey,
 
-          -1
+        /* ---------- DAILY ---------- */
 
-        )
+if(
 
-      );
+  task.type === "daily"
 
-  }
-
-  /* ---------- DAILY ---------- */
+){
 
   if(
 
-    task.type === "daily"
+    includeSameDay &&
+
+    latest === dateKey
 
   ){
 
-    if(
-
-      includeSameDay &&
-
-      latest === dateKey
-
-    ){
-
-      return{
-
-        state:"done",
-
-        progress:1,
-
-        detail:"Done for today"
-
-      };
-
-    }
-
-    const yesterday =
-
-      addDaysKey(
-
-        dateKey,
-
-        -1
-
-      );
-
-    if(
-
-      latest === yesterday
-
-    ){
-
-      return{
-
-        state:"pending",
-
-        progress:0,
-
-        detail:"Pending today"
-
-      };
-
-    }
-
-    const createdKey =
-
-      localDateKey(
-
-        new Date(
-
-          task.createdAt
-
-        )
-
-      );
-
-    if(
-
-      dateKey <= createdKey &&
-
-      !latest
-
-    ){
-
-      return{
-
-        state:"pending",
-
-        progress:0,
-
-        detail:"Pending today"
-
-      };
-
-    }
-
     return{
 
-      state:"overdue",
+      state:"done",
 
-      progress:0,
+      progress:1,
 
-      detail:"Overdue"
+      detail:"Done for today"
 
     };
 
   }
 
+  const yesterday =
+
+    addDaysKey(
+
+      dateKey,
+
+      -1
+
+    );
+
+  if(
+
+    latest === yesterday
+
+  ){
+
+    return{
+
+      state:"due",
+
+      progress:0,
+
+      detail:"Due Today"
+
+    };
+
+  }
+
+  const createdKey =
+
+    localDateKey(
+
+      new Date(
+
+        task.createdAt
+
+      )
+
+    );
+
+  if(
+
+    dateKey <= createdKey &&
+
+    !latest
+
+  ){
+
+    return{
+
+      state:"due",
+
+      progress:0,
+
+      detail:"Due Today"
+
+    };
+
+  }
+
+  return{
+
+    state:"overdue",
+
+    progress:0,
+
+    detail:"Overdue"
+
+  };
+
+}
   /* ---------- WEEKLY ---------- */
 
   if(
