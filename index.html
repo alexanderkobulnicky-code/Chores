@@ -6,41 +6,99 @@
 
 <meta charset="utf-8">
 
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta
 
-<meta name="theme-color" content="#f4f4ef">
+  name="viewport"
 
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-<meta http-equiv="Pragma" content="no-cache">
+<meta
 
-<meta http-equiv="Expires" content="0">
+  name="theme-color"
+
+  content="#f4f4ef">
+
+<meta
+
+  http-equiv="Cache-Control"
+
+  content="no-cache, no-store, must-revalidate">
+
+<meta
+
+  http-equiv="Pragma"
+
+  content="no-cache">
+
+<meta
+
+  http-equiv="Expires"
+
+  content="0">
 
 <title>Chores</title>
 
-<link rel="apple-touch-icon" href="BE53A647-84C0-4476-9861-D24FE24B40C7.png">
+<link
+
+  rel="apple-touch-icon"
+
+  href="BE53A647-84C0-4476-9861-D24FE24B40C7.png">
 
 <style>
 
 :root{
 
-  --bg:#f4f4ef; --card:#fff; --ink:#1d221f; --muted:#6d756f; --line:#dfe3dd;
+  --bg:#f4f4ef;
 
-  --done-slider:#315f4a; --done-bg:#dfe8e2; --done-border:#c4d2c8;
+  --card:#fff;
 
-  --pending-slider:#c6a52e; --pending-bg:#f3ecd0; --pending-border:#ddd09b;
+  --ink:#1d221f;
 
-  --due-slider:#d77b2f; --due-bg:#f3dfcf; --due-border:#dfb58f;
+  --muted:#6d756f;
 
-  --overdue-slider:#a7463f; --overdue-bg:#f0d9d7; --overdue-border:#d9aaa6;
+  --line:#dfe3dd;
 
-  --green-soft:#dfece5; --orange-soft:#f6e3d1; --red-soft:#f5dfdd;
+  --done-slider:#315f4a;
+
+  --done-bg:#dfe8e2;
+
+  --done-border:#c4d2c8;
+
+  --pending-slider:#c6a52e;
+
+  --pending-bg:#f3ecd0;
+
+  --pending-border:#ddd09b;
+
+  --due-slider:#d77b2f;
+
+  --due-bg:#f3dfcf;
+
+  --due-border:#dfb58f;
+
+  --overdue-slider:#a7463f;
+
+  --overdue-bg:#f0d9d7;
+
+  --overdue-border:#d9aaa6;
+
+  --green-soft:#dfece5;
+
+  --orange-soft:#f6e3d1;
+
+  --red-soft:#f5dfdd;
 
 }
 
-*{box-sizing:border-box}
+*{
 
-html,body{
+  box-sizing:border-box;
+
+}
+
+html,
+
+body{
 
   margin:0;
 
@@ -54,13 +112,35 @@ html,body{
 
 body{
 
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-family:
+
+    system-ui,
+
+    -apple-system,
+
+    BlinkMacSystemFont,
+
+    "Segoe UI",
+
+    sans-serif;
 
 }
 
-button,input,select{font:inherit}
+button,
 
-button{cursor:pointer}
+input,
+
+select{
+
+  font:inherit;
+
+}
+
+button{
+
+  cursor:pointer;
+
+}
 
 .app{
 
@@ -128,7 +208,9 @@ h1{
 
 }
 
-.add,.save{
+.add,
+
+.save{
 
   border:0;
 
@@ -161,6 +243,12 @@ h1{
   font-weight:650;
 
 }
+
+/* ==================================================
+
+   TOP STATUS
+
+   ================================================== */
 
 .status,
 
@@ -264,6 +352,12 @@ h1{
 
 }
 
+/* ==================================================
+
+   TASK CARDS
+
+   ================================================== */
+
 .tasks{
 
   display:grid;
@@ -282,7 +376,11 @@ h1{
 
   box-shadow:0 8px 26px rgba(20,30,24,.055);
 
-  transition:background .2s,border-color .2s;
+  transition:
+
+    background .2s,
+
+    border-color .2s;
 
 }
 
@@ -386,11 +484,21 @@ h1{
 
   border-radius:7px;
 
-  border:1px solid #ffffffaa;
+  border:
 
-  box-shadow:0 1px 4px #0002;
+    1px solid
 
-  background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
+    #ffffffaa;
+
+  box-shadow:
+
+    0 1px 4px
+
+    #0002;
+
+  background-image:
+
+    url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
 
   background-repeat:no-repeat;
 
@@ -400,7 +508,9 @@ h1{
 
   height:8px;
 
-  background:rgba(255,255,255,.5);
+  background:
+
+    rgba(255,255,255,.5);
 
   border-radius:99px;
 
@@ -418,13 +528,29 @@ h1{
 
 }
 
-.done .bar>div{background:var(--done-slider)}
+.done .bar>div{
 
-.pending .bar>div{background:var(--pending-slider)}
+  background:var(--done-slider);
 
-.due .bar>div{background:var(--due-slider)}
+}
 
-.overdue .bar>div{background:var(--overdue-slider)}
+.pending .bar>div{
+
+  background:var(--pending-slider);
+
+}
+
+.due .bar>div{
+
+  background:var(--due-slider);
+
+}
+
+.overdue .bar>div{
+
+  background:var(--overdue-slider);
+
+}
 
 .task-bottom{
 
@@ -459,6 +585,12 @@ h1{
   text-underline-offset:3px;
 
 }
+
+/* ==================================================
+
+   SWITCH
+
+   ================================================== */
 
 .switch{
 
@@ -512,7 +644,11 @@ h1{
 
   border-radius:50%;
 
-  box-shadow:0 2px 6px #0002;
+  box-shadow:
+
+    0 2px 6px
+
+    #0002;
 
   transition:.18s;
 
@@ -548,6 +684,12 @@ h1{
 
 }
 
+/* ==================================================
+
+   GENERIC
+
+   ================================================== */
+
 .empty{
 
   padding:34px;
@@ -556,7 +698,11 @@ h1{
 
   color:var(--muted);
 
-  border:1px dashed var(--line);
+  border:
+
+    1px dashed
+
+    var(--line);
 
   border-radius:18px;
 
@@ -568,7 +714,11 @@ h1{
 
 }
 
-/* AWARDS */
+/* ==================================================
+
+   AWARDS
+
+   ================================================== */
 
 .page-header{
 
@@ -650,7 +800,9 @@ h1{
 
   display:grid;
 
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:
+
+    repeat(5,1fr);
 
   gap:8px;
 
@@ -670,11 +822,17 @@ h1{
 
   border-radius:12px;
 
-  background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
+  background-image:
+
+    url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
 
   background-repeat:no-repeat;
 
-  box-shadow:0 2px 8px #0002;
+  box-shadow:
+
+    0 2px 8px
+
+    #0002;
 
 }
 
@@ -706,47 +864,83 @@ h1{
 
 }
 
-.medal10,.art10{
+/* Medal sheet */
 
-  background-size:300% 200%;
+.medal10,
 
-  background-position:0 0;
+.art10{
 
-}
+  background-size:
 
-.medal20,.art20{
+    300% 200%;
 
-  background-size:300% 200%;
+  background-position:
 
-  background-position:50% 0;
-
-}
-
-.medal50,.art50{
-
-  background-size:300% 200%;
-
-  background-position:100% 0;
+    0 0;
 
 }
 
-.medal100,.art100{
+.medal20,
 
-  background-size:200% 200%;
+.art20{
 
-  background-position:0 100%;
+  background-size:
 
-}
+    300% 200%;
 
-.medal200,.art200{
+  background-position:
 
-  background-size:200% 200%;
-
-  background-position:100% 100%;
+    50% 0;
 
 }
 
-/* CALENDAR */
+.medal50,
+
+.art50{
+
+  background-size:
+
+    300% 200%;
+
+  background-position:
+
+    100% 0;
+
+}
+
+.medal100,
+
+.art100{
+
+  background-size:
+
+    200% 200%;
+
+  background-position:
+
+    0 100%;
+
+}
+
+.medal200,
+
+.art200{
+
+  background-size:
+
+    200% 200%;
+
+  background-position:
+
+    100% 100%;
+
+}
+
+/* ==================================================
+
+   CALENDAR
+
+   ================================================== */
 
 .calendar-card{
 
@@ -780,7 +974,11 @@ h1{
 
 .month-button{
 
-  border:1px solid var(--line);
+  border:
+
+    1px solid
+
+    var(--line);
 
   background:white;
 
@@ -802,7 +1000,9 @@ h1{
 
   display:grid;
 
-  grid-template-columns:repeat(7,1fr);
+  grid-template-columns:
+
+    repeat(7,1fr);
 
   gap:5px;
 
@@ -826,7 +1026,11 @@ h1{
 
   min-height:68px;
 
-  border:1px solid var(--line);
+  border:
+
+    1px solid
+
+    var(--line);
 
   border-radius:11px;
 
@@ -870,7 +1074,11 @@ h1{
 
 .day-cell.today{
 
-  outline:2px solid var(--ink);
+  outline:
+
+    2px solid
+
+    var(--ink);
 
   outline-offset:-2px;
 
@@ -892,7 +1100,9 @@ h1{
 
   top:50%;
 
-  transform:translate(-50%,-42%);
+  transform:
+
+    translate(-50%,-42%);
 
   font-size:25px;
 
@@ -930,7 +1140,11 @@ h1{
 
 }
 
-/* SPECIAL ACHIEVEMENTS */
+/* ==================================================
+
+   SPECIAL ACHIEVEMENTS
+
+   ================================================== */
 
 .achievement-list{
 
@@ -974,7 +1188,11 @@ h1{
 
   color:var(--done-slider);
 
-  border:1px solid var(--done-border);
+  border:
+
+    1px solid
+
+    var(--done-border);
 
 }
 
@@ -1024,11 +1242,23 @@ h1{
 
 }
 
-/* DIALOG */
+/* ==================================================
+
+   DIALOG
+
+   ================================================== */
 
 dialog{
 
-  width:min(520px,calc(100% - 24px));
+  width:
+
+    min(
+
+      520px,
+
+      calc(100% - 24px)
+
+    );
 
   border:0;
 
@@ -1036,7 +1266,11 @@ dialog{
 
   padding:0;
 
-  box-shadow:0 25px 80px #0004;
+  box-shadow:
+
+    0 25px 80px
+
+    #0004;
 
 }
 
@@ -1086,19 +1320,27 @@ dialog::backdrop{
 
   display:grid;
 
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:
+
+    1fr 1fr;
 
   gap:10px;
 
 }
 
-input,select{
+input,
+
+select{
 
   width:100%;
 
   padding:11px;
 
-  border:1px solid var(--line);
+  border:
+
+    1px solid
+
+    var(--line);
 
   border-radius:11px;
 
@@ -1134,9 +1376,15 @@ input,select{
 
 }
 
-.ghost,.delete{
+.ghost,
 
-  border:1px solid var(--line);
+.delete{
+
+  border:
+
+    1px solid
+
+    var(--line);
 
   border-radius:999px;
 
@@ -1151,6 +1399,12 @@ input,select{
   color:var(--overdue-slider);
 
 }
+
+/* ==================================================
+
+   MOBILE
+
+   ================================================== */
 
 @media(max-width:600px){
 
@@ -1220,7 +1474,17 @@ input,select{
 
 <body>
 
-<main class="app" id="mainView">
+<!-- ==================================================
+
+     MAIN
+
+     ================================================== -->
+
+<main
+
+  class="app"
+
+  id="mainView">
 
 <header>
 
@@ -1332,7 +1596,11 @@ input,select{
 
 </main>
 
-<!-- AWARDS -->
+<!-- ==================================================
+
+     AWARDS
+
+     ================================================== -->
 
 <main
 
@@ -1376,7 +1644,11 @@ input,select{
 
 </main>
 
-<!-- CALENDAR -->
+<!-- ==================================================
+
+     CALENDAR
+
+     ================================================== -->
 
 <main
 
@@ -1470,7 +1742,11 @@ input,select{
 
 </main>
 
-<!-- TASK EDITOR -->
+<!-- ==================================================
+
+     TASK EDITOR
+
+     ================================================== -->
 
 <dialog id="taskDialog">
 
@@ -1544,21 +1820,57 @@ input,select{
 
 </div>
 
+<!-- ==================================================
+
+     WEEKLY SETTINGS
+
+     ================================================== -->
+
 <div
 
   id="weeklyFields"
 
   class="hidden">
 
+<div class="pair">
+
 <div class="field">
 
-<label for="resetWeekday">
+<label for="pendingWeekday">
 
   Resets to Pending
 
 </label>
 
-<select id="resetWeekday">
+<select id="pendingWeekday">
+
+<option value="0">Sunday</option>
+
+<option value="1">Monday</option>
+
+<option value="2">Tuesday</option>
+
+<option value="3">Wednesday</option>
+
+<option value="4">Thursday</option>
+
+<option value="5" selected>Friday</option>
+
+<option value="6">Saturday</option>
+
+</select>
+
+</div>
+
+<div class="field">
+
+<label for="overdueWeekday">
+
+  Becomes Overdue
+
+</label>
+
+<select id="overdueWeekday">
 
 <option value="0">Sunday</option>
 
@@ -1578,17 +1890,31 @@ input,select{
 
 </div>
 
+</div>
+
 <p class="fine">
 
-The task may be completed at any time during the week.
+A completed weekly task remains Done until the next
 
-It is Due Today on the day before this setting.
+“Resets to Pending” day.
 
-If you miss the weekly window, it becomes Overdue when the new week begins.
+The day immediately before “Becomes Overdue” is Due Today.
+
+Example: Pending Sunday + Overdue Wednesday means
+
+Pending Sunday and Monday, Due Today Tuesday,
+
+and Overdue Wednesday if it still has not been completed.
 
 </p>
 
 </div>
+
+<!-- ==================================================
+
+     EVERY N DAYS
+
+     ================================================== -->
 
 <div
 
@@ -1694,6 +2020,12 @@ and becomes Overdue Tuesday.
 
 </div>
 
+<!-- ==================================================
+
+     DAILY
+
+     ================================================== -->
+
 <div
 
   id="dailyNote"
@@ -1702,7 +2034,9 @@ and becomes Overdue Tuesday.
 
 Daily tasks are Due Today until completed.
 
-If a whole day passes without completion, they become Overdue.
+If a whole day passes without completion,
+
+they become Overdue.
 
 </div>
 
@@ -1836,7 +2170,9 @@ const uid =
 
     globalThis.crypto &&
 
-    typeof globalThis.crypto.randomUUID === "function"
+    typeof globalThis.crypto.randomUUID ===
+
+    "function"
 
   )
 
@@ -1876,7 +2212,13 @@ function localDateKey(
 
       date.getMonth()+1
 
-    ).padStart(2,"0");
+    ).padStart(
+
+      2,
+
+      "0"
+
+    );
 
   const d =
 
@@ -1884,7 +2226,13 @@ function localDateKey(
 
       date.getDate()
 
-    ).padStart(2,"0");
+    ).padStart(
+
+      2,
+
+      "0"
+
+    );
 
   return `${y}-${m}-${d}`;
 
@@ -1926,7 +2274,9 @@ function addDaysKey(
 
   d.setDate(
 
-    d.getDate()+days
+    d.getDate() +
+
+    days
 
   );
 
@@ -1944,15 +2294,25 @@ function diffCalendarDays(
 
   const a =
 
-    dateFromKey(fromKey);
+    dateFromKey(
+
+      fromKey
+
+    );
 
   const b =
 
-    dateFromKey(toKey);
+    dateFromKey(
+
+      toKey
+
+    );
 
   return Math.round(
 
-    (b-a)/86400000
+    (b-a) /
+
+    86400000
 
   );
 
@@ -1976,45 +2336,309 @@ function prettyDate(key){
 
   ).format(
 
-    dateFromKey(key)
+    dateFromKey(
+
+      key
+
+    )
 
   );
 
 }
 
-function weekStartKey(
+function nextWeekdayAfter(
 
   dateKey,
 
-  resetDay
+  weekday
 
 ){
 
   const d =
 
-    dateFromKey(dateKey);
+    dateFromKey(
 
-  const delta =
+      dateKey
+
+    );
+
+  let delta =
 
     (
 
-      d.getDay() -
+      Number(weekday) -
 
-      Number(resetDay) +
+      d.getDay() +
 
       7
 
     ) % 7;
 
-  d.setDate(
+  /*
 
-    d.getDate() -
+    Strictly AFTER the supplied date.
+
+  */
+
+  if(
+
+    delta === 0
+
+  ){
+
+    delta=7;
+
+  }
+
+  return addDaysKey(
+
+    dateKey,
 
     delta
 
   );
 
-  return localDateKey(d);
+}
+
+function daysFromWeekdayToWeekday(
+
+  fromWeekday,
+
+  toWeekday
+
+){
+
+  return (
+
+    Number(toWeekday) -
+
+    Number(fromWeekday) +
+
+    7
+
+  ) % 7;
+
+}
+
+function defaultPendingWeekday(
+
+  overdueWeekday
+
+){
+
+  /*
+
+    Three days before Overdue.
+
+    Wednesday -> Sunday
+
+    Monday    -> Friday
+
+    etc.
+
+  */
+
+  return (
+
+    Number(overdueWeekday) +
+
+    4
+
+  ) % 7;
+
+}
+
+/* ==================================================
+
+   WEEKLY CYCLE HELPERS
+
+   ================================================== */
+
+function weeklySettings(task){
+
+  const overdue =
+
+    Number(
+
+      task.overdueWeekday ??
+
+      task.resetWeekday ??
+
+      1
+
+    );
+
+  const pending =
+
+    Number(
+
+      task.pendingWeekday ??
+
+      defaultPendingWeekday(
+
+        overdue
+
+      )
+
+    );
+
+  return{
+
+    pending,
+
+    overdue
+
+  };
+
+}
+
+function weeklyCycleAfterCompletion(
+
+  task,
+
+  completionDate
+
+){
+
+  const settings =
+
+    weeklySettings(
+
+      task
+
+    );
+
+  /*
+
+    Completion satisfies the current
+
+    weekly obligation.
+
+    The NEXT occurrence of the
+
+    Pending weekday starts the next
+
+    action window.
+
+  */
+
+  const pendingDate =
+
+    nextWeekdayAfter(
+
+      completionDate,
+
+      settings.pending
+
+    );
+
+  /*
+
+    The next Overdue weekday after
+
+    that Pending boundary ends the
+
+    cycle.
+
+  */
+
+  const overdueDate =
+
+    nextWeekdayAfter(
+
+      pendingDate,
+
+      settings.overdue
+
+    );
+
+  const dueDate =
+
+    addDaysKey(
+
+      overdueDate,
+
+      -1
+
+    );
+
+  return{
+
+    pendingDate,
+
+    dueDate,
+
+    overdueDate
+
+  };
+
+}
+
+function firstWeeklyCycle(
+
+  task
+
+){
+
+  const settings =
+
+    weeklySettings(
+
+      task
+
+    );
+
+  const createdDate =
+
+    localDateKey(
+
+      new Date(
+
+        task.createdAt
+
+      )
+
+    );
+
+  /*
+
+    A brand-new weekly task is never
+
+    born already Overdue.
+
+    Its first Overdue date is the
+
+    NEXT occurrence of that weekday.
+
+  */
+
+  const overdueDate =
+
+    nextWeekdayAfter(
+
+      createdDate,
+
+      settings.overdue
+
+    );
+
+  const dueDate =
+
+    addDaysKey(
+
+      overdueDate,
+
+      -1
+
+    );
+
+  return{
+
+    dueDate,
+
+    overdueDate
+
+  };
 
 }
 
@@ -2048,7 +2672,29 @@ function makeTask(
 
     pendingWindow,
 
+    /*
+
+      Kept for backward compatibility.
+
+      In the old version, resetWeekday
+
+      was effectively the deadline /
+
+      cycle boundary.
+
+      New weekly tasks use:
+
+      pendingWeekday
+
+      overdueWeekday
+
+    */
+
     resetWeekday:1,
+
+    pendingWeekday:5,
+
+    overdueWeekday:1,
 
     lastDoneDate:null,
 
@@ -2096,7 +2742,11 @@ function parseState(raw){
 
     const x =
 
-      JSON.parse(raw);
+      JSON.parse(
+
+        raw
+
+      );
 
     return (
 
@@ -2144,7 +2794,9 @@ function candidateScore(x){
 
   let score =
 
-    x.tasks.length * 100;
+    x.tasks.length *
+
+    100;
 
   for(
 
@@ -2204,9 +2856,9 @@ function findBestStoredState(){
 
   /*
 
-    If the normal storage entry
+    Normal case:
 
-    contains actual tasks, use it.
+    primary storage contains tasks.
 
   */
 
@@ -2242,20 +2894,6 @@ function findBestStoredState(){
 
     );
 
-  /*
-
-    Search the other localStorage
-
-    entries for something that looks
-
-    like a Chores state object.
-
-    This gives us a chance to recover
-
-    data from earlier keys/backups.
-
-  */
-
   const keys=[];
 
   for(
@@ -2270,7 +2908,11 @@ function findBestStoredState(){
 
     const key =
 
-      localStorage.key(i);
+      localStorage.key(
+
+        i
+
+      );
 
     if(
 
@@ -2450,7 +3092,9 @@ function migrateState(parsed){
 
           Number(
 
-            task.pendingAfter ?? 5
+            task.pendingAfter ??
+
+            5
 
           );
 
@@ -2458,7 +3102,9 @@ function migrateState(parsed){
 
           Number(
 
-            task.maxDays ?? 7
+            task.maxDays ??
+
+            7
 
           );
 
@@ -2472,7 +3118,9 @@ function migrateState(parsed){
 
           );
 
-      }else{
+      }
+
+      else{
 
         task.pendingWindow=1;
 
@@ -2480,15 +3128,145 @@ function migrateState(parsed){
 
     }
 
+    /*
+
+      WEEKLY MIGRATION
+
+      Old resetWeekday is preserved
+
+      as the new Becomes Overdue day.
+
+      A new Pending weekday is
+
+      initially placed three days
+
+      before it.
+
+      Example:
+
+      old Wednesday
+
+      ->
+
+      Pending Sunday
+
+      Overdue Wednesday
+
+    */
+
     if(
 
-      task.resetWeekday ==
+      task.type ===
 
-      null
+      "weekly"
 
     ){
 
-      task.resetWeekday=1;
+      if(
+
+        task.overdueWeekday ==
+
+        null
+
+      ){
+
+        task.overdueWeekday =
+
+          Number(
+
+            task.resetWeekday ??
+
+            1
+
+          );
+
+      }
+
+      if(
+
+        task.pendingWeekday ==
+
+        null
+
+      ){
+
+        task.pendingWeekday =
+
+          defaultPendingWeekday(
+
+            task.overdueWeekday
+
+          );
+
+      }
+
+      /*
+
+        Keep the legacy property
+
+        synchronized as a safety net.
+
+      */
+
+      task.resetWeekday =
+
+        Number(
+
+          task.overdueWeekday
+
+        );
+
+    }
+
+    else{
+
+      if(
+
+        task.resetWeekday ==
+
+        null
+
+      ){
+
+        task.resetWeekday=1;
+
+      }
+
+      if(
+
+        task.overdueWeekday ==
+
+        null
+
+      ){
+
+        task.overdueWeekday =
+
+          Number(
+
+            task.resetWeekday
+
+          );
+
+      }
+
+      if(
+
+        task.pendingWeekday ==
+
+        null
+
+      ){
+
+        task.pendingWeekday =
+
+          defaultPendingWeekday(
+
+            task.overdueWeekday
+
+          );
+
+      }
 
     }
 
@@ -2616,7 +3394,9 @@ function migrateState(parsed){
 
         Number(
 
-          task.bestStreak ?? 0
+          task.bestStreak ??
+
+          0
 
         ) || 0;
 
@@ -2812,31 +3592,77 @@ function rotateBackups(){
 
   }
 
+  /*
+
+    Don't knowingly back up
+
+    malformed JSON.
+
+  */
+
+  if(
+
+    !parseState(
+
+      current
+
+    )
+
+  ){
+
+    return;
+
+  }
+
   try{
 
-    localStorage.setItem(
-
-      BACKUP_KEYS[2],
-
-      localStorage.getItem(
-
-        BACKUP_KEYS[1]
-
-      ) || ""
-
-    );
-
-    localStorage.setItem(
-
-      BACKUP_KEYS[1],
+    const backup1 =
 
       localStorage.getItem(
 
         BACKUP_KEYS[0]
 
-      ) || ""
+      );
 
-    );
+    const backup2 =
+
+      localStorage.getItem(
+
+        BACKUP_KEYS[1]
+
+      );
+
+    if(
+
+      backup2
+
+    ){
+
+      localStorage.setItem(
+
+        BACKUP_KEYS[2],
+
+        backup2
+
+      );
+
+    }
+
+    if(
+
+      backup1
+
+    ){
+
+      localStorage.setItem(
+
+        BACKUP_KEYS[1],
+
+        backup1
+
+      );
+
+    }
 
     localStorage.setItem(
 
@@ -2860,7 +3686,11 @@ function saveState(){
 
     STORAGE_KEY,
 
-    JSON.stringify(state)
+    JSON.stringify(
+
+      state
+
+    )
 
   );
 
@@ -2886,7 +3716,9 @@ function hasCompletionOn(
 
       task.completionDates
 
-    ) &&
+    )
+
+    &&
 
     task.completionDates.includes(
 
@@ -3002,7 +3834,11 @@ function statusAt(
 
   }
 
-  /* DAILY */
+  /* ==================================================
+
+     DAILY
+
+     ================================================== */
 
   if(
 
@@ -3110,7 +3946,11 @@ function statusAt(
 
   }
 
-  /* WEEKLY */
+  /* ==================================================
+
+     WEEKLY
+
+     ================================================== */
 
   if(
 
@@ -3120,119 +3960,141 @@ function statusAt(
 
   ){
 
-    const reset =
+    /*
 
-      Number(
+      If the task has ever been
 
-        task.resetWeekday ?? 1
+      completed, its next cycle is
 
-      );
+      determined from the most recent
 
-    const currentStart =
+      completion.
 
-      weekStartKey(
+      This is the crucial change.
 
-        dateKey,
+      A Tuesday completion with:
 
-        reset
+      Pending Sunday
 
-      );
+      Overdue Wednesday
 
-    const previousStart =
+      does NOT reset on Wednesday.
 
-      addDaysKey(
+      It stays Done until Sunday.
 
-        currentStart,
-
-        -7
-
-      );
-
-    const previousEnd =
-
-      addDaysKey(
-
-        currentStart,
-
-        -1
-
-      );
+    */
 
     if(
 
-      latest &&
-
-      latest >=
-
-        currentStart &&
-
-      latest <=
-
-        dateKey
+      latest
 
     ){
 
-      return{
+      const cycle =
 
-        state:"done",
+        weeklyCycleAfterCompletion(
 
-        progress:1,
+          task,
 
-        detail:"Done for this week"
+          latest
 
-      };
+        );
 
-    }
+      if(
 
-    const createdKey =
+        dateKey <
 
-      localDateKey(
+        cycle.pendingDate
 
-        new Date(
+      ){
 
-          task.createdAt
+        return{
 
-        )
+          state:"done",
 
-      );
+          progress:1,
 
-    const existedLastWeek =
+          detail:"Done"
 
-      createdKey <
+        };
 
-      currentStart;
+      }
 
-    const arr =
+      if(
 
-      Array.isArray(
+        dateKey <
 
-        task.completionDates
+        cycle.dueDate
 
-      )
+      ){
 
-      ? task.completionDates
+        const left =
 
-      : [];
+          diffCalendarDays(
 
-    const completedLastWeek =
+            dateKey,
 
-      arr.some(
+            cycle.dueDate
 
-        d =>
+          ) + 1;
 
-        d >= previousStart &&
+        return{
 
-        d <= previousEnd
+          state:"pending",
 
-      );
+          progress:
 
-    if(
+            Math.max(
 
-      existedLastWeek &&
+              0,
 
-      !completedLastWeek
+              Math.min(
 
-    ){
+                1,
+
+                left / 7
+
+              )
+
+            ),
+
+          detail:
+
+            `Pending — ${left} day${left===1?"":"s"} left`
+
+        };
+
+      }
+
+      if(
+
+        dateKey ===
+
+        cycle.dueDate
+
+      ){
+
+        return{
+
+          state:"due",
+
+          progress:0,
+
+          detail:"Due Today"
+
+        };
+
+      }
+
+      /*
+
+        Once the Overdue boundary
+
+        has been crossed, the task
+
+        stays Overdue until completed.
+
+      */
 
       return{
 
@@ -3240,27 +4102,85 @@ function statusAt(
 
         progress:0,
 
-        detail:"Overdue — missed last week"
+        detail:"Overdue"
 
       };
 
     }
 
-    const dueKey =
+    /*
 
-      addDaysKey(
+      Brand-new weekly task:
 
-        currentStart,
+      Pending immediately.
 
-        6
+      It receives its first deadline
+
+      at the next configured Overdue
+
+      weekday.
+
+    */
+
+    const cycle =
+
+      firstWeeklyCycle(
+
+        task
 
       );
 
     if(
 
+      dateKey <
+
+      cycle.dueDate
+
+    ){
+
+      const left =
+
+        diffCalendarDays(
+
+          dateKey,
+
+          cycle.dueDate
+
+        ) + 1;
+
+      return{
+
+        state:"pending",
+
+        progress:
+
+          Math.max(
+
+            0,
+
+            Math.min(
+
+              1,
+
+              left / 7
+
+            )
+
+          ),
+
+        detail:
+
+          `Pending — ${left} day${left===1?"":"s"} left`
+
+      };
+
+    }
+
+    if(
+
       dateKey ===
 
-      dueKey
+      cycle.dueDate
 
     ){
 
@@ -3276,45 +4196,23 @@ function statusAt(
 
     }
 
-    const left =
-
-      diffCalendarDays(
-
-        dateKey,
-
-        dueKey
-
-      ) + 1;
-
     return{
 
-      state:"pending",
+      state:"overdue",
 
-      progress:
+      progress:0,
 
-        Math.max(
-
-          0,
-
-          Math.min(
-
-            1,
-
-            left/7
-
-          )
-
-        ),
-
-      detail:
-
-        `Pending — ${left} day${left===1?"":"s"} left`
+      detail:"Overdue"
 
     };
 
   }
 
-  /* EVERY N DAYS */
+  /* ==================================================
+
+     EVERY N DAYS
+
+     ================================================== */
 
   if(
 
@@ -3402,7 +4300,7 @@ function statusAt(
 
   const left =
 
-    until+1;
+    until + 1;
 
   if(
 
@@ -3554,6 +4452,14 @@ function dayQualifiesForCleanSweep(
 
     }
 
+    /*
+
+      Daily tasks must actually
+
+      be completed that day.
+
+    */
+
     if(
 
       task.type ===
@@ -3581,6 +4487,16 @@ function dayQualifiesForCleanSweep(
       continue;
 
     }
+
+    /*
+
+      Pending is harmless.
+
+      Due Today and Overdue
+
+      must be cleared.
+
+    */
 
     const s =
 
@@ -3706,23 +4622,23 @@ function completedTypesOn(
 
   ){
 
+    const events =
+
+      Array.isArray(
+
+        task.completionEvents
+
+      )
+
+      ? task.completionEvents
+
+      : [];
+
     for(
 
       const event
 
-      of (
-
-        Array.isArray(
-
-          task.completionEvents
-
-        )
-
-        ? task.completionEvents
-
-        : []
-
-      )
+      of events
 
     ){
 
@@ -3764,7 +4680,9 @@ function achievementEarned(id){
 
       achievement =>
 
-      achievement.id === id
+      achievement.id ===
+
+      id
 
     );
 
@@ -3780,7 +4698,7 @@ function grantAchievement(
 
   if(
 
-    !achievementEarned(
+    achievementEarned(
 
       id
 
@@ -3788,19 +4706,21 @@ function grantAchievement(
 
   ){
 
-    state.specialAchievements.push(
-
-      {
-
-        id,
-
-        date:dateKey
-
-      }
-
-    );
+    return;
 
   }
+
+  state.specialAchievements.push(
+
+    {
+
+      id,
+
+      date:dateKey
+
+    }
+
+  );
 
 }
 
@@ -4108,27 +5028,29 @@ function lastGoodDate(task){
 
   ){
 
-    const start =
+    /*
 
-      weekStartKey(
+      The streak remains alive
 
-        task.lastDoneDate,
+      through Due Today.
 
-        Number(
+      It breaks when the configured
 
-          task.resetWeekday ?? 1
+      Overdue date arrives.
 
-        )
+    */
+
+    const cycle =
+
+      weeklyCycleAfterCompletion(
+
+        task,
+
+        task.lastDoneDate
 
       );
 
-    return addDaysKey(
-
-      start,
-
-      13
-
-    );
+    return cycle.dueDate;
 
   }
 
@@ -4718,13 +5640,15 @@ function render(){
 
     .sort(
 
-      (a,b)=>
+      (a,b) =>
 
       rank[
 
         status(a).state
 
-      ] -
+      ]
+
+      -
 
       rank[
 
@@ -4738,7 +5662,9 @@ function render(){
 
         a.createdAt
 
-      ) -
+      )
+
+      -
 
       Number(
 
@@ -4776,7 +5702,11 @@ function render(){
 
     const s =
 
-      status(task);
+      status(
+
+        task
+
+      );
 
     const streak =
 
@@ -4938,13 +5868,21 @@ function render(){
 
         "change",
 
-        event=>
+        event =>
 
         event.target.checked
 
-        ? markDone(task)
+        ? markDone(
 
-        : undoDone(task)
+            task
+
+          )
+
+        : undoDone(
+
+            task
+
+          )
 
       );
 
@@ -4956,7 +5894,13 @@ function render(){
 
         "click",
 
-        ()=>openEdit(task)
+        () =>
+
+        openEdit(
+
+          task
+
+        )
 
       );
 
@@ -5004,9 +5948,11 @@ function updateSummary(){
 
     states.filter(
 
-      state =>
+      value =>
 
-      state === "overdue"
+      value ===
+
+      "overdue"
 
     ).length;
 
@@ -5014,9 +5960,11 @@ function updateSummary(){
 
     states.filter(
 
-      state =>
+      value =>
 
-      state === "due"
+      value ===
+
+      "due"
 
     ).length;
 
@@ -5024,9 +5972,11 @@ function updateSummary(){
 
     states.filter(
 
-      state =>
+      value =>
 
-      state === "pending"
+      value ===
+
+      "pending"
 
     ).length;
 
@@ -5706,7 +6656,9 @@ function renderCalendar(){
 
         caption="so far";
 
-      }else{
+      }
+
+      else{
 
         caption="today";
 
@@ -5740,7 +6692,9 @@ function renderCalendar(){
 
         caption="Clean Sweep";
 
-      }else{
+      }
+
+      else{
 
         cell.classList.add(
 
@@ -5792,7 +6746,7 @@ function renderCalendar(){
 
 /* ==================================================
 
-   ACHIEVEMENTS DISPLAY
+   ACHIEVEMENT DISPLAY
 
    ================================================== */
 
@@ -5928,7 +6882,9 @@ function showOnly(id){
 
         "hidden",
 
-        view !== id
+        view !==
+
+        id
 
       );
 
@@ -6116,7 +7072,9 @@ function updateTypeFields(){
 
       "hidden",
 
-      type !== "weekly"
+      type !==
+
+      "weekly"
 
     );
 
@@ -6128,7 +7086,9 @@ function updateTypeFields(){
 
       "hidden",
 
-      type !== "interval"
+      type !==
+
+      "interval"
 
     );
 
@@ -6140,7 +7100,9 @@ function updateTypeFields(){
 
       "hidden",
 
-      type !== "daily"
+      type !==
+
+      "daily"
 
     );
 
@@ -6178,7 +7140,11 @@ $("addBtn")
 
         "daily";
 
-      $("resetWeekday").value =
+      $("pendingWeekday").value =
+
+        "5";
+
+      $("overdueWeekday").value =
 
         "1";
 
@@ -6208,7 +7174,9 @@ $("cancelBtn")
 
     "click",
 
-    ()=>dialog.close()
+    ()=>
+
+    dialog.close()
 
   );
 
@@ -6232,11 +7200,27 @@ function openEdit(task){
 
     task.type;
 
-  $("resetWeekday").value =
+  const settings =
+
+    weeklySettings(
+
+      task
+
+    );
+
+  $("pendingWeekday").value =
 
     String(
 
-      task.resetWeekday ?? 1
+      settings.pending
+
+    );
+
+  $("overdueWeekday").value =
+
+    String(
+
+      settings.overdue
 
     );
 
@@ -6244,7 +7228,9 @@ function openEdit(task){
 
     String(
 
-      task.maxDays ?? 7
+      task.maxDays ??
+
+      7
 
     );
 
@@ -6252,7 +7238,9 @@ function openEdit(task){
 
     String(
 
-      task.pendingWindow ?? 2
+      task.pendingWindow ??
+
+      2
 
     );
 
@@ -6290,11 +7278,19 @@ form.addEventListener(
 
       $("taskType").value;
 
-    const reset =
+    const pendingWeekday =
 
       Number(
 
-        $("resetWeekday").value
+        $("pendingWeekday").value
+
+      );
+
+    const overdueWeekday =
+
+      Number(
+
+        $("overdueWeekday").value
 
       );
 
@@ -6306,7 +7302,7 @@ form.addEventListener(
 
       );
 
-    const pending =
+    const pendingWindow =
 
       Number(
 
@@ -6324,11 +7320,17 @@ form.addEventListener(
 
     }
 
+    /* ---------- INTERVAL VALIDATION ---------- */
+
     if(
 
-      type === "interval" &&
+      type ===
 
-      (
+      "interval"
+
+    ){
+
+      if(
 
         !Number.isInteger(
 
@@ -6340,7 +7342,7 @@ form.addEventListener(
 
         !Number.isInteger(
 
-          pending
+          pendingWindow
 
         )
 
@@ -6350,23 +7352,121 @@ form.addEventListener(
 
         ||
 
-        pending < 1
+        pendingWindow < 1
 
         ||
 
-        pending > max
+        pendingWindow >
 
-      )
+        max
+
+      ){
+
+        alert(
+
+          "Maximum days and Pending window must be whole numbers, and Pending window cannot exceed Maximum days."
+
+        );
+
+        return;
+
+      }
+
+    }
+
+    /* ---------- WEEKLY VALIDATION ---------- */
+
+    if(
+
+      type ===
+
+      "weekly"
 
     ){
 
-      alert(
+      if(
 
-        "Maximum days and Pending window must be whole numbers, and Pending window cannot exceed Maximum days."
+        !Number.isInteger(
 
-      );
+          pendingWeekday
 
-      return;
+        )
+
+        ||
+
+        !Number.isInteger(
+
+          overdueWeekday
+
+        )
+
+        ||
+
+        pendingWeekday < 0
+
+        ||
+
+        pendingWeekday > 6
+
+        ||
+
+        overdueWeekday < 0
+
+        ||
+
+        overdueWeekday > 6
+
+      ){
+
+        alert(
+
+          "Please choose valid weekdays."
+
+        );
+
+        return;
+
+      }
+
+      const gap =
+
+        daysFromWeekdayToWeekday(
+
+          pendingWeekday,
+
+          overdueWeekday
+
+        );
+
+      /*
+
+        gap 0 = same weekday
+
+        gap 1 = Pending day would also
+
+                be the Due Today day.
+
+        Require at least one genuine
+
+        Pending day before Due Today.
+
+      */
+
+      if(
+
+        gap < 2
+
+      ){
+
+        alert(
+
+          "“Resets to Pending” must be at least one full day before Due Today. Choose a Pending day at least two days before the Overdue day."
+
+        );
+
+        return;
+
+      }
 
     }
 
@@ -6382,7 +7482,9 @@ form.addEventListener(
 
           task =>
 
-          task.id === id
+          task.id ===
+
+          id
 
         );
 
@@ -6404,9 +7506,27 @@ form.addEventListener(
 
         type;
 
+      task.pendingWeekday =
+
+        pendingWeekday;
+
+      task.overdueWeekday =
+
+        overdueWeekday;
+
+      /*
+
+        Maintain legacy field in case
+
+        an older cached version ever
+
+        reads this storage.
+
+      */
+
       task.resetWeekday =
 
-        reset;
+        overdueWeekday;
 
       task.maxDays =
 
@@ -6414,7 +7534,7 @@ form.addEventListener(
 
       task.pendingWindow =
 
-        pending;
+        pendingWindow;
 
     }
 
@@ -6430,13 +7550,21 @@ form.addEventListener(
 
           max,
 
-          pending
+          pendingWindow
 
         );
 
+      task.pendingWeekday =
+
+        pendingWeekday;
+
+      task.overdueWeekday =
+
+        overdueWeekday;
+
       task.resetWeekday =
 
-        reset;
+        overdueWeekday;
 
       state.tasks.push(
 
@@ -6474,13 +7602,17 @@ $("deleteBtn")
 
           task =>
 
-          task.id === id
+          task.id ===
+
+          id
 
         );
 
       if(
 
-        task &&
+        task
+
+        &&
 
         confirm(
 
@@ -6496,7 +7628,9 @@ $("deleteBtn")
 
             item =>
 
-            item.id !== id
+            item.id !==
+
+            id
 
           );
 
