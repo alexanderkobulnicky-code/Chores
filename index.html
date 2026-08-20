@@ -6,99 +6,45 @@
 
 <meta charset="utf-8">
 
-<meta
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-  name="viewport"
+<meta name="theme-color" content="#f4f4ef">
 
-  content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 
-<meta
+<meta http-equiv="Pragma" content="no-cache">
 
-  name="theme-color"
-
-  content="#f4f4ef">
-
-<meta
-
-  http-equiv="Cache-Control"
-
-  content="no-cache, no-store, must-revalidate">
-
-<meta
-
-  http-equiv="Pragma"
-
-  content="no-cache">
-
-<meta
-
-  http-equiv="Expires"
-
-  content="0">
+<meta http-equiv="Expires" content="0">
 
 <title>Chores</title>
 
-<link
-
-  rel="apple-touch-icon"
-
-  href="BE53A647-84C0-4476-9861-D24FE24B40C7.png">
+<link rel="apple-touch-icon" href="BE53A647-84C0-4476-9861-D24FE24B40C7.png">
 
 <style>
 
 :root{
 
-  --bg:#f4f4ef;
+  --bg:#f4f4ef;--card:#fff;--ink:#1d221f;--muted:#6d756f;--line:#dfe3dd;
 
-  --card:#fff;
+  --done-slider:#315f4a;--done-bg:#dfe8e2;--done-border:#c4d2c8;
 
-  --ink:#1d221f;
+  --pending-slider:#c6a52e;--pending-bg:#f3ecd0;--pending-border:#ddd09b;
 
-  --muted:#6d756f;
+  --due-slider:#d77b2f;--due-bg:#f3dfcf;--due-border:#dfb58f;
 
-  --line:#dfe3dd;
+  --overdue-slider:#a7463f;--overdue-bg:#f0d9d7;--overdue-border:#d9aaa6;
 
-  --done-slider:#315f4a;
+  --todo-slider:#56717f;--todo-bg:#e4eaed;--todo-border:#cbd6db;
 
-  --done-bg:#dfe8e2;
+  --todo-done-slider:#65736d;--todo-done-bg:#e2e7e4;--todo-done-border:#cbd4cf;
 
-  --done-border:#c4d2c8;
-
-  --pending-slider:#c6a52e;
-
-  --pending-bg:#f3ecd0;
-
-  --pending-border:#ddd09b;
-
-  --due-slider:#d77b2f;
-
-  --due-bg:#f3dfcf;
-
-  --due-border:#dfb58f;
-
-  --overdue-slider:#a7463f;
-
-  --overdue-bg:#f0d9d7;
-
-  --overdue-border:#d9aaa6;
-
-  --green-soft:#dfece5;
-
-  --orange-soft:#f6e3d1;
-
-  --red-soft:#f5dfdd;
+  --green-soft:#dfece5;--orange-soft:#f6e3d1;--red-soft:#f5dfdd;
 
 }
 
-*{
+*{box-sizing:border-box}
 
-  box-sizing:border-box;
-
-}
-
-html,
-
-body{
+html,body{
 
   margin:0;
 
@@ -112,35 +58,13 @@ body{
 
 body{
 
-  font-family:
-
-    system-ui,
-
-    -apple-system,
-
-    BlinkMacSystemFont,
-
-    "Segoe UI",
-
-    sans-serif;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 
 }
 
-button,
+button,input,select{font:inherit}
 
-input,
-
-select{
-
-  font:inherit;
-
-}
-
-button{
-
-  cursor:pointer;
-
-}
+button{cursor:pointer}
 
 .app{
 
@@ -162,7 +86,11 @@ header,
 
 .modal-actions,
 
-.page-header{
+.page-header,
+
+.todo-top,
+
+.todo-bottom{
 
   display:flex;
 
@@ -208,9 +136,7 @@ h1{
 
 }
 
-.add,
-
-.save{
+.add,.save{
 
   border:0;
 
@@ -218,7 +144,7 @@ h1{
 
   background:var(--ink);
 
-  color:white;
+  color:#fff;
 
   padding:11px 15px;
 
@@ -234,7 +160,7 @@ h1{
 
   border-radius:999px;
 
-  background:white;
+  background:#fff;
 
   color:var(--ink);
 
@@ -244,19 +170,15 @@ h1{
 
 }
 
-/* ==================================================
-
-   TOP STATUS
-
-   ================================================== */
-
 .status,
 
 .award-task,
 
 .achievement-card,
 
-.calendar-card{
+.calendar-card,
+
+.todo-card{
 
   background:var(--card);
 
@@ -352,13 +274,7 @@ h1{
 
 }
 
-/* ==================================================
-
-   TASK CARDS
-
-   ================================================== */
-
-.tasks{
+.tasks,.todos{
 
   display:grid;
 
@@ -376,11 +292,7 @@ h1{
 
   box-shadow:0 8px 26px rgba(20,30,24,.055);
 
-  transition:
-
-    background .2s,
-
-    border-color .2s;
+  transition:background .2s,border-color .2s;
 
 }
 
@@ -416,7 +328,7 @@ h1{
 
 }
 
-.task-name{
+.task-name,.todo-name{
 
   font-size:20px;
 
@@ -484,21 +396,11 @@ h1{
 
   border-radius:7px;
 
-  border:
+  border:1px solid #ffffffaa;
 
-    1px solid
+  box-shadow:0 1px 4px #0002;
 
-    #ffffffaa;
-
-  box-shadow:
-
-    0 1px 4px
-
-    #0002;
-
-  background-image:
-
-    url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
+  background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
 
   background-repeat:no-repeat;
 
@@ -508,9 +410,7 @@ h1{
 
   height:8px;
 
-  background:
-
-    rgba(255,255,255,.5);
+  background:rgba(255,255,255,.5);
 
   border-radius:99px;
 
@@ -528,29 +428,13 @@ h1{
 
 }
 
-.done .bar>div{
+.done .bar>div{background:var(--done-slider)}
 
-  background:var(--done-slider);
+.pending .bar>div{background:var(--pending-slider)}
 
-}
+.due .bar>div{background:var(--due-slider)}
 
-.pending .bar>div{
-
-  background:var(--pending-slider);
-
-}
-
-.due .bar>div{
-
-  background:var(--due-slider);
-
-}
-
-.overdue .bar>div{
-
-  background:var(--overdue-slider);
-
-}
+.overdue .bar>div{background:var(--overdue-slider)}
 
 .task-bottom{
 
@@ -585,12 +469,6 @@ h1{
   text-underline-offset:3px;
 
 }
-
-/* ==================================================
-
-   SWITCH
-
-   ================================================== */
 
 .switch{
 
@@ -640,15 +518,11 @@ h1{
 
   top:4px;
 
-  background:white;
+  background:#fff;
 
   border-radius:50%;
 
-  box-shadow:
-
-    0 2px 6px
-
-    #0002;
+  box-shadow:0 2px 6px #0002;
 
   transition:.18s;
 
@@ -684,12 +558,6 @@ h1{
 
 }
 
-/* ==================================================
-
-   GENERIC
-
-   ================================================== */
-
 .empty{
 
   padding:34px;
@@ -698,11 +566,7 @@ h1{
 
   color:var(--muted);
 
-  border:
-
-    1px dashed
-
-    var(--line);
+  border:1px dashed var(--line);
 
   border-radius:18px;
 
@@ -800,9 +664,7 @@ h1{
 
   display:grid;
 
-  grid-template-columns:
-
-    repeat(5,1fr);
+  grid-template-columns:repeat(5,1fr);
 
   gap:8px;
 
@@ -822,17 +684,11 @@ h1{
 
   border-radius:12px;
 
-  background-image:
-
-    url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
+  background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
 
   background-repeat:no-repeat;
 
-  box-shadow:
-
-    0 2px 8px
-
-    #0002;
+  box-shadow:0 2px 8px #0002;
 
 }
 
@@ -864,75 +720,43 @@ h1{
 
 }
 
-/* Medal sheet */
+.medal10,.art10{
 
-.medal10,
+  background-size:300% 200%;
 
-.art10{
-
-  background-size:
-
-    300% 200%;
-
-  background-position:
-
-    0 0;
+  background-position:0 0;
 
 }
 
-.medal20,
+.medal20,.art20{
 
-.art20{
+  background-size:300% 200%;
 
-  background-size:
-
-    300% 200%;
-
-  background-position:
-
-    50% 0;
+  background-position:50% 0;
 
 }
 
-.medal50,
+.medal50,.art50{
 
-.art50{
+  background-size:300% 200%;
 
-  background-size:
-
-    300% 200%;
-
-  background-position:
-
-    100% 0;
+  background-position:100% 0;
 
 }
 
-.medal100,
+.medal100,.art100{
 
-.art100{
+  background-size:200% 200%;
 
-  background-size:
-
-    200% 200%;
-
-  background-position:
-
-    0 100%;
+  background-position:0 100%;
 
 }
 
-.medal200,
+.medal200,.art200{
 
-.art200{
+  background-size:200% 200%;
 
-  background-size:
-
-    200% 200%;
-
-  background-position:
-
-    100% 100%;
+  background-position:100% 100%;
 
 }
 
@@ -974,13 +798,9 @@ h1{
 
 .month-button{
 
-  border:
+  border:1px solid var(--line);
 
-    1px solid
-
-    var(--line);
-
-  background:white;
+  background:#fff;
 
   width:38px;
 
@@ -1000,9 +820,7 @@ h1{
 
   display:grid;
 
-  grid-template-columns:
-
-    repeat(7,1fr);
+  grid-template-columns:repeat(7,1fr);
 
   gap:5px;
 
@@ -1026,11 +844,7 @@ h1{
 
   min-height:68px;
 
-  border:
-
-    1px solid
-
-    var(--line);
+  border:1px solid var(--line);
 
   border-radius:11px;
 
@@ -1074,11 +888,7 @@ h1{
 
 .day-cell.today{
 
-  outline:
-
-    2px solid
-
-    var(--ink);
+  outline:2px solid var(--ink);
 
   outline-offset:-2px;
 
@@ -1100,9 +910,7 @@ h1{
 
   top:50%;
 
-  transform:
-
-    translate(-50%,-42%);
+  transform:translate(-50%,-42%);
 
   font-size:25px;
 
@@ -1188,11 +996,7 @@ h1{
 
   color:var(--done-slider);
 
-  border:
-
-    1px solid
-
-    var(--done-border);
+  border:1px solid var(--done-border);
 
 }
 
@@ -1244,21 +1048,211 @@ h1{
 
 /* ==================================================
 
-   DIALOG
+   TO DO
+
+   ================================================== */
+
+.todo-card{
+
+  padding:16px 18px;
+
+  transition:background .2s,border-color .2s;
+
+}
+
+.todo-card.todo{
+
+  background:var(--todo-bg);
+
+  border-color:var(--todo-border);
+
+}
+
+.todo-card.pending{
+
+  background:var(--pending-bg);
+
+  border-color:var(--pending-border);
+
+}
+
+.todo-card.due{
+
+  background:var(--due-bg);
+
+  border-color:var(--due-border);
+
+}
+
+.todo-card.overdue{
+
+  background:var(--overdue-bg);
+
+  border-color:var(--overdue-border);
+
+}
+
+.todo-card.completed{
+
+  background:var(--todo-done-bg);
+
+  border-color:var(--todo-done-border);
+
+}
+
+.todo-left{
+
+  display:flex;
+
+  align-items:flex-start;
+
+  gap:12px;
+
+  min-width:0;
+
+}
+
+.todo-copy{
+
+  min-width:0;
+
+}
+
+.todo-bottom{
+
+  margin-top:10px;
+
+  color:var(--muted);
+
+  font-size:11px;
+
+}
+
+.todo-edit{
+
+  border:0;
+
+  background:none;
+
+  color:var(--ink);
+
+  text-decoration:underline;
+
+  text-underline-offset:3px;
+
+  padding:2px 0;
+
+}
+
+.todo-check{
+
+  position:relative;
+
+  width:30px;
+
+  height:30px;
+
+  flex:0 0 30px;
+
+  margin-top:1px;
+
+}
+
+.todo-check input{
+
+  position:absolute;
+
+  opacity:0;
+
+  width:0;
+
+  height:0;
+
+}
+
+.todo-check span{
+
+  position:absolute;
+
+  inset:0;
+
+  border-radius:8px;
+
+  border:2px solid var(--todo-slider);
+
+  background:rgba(255,255,255,.72);
+
+  display:grid;
+
+  place-items:center;
+
+  font-weight:900;
+
+  color:#fff;
+
+}
+
+.todo-check input:checked+span{
+
+  background:var(--todo-done-slider);
+
+  border-color:var(--todo-done-slider);
+
+}
+
+.todo-check input:checked+span:after{
+
+  content:"✓";
+
+}
+
+.todo-card.pending .todo-check span{
+
+  border-color:var(--pending-slider);
+
+}
+
+.todo-card.due .todo-check span{
+
+  border-color:var(--due-slider);
+
+}
+
+.todo-card.overdue .todo-check span{
+
+  border-color:var(--overdue-slider);
+
+}
+
+.todo-summary{
+
+  margin:0 0 16px;
+
+  color:var(--muted);
+
+  font-size:13px;
+
+}
+
+.todo-actions{
+
+  display:flex;
+
+  gap:8px;
+
+  align-items:center;
+
+}
+
+/* ==================================================
+
+   DIALOGS
 
    ================================================== */
 
 dialog{
 
-  width:
-
-    min(
-
-      520px,
-
-      calc(100% - 24px)
-
-    );
+  width:min(520px,calc(100% - 24px));
 
   border:0;
 
@@ -1266,11 +1260,7 @@ dialog{
 
   padding:0;
 
-  box-shadow:
-
-    0 25px 80px
-
-    #0004;
+  box-shadow:0 25px 80px #0004;
 
 }
 
@@ -1320,31 +1310,23 @@ dialog::backdrop{
 
   display:grid;
 
-  grid-template-columns:
-
-    1fr 1fr;
+  grid-template-columns:1fr 1fr;
 
   gap:10px;
 
 }
 
-input,
-
-select{
+input,select{
 
   width:100%;
 
   padding:11px;
 
-  border:
-
-    1px solid
-
-    var(--line);
+  border:1px solid var(--line);
 
   border-radius:11px;
 
-  background:white;
+  background:#fff;
 
   color:var(--ink);
 
@@ -1376,21 +1358,15 @@ select{
 
 }
 
-.ghost,
+.ghost,.delete{
 
-.delete{
-
-  border:
-
-    1px solid
-
-    var(--line);
+  border:1px solid var(--line);
 
   border-radius:999px;
 
   padding:10px 13px;
 
-  background:white;
+  background:#fff;
 
 }
 
@@ -1399,12 +1375,6 @@ select{
   color:var(--overdue-slider);
 
 }
-
-/* ==================================================
-
-   MOBILE
-
-   ================================================== */
 
 @media(max-width:600px){
 
@@ -1466,6 +1436,20 @@ select{
 
   }
 
+  .page-header{
+
+    align-items:flex-start;
+
+  }
+
+  .todo-actions{
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+  }
+
 }
 
 </style>
@@ -1476,65 +1460,65 @@ select{
 
 <!-- ==================================================
 
-     MAIN
+     CHORES
 
      ================================================== -->
 
-<main
-
-  class="app"
-
-  id="mainView">
+<main class="app" id="mainView">
 
 <header>
 
-<div>
+  <div>
 
-<h1>Chores</h1>
+    <h1>Chores</h1>
 
-<div
+    <div class="date" id="date"></div>
 
-  class="date"
+  </div>
 
-  id="date">
+  <div class="header-actions">
 
-</div>
+    <button
 
-</div>
+      class="secondary-button"
 
-<div class="header-actions">
+      id="todoBtn">
 
-<button
+      To Do
 
-  class="secondary-button"
+    </button>
 
-  id="calendarBtn">
+    <button
 
-  Calendar
+      class="secondary-button"
 
-</button>
+      id="calendarBtn">
 
-<button
+      Calendar
 
-  class="secondary-button"
+    </button>
 
-  id="awardsBtn">
+    <button
 
-  Awards
+      class="secondary-button"
 
-</button>
+      id="awardsBtn">
 
-<button
+      Awards
 
-  class="add"
+    </button>
 
-  id="addBtn">
+    <button
 
-  ＋ Add task
+      class="add"
 
-</button>
+      id="addBtn">
 
-</div>
+      ＋ Add task
+
+    </button>
+
+  </div>
 
 </header>
 
@@ -1548,35 +1532,35 @@ select{
 
 <section class="status">
 
-<div>
+  <div>
 
-<h2 id="statusTitle">
+    <h2 id="statusTitle">
 
-  No tasks overdue
+      No tasks overdue
 
-</h2>
+    </h2>
 
-<div
+    <div
 
-  class="status-copy"
+      class="status-copy"
 
-  id="statusCopy">
+      id="statusCopy">
 
-  The field is clear.
+      The field is clear.
 
-</div>
+    </div>
 
-</div>
+  </div>
 
-<div
+  <div
 
-  class="badge"
+    class="badge"
 
-  id="statusBadge">
+    id="statusBadge">
 
-  ✓
+    ✓
 
-</div>
+  </div>
 
 </section>
 
@@ -1608,39 +1592,39 @@ select{
 
   id="awardsView">
 
-<div class="page-header">
+  <div class="page-header">
 
-<div>
+    <div>
 
-<h1>Awards</h1>
+      <h1>Awards</h1>
 
-<div class="date">
+      <div class="date">
 
-  Every task has its own trophy case.
+        Every task has its own trophy case.
 
-</div>
+      </div>
 
-</div>
+    </div>
 
-<button
+    <button
 
-  class="back-button"
+      class="back-button"
 
-  id="awardsBackBtn">
+      id="awardsBackBtn">
 
-  ← Chores
+      ← Chores
 
-</button>
+    </button>
 
-</div>
+  </div>
 
-<section
+  <section
 
-  class="awards-list"
+    class="awards-list"
 
-  id="awardsList">
+    id="awardsList">
 
-</section>
+  </section>
 
 </main>
 
@@ -1656,95 +1640,165 @@ select{
 
   id="calendarView">
 
-<div class="page-header">
+  <div class="page-header">
 
-<div>
+    <div>
 
-<h1>Calendar</h1>
+      <h1>Calendar</h1>
 
-<div class="date">
+      <div class="date">
 
-  A Clean Sweep means everything that actually had to be done that day got done.
+        A Clean Sweep means everything that actually had to be done that day got done.
 
-</div>
+      </div>
 
-</div>
+    </div>
 
-<button
+    <button
 
-  class="back-button"
+      class="back-button"
 
-  id="calendarBackBtn">
+      id="calendarBackBtn">
 
-  ← Chores
+      ← Chores
 
-</button>
+    </button>
 
-</div>
+  </div>
 
-<section class="calendar-card">
+  <section class="calendar-card">
 
-<div class="calendar-toolbar">
+    <div class="calendar-toolbar">
 
-<button
+      <button
 
-  class="month-button"
+        class="month-button"
 
-  id="previousMonthBtn">
+        id="previousMonthBtn">
 
-  ‹
+        ‹
 
-</button>
+      </button>
 
-<div
+      <div
 
-  class="calendar-month"
+        class="calendar-month"
 
-  id="calendarMonth">
+        id="calendarMonth">
 
-</div>
+      </div>
 
-<button
+      <button
 
-  class="month-button"
+        class="month-button"
 
-  id="nextMonthBtn">
+        id="nextMonthBtn">
 
-  ›
+        ›
 
-</button>
+      </button>
 
-</div>
+    </div>
 
-<div
+    <div
 
-  class="calendar-grid"
+      class="calendar-grid"
 
-  id="calendarGrid">
+      id="calendarGrid">
 
-</div>
+    </div>
 
-</section>
+  </section>
 
-<div class="section-title">
+  <div class="section-title">
 
-  Special achievements
+    Special achievements
 
-</div>
+  </div>
 
-<section
+  <section
 
-  class="achievement-list"
+    class="achievement-list"
 
-  id="achievementList">
+    id="achievementList">
 
-</section>
+  </section>
 
 </main>
 
 <!-- ==================================================
 
-     TASK EDITOR
+     TO DO
+
+     ================================================== -->
+
+<main
+
+  class="app hidden"
+
+  id="todoView">
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>To Do</h1>
+
+      <div class="date">
+
+        One-off tasks and miscellaneous obligations.
+
+      </div>
+
+    </div>
+
+    <div class="todo-actions">
+
+      <button
+
+        class="add"
+
+        id="addTodoBtn">
+
+        ＋ Add item
+
+      </button>
+
+      <button
+
+        class="back-button"
+
+        id="todoBackBtn">
+
+        ← Chores
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <p class="todo-summary">
+
+    Pending means it cannot reasonably be started yet.
+
+    Finished items remain here for seven days.
+
+  </p>
+
+  <section
+
+    class="todos"
+
+    id="todoList">
+
+  </section>
+
+</main>
+
+<!-- ==================================================
+
+     RECURRING TASK EDITOR
 
      ================================================== -->
 
@@ -1820,11 +1874,7 @@ select{
 
 </div>
 
-<!-- ==================================================
-
-     WEEKLY SETTINGS
-
-     ================================================== -->
+<!-- WEEKLY -->
 
 <div
 
@@ -1900,29 +1950,17 @@ A completed weekly task remains Done until the next
 
 The day immediately before “Becomes Overdue” is Due Today.
 
-Example: Pending Sunday + Overdue Wednesday means
-
-Pending Sunday and Monday, Due Today Tuesday,
-
-and Overdue Wednesday if it still has not been completed.
-
 </p>
 
 </div>
 
-<!-- ==================================================
-
-     EVERY N DAYS
-
-     ================================================== -->
+<!-- EVERY N DAYS -->
 
 <div
 
   id="intervalFields"
 
   class="hidden">
-
-<div class="pair">
 
 <div class="field">
 
@@ -1948,26 +1986,6 @@ and Overdue Wednesday if it still has not been completed.
 
 <div class="field">
 
-<label>
-
-  Unit
-
-</label>
-
-<input
-
-  value="days"
-
-  disabled>
-
-</div>
-
-</div>
-
-<div class="pair">
-
-<div class="field">
-
 <label for="pendingWindow">
 
   Pending window
@@ -1988,24 +2006,6 @@ and Overdue Wednesday if it still has not been completed.
 
 </div>
 
-<div class="field">
-
-<label>
-
-  Unit
-
-</label>
-
-<input
-
-  value="days"
-
-  disabled>
-
-</div>
-
-</div>
-
 <p class="fine">
 
 Example: Maximum 7 days and Pending window 2 days.
@@ -2020,11 +2020,7 @@ and becomes Overdue Tuesday.
 
 </div>
 
-<!-- ==================================================
-
-     DAILY
-
-     ================================================== -->
+<!-- DAILY -->
 
 <div
 
@@ -2065,6 +2061,154 @@ they become Overdue.
   class="ghost"
 
   id="cancelBtn">
+
+  Cancel
+
+</button>
+
+<button class="save">
+
+  Save
+
+</button>
+
+</div>
+
+</div>
+
+</form>
+
+</dialog>
+
+<!-- ==================================================
+
+     TO-DO EDITOR
+
+     ================================================== -->
+
+<dialog id="todoDialog">
+
+<form
+
+  class="modal"
+
+  id="todoForm">
+
+<h2 id="todoDialogTitle">
+
+  Add to-do
+
+</h2>
+
+<input
+
+  type="hidden"
+
+  id="todoId">
+
+<div class="field">
+
+<label for="todoName">
+
+  Task
+
+</label>
+
+<input
+
+  id="todoName"
+
+  maxlength="100"
+
+  required
+
+  placeholder="e.g. Replace bathroom light bulb">
+
+</div>
+
+<div class="field">
+
+<label for="todoStartDate">
+
+  Can start
+
+  <span style="font-weight:400">
+
+    (optional)
+
+  </span>
+
+</label>
+
+<input
+
+  id="todoStartDate"
+
+  type="date">
+
+</div>
+
+<div class="field">
+
+<label for="todoDueDate">
+
+  Due by
+
+  <span style="font-weight:400">
+
+    (optional)
+
+  </span>
+
+</label>
+
+<input
+
+  id="todoDueDate"
+
+  type="date">
+
+</div>
+
+<p class="fine">
+
+Before “Can start,” the item is Pending.
+
+On that date it becomes To Do.
+
+On its Due by date it is Due Today;
+
+the following day it becomes Overdue.
+
+Leave either date blank if it does not apply.
+
+</p>
+
+<div class="modal-actions">
+
+<button
+
+  type="button"
+
+  class="delete"
+
+  id="deleteTodoBtn"
+
+  hidden>
+
+  Delete
+
+</button>
+
+<div class="right-actions">
+
+<button
+
+  type="button"
+
+  class="ghost"
+
+  id="cancelTodoBtn">
 
   Cancel
 
@@ -2166,19 +2310,17 @@ const $ =
 
 const uid =
 
-  () => (
+  () =>
 
-    globalThis.crypto &&
+  globalThis.crypto &&
 
-    typeof globalThis.crypto.randomUUID ===
+  typeof globalThis.crypto.randomUUID ===
 
-    "function"
-
-  )
+  "function"
 
   ? globalThis.crypto.randomUUID()
 
-  : "task-" +
+  : "item-" +
 
     Date.now() +
 
@@ -2270,7 +2412,11 @@ function addDaysKey(
 
   const d =
 
-    dateFromKey(key);
+    dateFromKey(
+
+      key
+
+    );
 
   d.setDate(
 
@@ -2280,7 +2426,11 @@ function addDaysKey(
 
   );
 
-  return localDateKey(d);
+  return localDateKey(
+
+    d
+
+  );
 
 }
 
@@ -2292,25 +2442,17 @@ function diffCalendarDays(
 
 ){
 
-  const a =
-
-    dateFromKey(
-
-      fromKey
-
-    );
-
-  const b =
-
-    dateFromKey(
-
-      toKey
-
-    );
-
   return Math.round(
 
-    (b-a) /
+    (
+
+      dateFromKey(toKey) -
+
+      dateFromKey(fromKey)
+
+    )
+
+    /
 
     86400000
 
@@ -2374,12 +2516,6 @@ function nextWeekdayAfter(
 
     ) % 7;
 
-  /*
-
-    Strictly AFTER the supplied date.
-
-  */
-
   if(
 
     delta === 0
@@ -2426,18 +2562,6 @@ function defaultPendingWeekday(
 
 ){
 
-  /*
-
-    Three days before Overdue.
-
-    Wednesday -> Sunday
-
-    Monday    -> Friday
-
-    etc.
-
-  */
-
   return (
 
     Number(overdueWeekday) +
@@ -2450,7 +2574,7 @@ function defaultPendingWeekday(
 
 /* ==================================================
 
-   WEEKLY CYCLE HELPERS
+   WEEKLY HELPERS
 
    ================================================== */
 
@@ -2500,7 +2624,7 @@ function weeklyCycleAfterCompletion(
 
 ){
 
-  const settings =
+  const s =
 
     weeklySettings(
 
@@ -2508,39 +2632,15 @@ function weeklyCycleAfterCompletion(
 
     );
 
-  /*
-
-    Completion satisfies the current
-
-    weekly obligation.
-
-    The NEXT occurrence of the
-
-    Pending weekday starts the next
-
-    action window.
-
-  */
-
   const pendingDate =
 
     nextWeekdayAfter(
 
       completionDate,
 
-      settings.pending
+      s.pending
 
     );
-
-  /*
-
-    The next Overdue weekday after
-
-    that Pending boundary ends the
-
-    cycle.
-
-  */
 
   const overdueDate =
 
@@ -2548,17 +2648,7 @@ function weeklyCycleAfterCompletion(
 
       pendingDate,
 
-      settings.overdue
-
-    );
-
-  const dueDate =
-
-    addDaysKey(
-
-      overdueDate,
-
-      -1
+      s.overdue
 
     );
 
@@ -2566,7 +2656,15 @@ function weeklyCycleAfterCompletion(
 
     pendingDate,
 
-    dueDate,
+    dueDate:
+
+      addDaysKey(
+
+        overdueDate,
+
+        -1
+
+      ),
 
     overdueDate
 
@@ -2574,13 +2672,9 @@ function weeklyCycleAfterCompletion(
 
 }
 
-function firstWeeklyCycle(
+function firstWeeklyCycle(task){
 
-  task
-
-){
-
-  const settings =
+  const s =
 
     weeklySettings(
 
@@ -2600,41 +2694,27 @@ function firstWeeklyCycle(
 
     );
 
-  /*
-
-    A brand-new weekly task is never
-
-    born already Overdue.
-
-    Its first Overdue date is the
-
-    NEXT occurrence of that weekday.
-
-  */
-
   const overdueDate =
 
     nextWeekdayAfter(
 
       createdDate,
 
-      settings.overdue
-
-    );
-
-  const dueDate =
-
-    addDaysKey(
-
-      overdueDate,
-
-      -1
+      s.overdue
 
     );
 
   return{
 
-    dueDate,
+    dueDate:
+
+      addDaysKey(
+
+        overdueDate,
+
+        -1
+
+      ),
 
     overdueDate
 
@@ -2644,7 +2724,7 @@ function firstWeeklyCycle(
 
 /* ==================================================
 
-   TASK CREATION
+   OBJECT CREATION
 
    ================================================== */
 
@@ -2672,24 +2752,6 @@ function makeTask(
 
     pendingWindow,
 
-    /*
-
-      Kept for backward compatibility.
-
-      In the old version, resetWeekday
-
-      was effectively the deadline /
-
-      cycle boundary.
-
-      New weekly tasks use:
-
-      pendingWeekday
-
-      overdueWeekday
-
-    */
-
     resetWeekday:1,
 
     pendingWeekday:5,
@@ -2713,6 +2775,42 @@ function makeTask(
     bestStreakDays:0,
 
     unlockedAwards:[],
+
+    createdAt:Date.now()
+
+  };
+
+}
+
+function makeTodo(
+
+  name,
+
+  startDate=null,
+
+  dueDate=null
+
+){
+
+  return{
+
+    id:uid(),
+
+    name,
+
+    startDate:
+
+      startDate ||
+
+      null,
+
+    dueDate:
+
+      dueDate ||
+
+      null,
+
+    doneDate:null,
 
     createdAt:Date.now()
 
@@ -2798,6 +2896,24 @@ function candidateScore(x){
 
     100;
 
+  score +=
+
+    (
+
+      Array.isArray(
+
+        x.todos
+
+      )
+
+      ? x.todos.length
+
+      : 0
+
+    )
+
+    * 10;
+
   for(
 
     const task
@@ -2853,14 +2969,6 @@ function findBestStoredState(){
       )
 
     );
-
-  /*
-
-    Normal case:
-
-    primary storage contains tasks.
-
-  */
 
   if(
 
@@ -3064,6 +3172,98 @@ function migrateState(parsed){
 
   }
 
+  if(
+
+    !Array.isArray(
+
+      parsed.todos
+
+    )
+
+  ){
+
+    parsed.todos=[];
+
+  }
+
+  for(
+
+    const todo
+
+    of parsed.todos
+
+  ){
+
+    if(
+
+      !todo.id
+
+    ){
+
+      todo.id=uid();
+
+    }
+
+    if(
+
+      !todo.name
+
+    ){
+
+      todo.name="Untitled";
+
+    }
+
+    if(
+
+      todo.startDate ===
+
+      undefined
+
+    ){
+
+      todo.startDate=null;
+
+    }
+
+    if(
+
+      todo.dueDate ===
+
+      undefined
+
+    ){
+
+      todo.dueDate=null;
+
+    }
+
+    if(
+
+      todo.doneDate ===
+
+      undefined
+
+    ){
+
+      todo.doneDate=null;
+
+    }
+
+    if(
+
+      !todo.createdAt
+
+    ){
+
+      todo.createdAt =
+
+        Date.now();
+
+    }
+
+  }
+
   for(
 
     const task
@@ -3128,32 +3328,6 @@ function migrateState(parsed){
 
     }
 
-    /*
-
-      WEEKLY MIGRATION
-
-      Old resetWeekday is preserved
-
-      as the new Becomes Overdue day.
-
-      A new Pending weekday is
-
-      initially placed three days
-
-      before it.
-
-      Example:
-
-      old Wednesday
-
-      ->
-
-      Pending Sunday
-
-      Overdue Wednesday
-
-    */
-
     if(
 
       task.type ===
@@ -3199,14 +3373,6 @@ function migrateState(parsed){
           );
 
       }
-
-      /*
-
-        Keep the legacy property
-
-        synchronized as a safety net.
-
-      */
 
       task.resetWeekday =
 
@@ -3430,7 +3596,9 @@ function migrateState(parsed){
 
           task.bestStreakDays
 
-        ) >= milestone &&
+        ) >= milestone
+
+        &&
 
         !task.unlockedAwards.includes(
 
@@ -3503,6 +3671,8 @@ function defaultState(){
     dailySnapshots:{},
 
     specialAchievements:[],
+
+    todos:[],
 
     tasks:[
 
@@ -3584,23 +3754,7 @@ function rotateBackups(){
 
   if(
 
-    !current
-
-  ){
-
-    return;
-
-  }
-
-  /*
-
-    Don't knowingly back up
-
-    malformed JSON.
-
-  */
-
-  if(
+    !current ||
 
     !parseState(
 
@@ -3616,7 +3770,7 @@ function rotateBackups(){
 
   try{
 
-    const backup1 =
+    const b1 =
 
       localStorage.getItem(
 
@@ -3624,7 +3778,7 @@ function rotateBackups(){
 
       );
 
-    const backup2 =
+    const b2 =
 
       localStorage.getItem(
 
@@ -3634,7 +3788,7 @@ function rotateBackups(){
 
     if(
 
-      backup2
+      b2
 
     ){
 
@@ -3642,7 +3796,7 @@ function rotateBackups(){
 
         BACKUP_KEYS[2],
 
-        backup2
+        b2
 
       );
 
@@ -3650,7 +3804,7 @@ function rotateBackups(){
 
     if(
 
-      backup1
+      b1
 
     ){
 
@@ -3658,7 +3812,7 @@ function rotateBackups(){
 
         BACKUP_KEYS[1],
 
-        backup1
+        b1
 
       );
 
@@ -3782,7 +3936,7 @@ function latestCompletionOnOrBefore(
 
 /* ==================================================
 
-   STATUS
+   RECURRING TASK STATUS
 
    ================================================== */
 
@@ -3834,11 +3988,7 @@ function statusAt(
 
   }
 
-  /* ==================================================
-
-     DAILY
-
-     ================================================== */
+  /* DAILY */
 
   if(
 
@@ -3946,11 +4096,7 @@ function statusAt(
 
   }
 
-  /* ==================================================
-
-     WEEKLY
-
-     ================================================== */
+  /* WEEKLY */
 
   if(
 
@@ -3959,30 +4105,6 @@ function statusAt(
     "weekly"
 
   ){
-
-    /*
-
-      If the task has ever been
-
-      completed, its next cycle is
-
-      determined from the most recent
-
-      completion.
-
-      This is the crucial change.
-
-      A Tuesday completion with:
-
-      Pending Sunday
-
-      Overdue Wednesday
-
-      does NOT reset on Wednesday.
-
-      It stays Done until Sunday.
-
-    */
 
     if(
 
@@ -4052,7 +4174,7 @@ function statusAt(
 
                 1,
 
-                left / 7
+                left/7
 
               )
 
@@ -4086,16 +4208,6 @@ function statusAt(
 
       }
 
-      /*
-
-        Once the Overdue boundary
-
-        has been crossed, the task
-
-        stays Overdue until completed.
-
-      */
-
       return{
 
         state:"overdue",
@@ -4107,20 +4219,6 @@ function statusAt(
       };
 
     }
-
-    /*
-
-      Brand-new weekly task:
-
-      Pending immediately.
-
-      It receives its first deadline
-
-      at the next configured Overdue
-
-      weekday.
-
-    */
 
     const cycle =
 
@@ -4162,7 +4260,7 @@ function statusAt(
 
               1,
 
-              left / 7
+              left/7
 
             )
 
@@ -4208,11 +4306,7 @@ function statusAt(
 
   }
 
-  /* ==================================================
-
-     EVERY N DAYS
-
-     ================================================== */
+  /* EVERY N DAYS */
 
   if(
 
@@ -4452,14 +4546,6 @@ function dayQualifiesForCleanSweep(
 
     }
 
-    /*
-
-      Daily tasks must actually
-
-      be completed that day.
-
-    */
-
     if(
 
       task.type ===
@@ -4487,16 +4573,6 @@ function dayQualifiesForCleanSweep(
       continue;
 
     }
-
-    /*
-
-      Pending is harmless.
-
-      Due Today and Overdue
-
-      must be cleared.
-
-    */
 
     const s =
 
@@ -4622,23 +4698,23 @@ function completedTypesOn(
 
   ){
 
-    const events =
-
-      Array.isArray(
-
-        task.completionEvents
-
-      )
-
-      ? task.completionEvents
-
-      : [];
-
     for(
 
       const event
 
-      of events
+      of (
+
+        Array.isArray(
+
+          task.completionEvents
+
+        )
+
+        ? task.completionEvents
+
+        : []
+
+      )
 
     ){
 
@@ -4698,7 +4774,7 @@ function grantAchievement(
 
   if(
 
-    achievementEarned(
+    !achievementEarned(
 
       id
 
@@ -4706,21 +4782,19 @@ function grantAchievement(
 
   ){
 
-    return;
+    state.specialAchievements.push(
+
+      {
+
+        id,
+
+        date:dateKey
+
+      }
+
+    );
 
   }
-
-  state.specialAchievements.push(
-
-    {
-
-      id,
-
-      date:dateKey
-
-    }
-
-  );
 
 }
 
@@ -5028,29 +5102,13 @@ function lastGoodDate(task){
 
   ){
 
-    /*
+    return weeklyCycleAfterCompletion(
 
-      The streak remains alive
+      task,
 
-      through Due Today.
+      task.lastDoneDate
 
-      It breaks when the configured
-
-      Overdue date arrives.
-
-    */
-
-    const cycle =
-
-      weeklyCycleAfterCompletion(
-
-        task,
-
-        task.lastDoneDate
-
-      );
-
-    return cycle.dueDate;
+    ).dueDate;
 
   }
 
@@ -5242,7 +5300,9 @@ function updateTaskAwards(task){
 
       task.bestStreakDays >=
 
-      milestone &&
+      milestone
+
+      &&
 
       !task.unlockedAwards.includes(
 
@@ -5292,7 +5352,7 @@ function updateAllTaskAwards(){
 
 /* ==================================================
 
-   COMPLETE / UNDO
+   COMPLETE / UNDO RECURRING TASKS
 
    ================================================== */
 
@@ -5438,7 +5498,9 @@ function undoDone(task){
 
       date =>
 
-      date !== today
+      date !==
+
+      today
 
     );
 
@@ -5566,7 +5628,7 @@ function medalsForTask(task){
 
 /* ==================================================
 
-   MAIN SCREEN
+   MAIN CHORES SCREEN
 
    ================================================== */
 
@@ -5928,7 +5990,7 @@ function render(){
 
 /* ==================================================
 
-   SUMMARY
+   CHORES SUMMARY
 
    ================================================== */
 
@@ -5948,9 +6010,9 @@ function updateSummary(){
 
     states.filter(
 
-      value =>
+      x =>
 
-      value ===
+      x ===
 
       "overdue"
 
@@ -5960,9 +6022,9 @@ function updateSummary(){
 
     states.filter(
 
-      value =>
+      x =>
 
-      value ===
+      x ===
 
       "due"
 
@@ -5972,9 +6034,9 @@ function updateSummary(){
 
     states.filter(
 
-      value =>
+      x =>
 
-      value ===
+      x ===
 
       "pending"
 
@@ -5996,13 +6058,9 @@ function updateSummary(){
 
       .textContent =
 
-      (
+      due +
 
-        due +
-
-        pending
-
-      )
+      pending
 
       ? `${due+pending} more waiting.`
 
@@ -6746,7 +6804,7 @@ function renderCalendar(){
 
 /* ==================================================
 
-   ACHIEVEMENT DISPLAY
+   ACHIEVEMENTS DISPLAY
 
    ================================================== */
 
@@ -6852,6 +6910,562 @@ function renderAchievements(){
 
 /* ==================================================
 
+   TO-DO STATUS
+
+   ================================================== */
+
+function todoStatus(
+
+  item,
+
+  dateKey=localDateKey()
+
+){
+
+  if(
+
+    item.doneDate
+
+  ){
+
+    return{
+
+      state:"completed",
+
+      detail:
+
+        `Done — ${prettyDate(item.doneDate)}`
+
+    };
+
+  }
+
+  if(
+
+    item.dueDate &&
+
+    dateKey >
+
+    item.dueDate
+
+  ){
+
+    const late =
+
+      diffCalendarDays(
+
+        item.dueDate,
+
+        dateKey
+
+      );
+
+    return{
+
+      state:"overdue",
+
+      detail:
+
+        `Overdue — ${late} day${late===1?"":"s"} late`
+
+    };
+
+  }
+
+  if(
+
+    item.dueDate &&
+
+    dateKey ===
+
+    item.dueDate
+
+  ){
+
+    return{
+
+      state:"due",
+
+      detail:
+
+        "Due Today"
+
+    };
+
+  }
+
+  if(
+
+    item.startDate &&
+
+    dateKey <
+
+    item.startDate
+
+  ){
+
+    return{
+
+      state:"pending",
+
+      detail:
+
+        `Pending — can start ${prettyDate(item.startDate)}`
+
+    };
+
+  }
+
+  if(
+
+    item.dueDate
+
+  ){
+
+    return{
+
+      state:"todo",
+
+      detail:
+
+        `To Do — due ${prettyDate(item.dueDate)}`
+
+    };
+
+  }
+
+  return{
+
+    state:"todo",
+
+    detail:"To Do"
+
+  };
+
+}
+
+function todoVisible(item){
+
+  if(
+
+    !item.doneDate
+
+  ){
+
+    return true;
+
+  }
+
+  return (
+
+    diffCalendarDays(
+
+      item.doneDate,
+
+      localDateKey()
+
+    )
+
+    < 7
+
+  );
+
+}
+
+function todoSort(
+
+  a,
+
+  b
+
+){
+
+  const rank = {
+
+    overdue:0,
+
+    due:1,
+
+    todo:2,
+
+    pending:3,
+
+    completed:4
+
+  };
+
+  const sa =
+
+    todoStatus(a);
+
+  const sb =
+
+    todoStatus(b);
+
+  if(
+
+    rank[sa.state] !==
+
+    rank[sb.state]
+
+  ){
+
+    return (
+
+      rank[sa.state] -
+
+      rank[sb.state]
+
+    );
+
+  }
+
+  if(
+
+    sa.state ===
+
+    "overdue"
+
+    ||
+
+    sa.state ===
+
+    "due"
+
+    ||
+
+    sa.state ===
+
+    "todo"
+
+  ){
+
+    const ad =
+
+      a.dueDate ||
+
+      "9999-12-31";
+
+    const bd =
+
+      b.dueDate ||
+
+      "9999-12-31";
+
+    if(
+
+      ad !==
+
+      bd
+
+    ){
+
+      return ad.localeCompare(
+
+        bd
+
+      );
+
+    }
+
+  }
+
+  if(
+
+    sa.state ===
+
+    "pending"
+
+  ){
+
+    const ad =
+
+      a.startDate ||
+
+      "9999-12-31";
+
+    const bd =
+
+      b.startDate ||
+
+      "9999-12-31";
+
+    if(
+
+      ad !==
+
+      bd
+
+    ){
+
+      return ad.localeCompare(
+
+        bd
+
+      );
+
+    }
+
+  }
+
+  if(
+
+    sa.state ===
+
+    "completed"
+
+  ){
+
+    return String(
+
+      b.doneDate ||
+
+      ""
+
+    ).localeCompare(
+
+      String(
+
+        a.doneDate ||
+
+        ""
+
+      )
+
+    );
+
+  }
+
+  return (
+
+    Number(
+
+      a.createdAt
+
+    )
+
+    -
+
+    Number(
+
+      b.createdAt
+
+    )
+
+  );
+
+}
+
+/* ==================================================
+
+   RENDER TO-DO LIST
+
+   ================================================== */
+
+function renderTodos(){
+
+  const list =
+
+    $("todoList");
+
+  const items =
+
+    state.todos
+
+    .filter(
+
+      todoVisible
+
+    )
+
+    .sort(
+
+      todoSort
+
+    );
+
+  list.innerHTML="";
+
+  if(
+
+    !items.length
+
+  ){
+
+    list.innerHTML =
+
+      '<div class="empty">Nothing on the list.</div>';
+
+    return;
+
+  }
+
+  for(
+
+    const item
+
+    of items
+
+  ){
+
+    const s =
+
+      todoStatus(
+
+        item
+
+      );
+
+    const card =
+
+      document.createElement(
+
+        "article"
+
+      );
+
+    card.className =
+
+      `todo-card ${s.state}`;
+
+    card.innerHTML = `
+
+      <div class="todo-top">
+
+        <div class="todo-left">
+
+          <label class="todo-check">
+
+            <input
+
+              type="checkbox"
+
+              ${
+
+                item.doneDate
+
+                ? "checked"
+
+                : ""
+
+              }>
+
+            <span></span>
+
+          </label>
+
+          <div class="todo-copy">
+
+            <div class="todo-name">
+
+              ${escapeHtml(item.name)}
+
+            </div>
+
+            <div class="meta">
+
+              ${s.detail}
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <button class="todo-edit">
+
+          Edit
+
+        </button>
+
+      </div>
+
+      <div class="todo-bottom">
+
+        <span>
+
+          ${
+
+            item.startDate
+
+            ? `Can start ${prettyDate(item.startDate)}`
+
+            : "Available now"
+
+          }
+
+          ${
+
+            item.dueDate
+
+            ? ` · Due ${prettyDate(item.dueDate)}`
+
+            : " · No deadline"
+
+          }
+
+        </span>
+
+      </div>
+
+    `;
+
+    card
+
+      .querySelector("input")
+
+      .addEventListener(
+
+        "change",
+
+        event=>{
+
+          item.doneDate =
+
+            event.target.checked
+
+            ? localDateKey()
+
+            : null;
+
+          saveState();
+
+          renderTodos();
+
+        }
+
+      );
+
+    card
+
+      .querySelector(".todo-edit")
+
+      .addEventListener(
+
+        "click",
+
+        () =>
+
+        openTodoEdit(
+
+          item
+
+        )
+
+      );
+
+    list.appendChild(
+
+      card
+
+    );
+
+  }
+
+}
+
+/* ==================================================
+
    PAGE NAVIGATION
 
    ================================================== */
@@ -6868,7 +7482,9 @@ function showOnly(id){
 
       "awardsView",
 
-      "calendarView"
+      "calendarView",
+
+      "todoView"
 
     ]
 
@@ -6952,6 +7568,26 @@ $("calendarBtn")
 
   );
 
+$("todoBtn")
+
+  .addEventListener(
+
+    "click",
+
+    ()=>{
+
+      renderTodos();
+
+      showOnly(
+
+        "todoView"
+
+      );
+
+    }
+
+  );
+
 $("awardsBackBtn")
 
   .addEventListener(
@@ -6973,6 +7609,26 @@ $("awardsBackBtn")
   );
 
 $("calendarBackBtn")
+
+  .addEventListener(
+
+    "click",
+
+    ()=>{
+
+      render();
+
+      showOnly(
+
+        "mainView"
+
+      );
+
+    }
+
+  );
+
+$("todoBackBtn")
 
   .addEventListener(
 
@@ -7046,7 +7702,7 @@ $("nextMonthBtn")
 
 /* ==================================================
 
-   TASK EDITOR
+   RECURRING TASK EDITOR
 
    ================================================== */
 
@@ -7320,17 +7976,15 @@ form.addEventListener(
 
     }
 
-    /* ---------- INTERVAL VALIDATION ---------- */
-
     if(
 
       type ===
 
       "interval"
 
-    ){
+      &&
 
-      if(
+      (
 
         !Number.isInteger(
 
@@ -7360,21 +8014,19 @@ form.addEventListener(
 
         max
 
-      ){
+      )
 
-        alert(
+    ){
 
-          "Maximum days and Pending window must be whole numbers, and Pending window cannot exceed Maximum days."
+      alert(
 
-        );
+        "Maximum days and Pending window must be whole numbers, and Pending window cannot exceed Maximum days."
 
-        return;
+      );
 
-      }
+      return;
 
     }
-
-    /* ---------- WEEKLY VALIDATION ---------- */
 
     if(
 
@@ -7383,50 +8035,6 @@ form.addEventListener(
       "weekly"
 
     ){
-
-      if(
-
-        !Number.isInteger(
-
-          pendingWeekday
-
-        )
-
-        ||
-
-        !Number.isInteger(
-
-          overdueWeekday
-
-        )
-
-        ||
-
-        pendingWeekday < 0
-
-        ||
-
-        pendingWeekday > 6
-
-        ||
-
-        overdueWeekday < 0
-
-        ||
-
-        overdueWeekday > 6
-
-      ){
-
-        alert(
-
-          "Please choose valid weekdays."
-
-        );
-
-        return;
-
-      }
 
       const gap =
 
@@ -7437,20 +8045,6 @@ form.addEventListener(
           overdueWeekday
 
         );
-
-      /*
-
-        gap 0 = same weekday
-
-        gap 1 = Pending day would also
-
-                be the Due Today day.
-
-        Require at least one genuine
-
-        Pending day before Due Today.
-
-      */
 
       if(
 
@@ -7513,16 +8107,6 @@ form.addEventListener(
       task.overdueWeekday =
 
         overdueWeekday;
-
-      /*
-
-        Maintain legacy field in case
-
-        an older cached version ever
-
-        reads this storage.
-
-      */
 
       task.resetWeekday =
 
@@ -7648,11 +8232,299 @@ $("deleteBtn")
 
 /* ==================================================
 
+   TO-DO EDITOR
+
+   ================================================== */
+
+const todoDialog =
+
+  $("todoDialog");
+
+const todoForm =
+
+  $("todoForm");
+
+$("addTodoBtn")
+
+  .addEventListener(
+
+    "click",
+
+    ()=>{
+
+      todoForm.reset();
+
+      $("todoId").value="";
+
+      $("todoDialogTitle")
+
+        .textContent =
+
+        "Add to-do";
+
+      $("deleteTodoBtn").hidden =
+
+        true;
+
+      todoDialog.showModal();
+
+    }
+
+  );
+
+$("cancelTodoBtn")
+
+  .addEventListener(
+
+    "click",
+
+    ()=>
+
+    todoDialog.close()
+
+  );
+
+function openTodoEdit(item){
+
+  $("todoId").value =
+
+    item.id;
+
+  $("todoDialogTitle")
+
+    .textContent =
+
+    "Edit to-do";
+
+  $("todoName").value =
+
+    item.name;
+
+  $("todoStartDate").value =
+
+    item.startDate ||
+
+    "";
+
+  $("todoDueDate").value =
+
+    item.dueDate ||
+
+    "";
+
+  $("deleteTodoBtn").hidden =
+
+    false;
+
+  todoDialog.showModal();
+
+}
+
+todoForm.addEventListener(
+
+  "submit",
+
+  event=>{
+
+    event.preventDefault();
+
+    const id =
+
+      $("todoId").value;
+
+    const name =
+
+      $("todoName")
+
+      .value
+
+      .trim();
+
+    const startDate =
+
+      $("todoStartDate").value ||
+
+      null;
+
+    const dueDate =
+
+      $("todoDueDate").value ||
+
+      null;
+
+    if(
+
+      !name
+
+    ){
+
+      return;
+
+    }
+
+    if(
+
+      startDate &&
+
+      dueDate &&
+
+      dueDate <
+
+      startDate
+
+    ){
+
+      alert(
+
+        "Due by cannot be earlier than Can start."
+
+      );
+
+      return;
+
+    }
+
+    if(
+
+      id
+
+    ){
+
+      const item =
+
+        state.todos.find(
+
+          item =>
+
+          item.id ===
+
+          id
+
+        );
+
+      if(
+
+        !item
+
+      ){
+
+        return;
+
+      }
+
+      item.name =
+
+        name;
+
+      item.startDate =
+
+        startDate;
+
+      item.dueDate =
+
+        dueDate;
+
+    }
+
+    else{
+
+      state.todos.push(
+
+        makeTodo(
+
+          name,
+
+          startDate,
+
+          dueDate
+
+        )
+
+      );
+
+    }
+
+    saveState();
+
+    todoDialog.close();
+
+    renderTodos();
+
+  }
+
+);
+
+$("deleteTodoBtn")
+
+  .addEventListener(
+
+    "click",
+
+    ()=>{
+
+      const id =
+
+        $("todoId").value;
+
+      const item =
+
+        state.todos.find(
+
+          item =>
+
+          item.id ===
+
+          id
+
+        );
+
+      if(
+
+        item
+
+        &&
+
+        confirm(
+
+          `Delete "${item.name}"?`
+
+        )
+
+      ){
+
+        state.todos =
+
+          state.todos.filter(
+
+            candidate =>
+
+            candidate.id !==
+
+            id
+
+          );
+
+        saveState();
+
+        todoDialog.close();
+
+        renderTodos();
+
+      }
+
+    }
+
+  );
+
+/* ==================================================
+
    STARTUP
 
    ================================================== */
 
 finalizePastDays();
+
+saveState();
 
 render();
 
@@ -7695,6 +8567,24 @@ setInterval(
     ){
 
       renderCalendar();
+
+    }
+
+    else if(
+
+      !$("todoView")
+
+        .classList
+
+        .contains(
+
+          "hidden"
+
+        )
+
+    ){
+
+      renderTodos();
 
     }
 
