@@ -1,8601 +1,2138 @@
 <!doctype html>
-
 <html lang="en">
-
 <head>
-
 <meta charset="utf-8">
-
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-
 <meta name="theme-color" content="#f4f4ef">
-
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-
 <meta http-equiv="Pragma" content="no-cache">
-
 <meta http-equiv="Expires" content="0">
-
 <title>Chores</title>
-
 <link rel="apple-touch-icon" href="BE53A647-84C0-4476-9861-D24FE24B40C7.png">
-
 <style>
-
 :root{
-
   --bg:#f4f4ef;--card:#fff;--ink:#1d221f;--muted:#6d756f;--line:#dfe3dd;
-
   --done-slider:#315f4a;--done-bg:#dfe8e2;--done-border:#c4d2c8;
-
   --pending-slider:#c6a52e;--pending-bg:#f3ecd0;--pending-border:#ddd09b;
-
   --due-slider:#d77b2f;--due-bg:#f3dfcf;--due-border:#dfb58f;
-
   --overdue-slider:#a7463f;--overdue-bg:#f0d9d7;--overdue-border:#d9aaa6;
-
   --todo-slider:#56717f;--todo-bg:#e4eaed;--todo-border:#cbd6db;
-
   --todo-done-slider:#65736d;--todo-done-bg:#e2e7e4;--todo-done-border:#cbd4cf;
-
+  --paused-slider:#6b7d88;--paused-bg:#e2e8eb;--paused-border:#c8d2d8;
   --green-soft:#dfece5;--orange-soft:#f6e3d1;--red-soft:#f5dfdd;
-
 }
-
 *{box-sizing:border-box}
-
-html,body{
-
-  margin:0;
-
-  min-height:100%;
-
-  background:var(--bg);
-
-  color:var(--ink);
-
-}
-
-body{
-
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-
-}
-
-button,input,select{font:inherit}
-
-button{cursor:pointer}
-
-.app{
-
-  width:min(820px,100%);
-
-  margin:auto;
-
-  padding:22px 16px 56px;
-
-}
-
-header,
-
-.status,
-
-.task-top,
-
-.task-bottom,
-
-.modal-actions,
-
-.page-header,
-
-.todo-top,
-
-.todo-bottom{
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:space-between;
-
-  gap:12px;
-
-}
-
-h1{
-
-  margin:0;
-
-  font-size:42px;
-
-  letter-spacing:-.045em;
-
-}
-
-.date{
-
-  color:var(--muted);
-
-  font-size:14px;
-
-  margin-top:3px;
-
-}
-
-.header-actions{
-
-  display:flex;
-
-  gap:7px;
-
-  align-items:center;
-
-  flex-wrap:wrap;
-
-  justify-content:flex-end;
-
-}
-
-.add,.save{
-
-  border:0;
-
-  border-radius:999px;
-
-  background:var(--ink);
-
-  color:#fff;
-
-  padding:11px 15px;
-
-  font-weight:700;
-
-}
-
-.secondary-button,
-
-.back-button{
-
-  border:1px solid var(--line);
-
-  border-radius:999px;
-
-  background:#fff;
-
-  color:var(--ink);
-
-  padding:10px 13px;
-
-  font-weight:650;
-
-}
-
-.status,
-
-.award-task,
-
-.achievement-card,
-
-.calendar-card,
-
-.todo-card{
-
-  background:var(--card);
-
-  border:1px solid var(--line);
-
-  border-radius:18px;
-
-  box-shadow:0 8px 26px rgba(20,30,24,.055);
-
-}
-
-.status{
-
-  padding:19px;
-
-  margin:18px 0;
-
-}
-
-.status h2{
-
-  font-size:28px;
-
-  letter-spacing:-.03em;
-
-  margin:0;
-
-}
-
-.status-copy{
-
-  color:var(--muted);
-
-  font-size:14px;
-
-  margin-top:4px;
-
-}
-
-.badge{
-
-  min-width:54px;
-
-  height:54px;
-
-  border-radius:50%;
-
-  display:grid;
-
-  place-items:center;
-
-  background:var(--green-soft);
-
-  color:var(--done-slider);
-
-  font-weight:800;
-
-  font-size:18px;
-
-}
-
-.recovery{
-
-  display:none;
-
-  margin:-7px 0 15px;
-
-  padding:10px 13px;
-
-  border-radius:12px;
-
-  background:#fff8d8;
-
-  border:1px solid #e4d395;
-
-  font-size:12px;
-
-  color:#625925;
-
-}
-
-.section-title{
-
-  color:var(--muted);
-
-  font-size:13px;
-
-  text-transform:uppercase;
-
-  letter-spacing:.12em;
-
-  margin:18px 0 10px;
-
-}
-
-.tasks,.todos{
-
-  display:grid;
-
-  gap:11px;
-
-}
-
-.task{
-
-  padding:18px;
-
-  border:1px solid var(--line);
-
-  border-radius:18px;
-
-  box-shadow:0 8px 26px rgba(20,30,24,.055);
-
-  transition:background .2s,border-color .2s;
-
-}
-
-.task.done{
-
-  background:var(--done-bg);
-
-  border-color:var(--done-border);
-
-}
-
-.task.pending{
-
-  background:var(--pending-bg);
-
-  border-color:var(--pending-border);
-
-}
-
-.task.due{
-
-  background:var(--due-bg);
-
-  border-color:var(--due-border);
-
-}
-
-.task.overdue{
-
-  background:var(--overdue-bg);
-
-  border-color:var(--overdue-border);
-
-}
-
-.task-name,.todo-name{
-
-  font-size:20px;
-
-  font-weight:750;
-
-  letter-spacing:-.02em;
-
-}
-
-.meta{
-
-  color:var(--muted);
-
-  font-size:14px;
-
-  margin-top:4px;
-
-  line-height:1.35;
-
-}
-
-.task-right{
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:flex-end;
-
-  gap:7px;
-
-}
-
-.task-streak{
-
-  color:var(--muted);
-
-  font-size:11px;
-
-  white-space:nowrap;
-
-}
-
-.task-medals{
-
-  display:flex;
-
-  gap:4px;
-
-  min-height:28px;
-
-  justify-content:flex-end;
-
-  flex-wrap:wrap;
-
-  max-width:170px;
-
-}
-
-.mini-medal{
-
-  width:28px;
-
-  height:28px;
-
-  border-radius:7px;
-
-  border:1px solid #ffffffaa;
-
-  box-shadow:0 1px 4px #0002;
-
-  background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
-
-  background-repeat:no-repeat;
-
-}
-
-.bar{
-
-  height:8px;
-
-  background:rgba(255,255,255,.5);
-
-  border-radius:99px;
-
-  overflow:hidden;
-
-  margin:14px 0;
-
-}
-
-.bar>div{
-
-  height:100%;
-
-  border-radius:inherit;
-
-}
-
-.done .bar>div{background:var(--done-slider)}
-
-.pending .bar>div{background:var(--pending-slider)}
-
-.due .bar>div{background:var(--due-slider)}
-
-.overdue .bar>div{background:var(--overdue-slider)}
-
-.task-bottom{
-
-  font-size:12px;
-
-  color:var(--muted);
-
-  flex-wrap:wrap;
-
-}
-
-.stats{
-
-  display:flex;
-
-  gap:13px;
-
-  flex-wrap:wrap;
-
-}
-
-.edit{
-
-  border:0;
-
-  background:none;
-
-  color:var(--ink);
-
-  text-decoration:underline;
-
-  text-underline-offset:3px;
-
-}
-
-.switch{
-
-  position:relative;
-
-  width:64px;
-
-  height:34px;
-
-  flex:0 0 auto;
-
-}
-
-.switch input{
-
-  opacity:0;
-
-  width:0;
-
-  height:0;
-
-}
-
-.switch span{
-
-  position:absolute;
-
-  inset:0;
-
-  border-radius:99px;
-
-  transition:.18s;
-
-}
-
-.switch span:before{
-
-  content:"";
-
-  position:absolute;
-
-  width:26px;
-
-  height:26px;
-
-  left:4px;
-
-  top:4px;
-
-  background:#fff;
-
-  border-radius:50%;
-
-  box-shadow:0 2px 6px #0002;
-
-  transition:.18s;
-
-}
-
-.done .switch span{
-
-  background:var(--done-slider);
-
-}
-
-.done .switch span:before{
-
-  transform:translateX(30px);
-
-}
-
-.pending .switch span{
-
-  background:var(--pending-slider);
-
-}
-
-.due .switch span{
-
-  background:var(--due-slider);
-
-}
-
-.overdue .switch span{
-
-  background:var(--overdue-slider);
-
-}
-
-.empty{
-
-  padding:34px;
-
-  text-align:center;
-
-  color:var(--muted);
-
-  border:1px dashed var(--line);
-
-  border-radius:18px;
-
-}
-
-.hidden{
-
-  display:none!important;
-
-}
-
-/* ==================================================
-
-   AWARDS
-
-   ================================================== */
-
-.page-header{
-
-  margin-bottom:18px;
-
-}
-
-.page-header h1{
-
-  font-size:36px;
-
-}
-
-.awards-list{
-
-  display:grid;
-
-  gap:14px;
-
-}
-
-.award-task{
-
-  padding:18px;
-
-}
-
-.award-task-top{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  gap:12px;
-
-  align-items:flex-start;
-
-  margin-bottom:14px;
-
-}
-
-.award-task-name{
-
-  font-size:22px;
-
-  font-weight:750;
-
-}
-
-.award-task-streak{
-
-  color:var(--muted);
-
-  font-size:13px;
-
-  margin-top:3px;
-
-}
-
-.next-target{
-
-  background:var(--green-soft);
-
-  color:var(--done-slider);
-
-  border-radius:12px;
-
-  padding:8px 10px;
-
-  font-size:12px;
-
-  font-weight:700;
-
-  text-align:right;
-
-}
-
-.award-row{
-
-  display:grid;
-
-  grid-template-columns:repeat(5,1fr);
-
-  gap:8px;
-
-}
-
-.award-item{
-
-  text-align:center;
-
-}
-
-.award-art{
-
-  width:100%;
-
-  aspect-ratio:1;
-
-  border-radius:12px;
-
-  background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");
-
-  background-repeat:no-repeat;
-
-  box-shadow:0 2px 8px #0002;
-
-}
-
-.award-item.locked .award-art{
-
-  opacity:.25;
-
-  filter:grayscale(.8);
-
-}
-
-.award-number{
-
-  margin-top:5px;
-
-  font-size:12px;
-
-  font-weight:750;
-
-}
-
-.award-state{
-
-  color:var(--muted);
-
-  font-size:10px;
-
-  margin-top:1px;
-
-}
-
-.medal10,.art10{
-
-  background-size:300% 200%;
-
-  background-position:0 0;
-
-}
-
-.medal20,.art20{
-
-  background-size:300% 200%;
-
-  background-position:50% 0;
-
-}
-
-.medal50,.art50{
-
-  background-size:300% 200%;
-
-  background-position:100% 0;
-
-}
-
-.medal100,.art100{
-
-  background-size:200% 200%;
-
-  background-position:0 100%;
-
-}
-
-.medal200,.art200{
-
-  background-size:200% 200%;
-
-  background-position:100% 100%;
-
-}
-
-/* ==================================================
-
-   CALENDAR
-
-   ================================================== */
-
-.calendar-card{
-
-  padding:16px;
-
-}
-
-.calendar-toolbar{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:center;
-
-  gap:10px;
-
-  margin-bottom:14px;
-
-}
-
-.calendar-month{
-
-  font-size:21px;
-
-  font-weight:750;
-
-  letter-spacing:-.02em;
-
-}
-
-.month-button{
-
-  border:1px solid var(--line);
-
-  background:#fff;
-
-  width:38px;
-
-  height:38px;
-
-  border-radius:50%;
-
-  display:grid;
-
-  place-items:center;
-
-  font-size:20px;
-
-}
-
-.calendar-grid{
-
-  display:grid;
-
-  grid-template-columns:repeat(7,1fr);
-
-  gap:5px;
-
-}
-
-.weekday{
-
-  color:var(--muted);
-
-  text-align:center;
-
-  font-size:11px;
-
-  font-weight:700;
-
-  padding:4px 0;
-
-}
-
-.day-cell{
-
-  min-height:68px;
-
-  border:1px solid var(--line);
-
-  border-radius:11px;
-
-  padding:6px;
-
-  background:#fafbf9;
-
-  position:relative;
-
-}
-
-.day-cell.other{
-
-  visibility:hidden;
-
-}
-
-.day-cell.future,
-
-.day-cell.before-tracking{
-
-  opacity:.35;
-
-}
-
-.day-cell.clean{
-
-  background:var(--done-bg);
-
-  border-color:var(--done-border);
-
-}
-
-.day-cell.failed{
-
-  background:var(--overdue-bg);
-
-  border-color:var(--overdue-border);
-
-}
-
-.day-cell.today{
-
-  outline:2px solid var(--ink);
-
-  outline-offset:-2px;
-
-}
-
-.day-number{
-
-  font-size:12px;
-
-  font-weight:700;
-
-}
-
-.day-mark{
-
-  position:absolute;
-
-  left:50%;
-
-  top:50%;
-
-  transform:translate(-50%,-42%);
-
-  font-size:25px;
-
-  font-weight:850;
-
-}
-
-.day-cell.clean .day-mark{
-
-  color:var(--done-slider);
-
-}
-
-.day-cell.failed .day-mark{
-
-  color:var(--overdue-slider);
-
-}
-
-.day-caption{
-
-  position:absolute;
-
-  bottom:5px;
-
-  left:5px;
-
-  right:5px;
-
-  font-size:8px;
-
-  color:var(--muted);
-
-  text-align:center;
-
-}
-
-/* ==================================================
-
-   SPECIAL ACHIEVEMENTS
-
-   ================================================== */
-
-.achievement-list{
-
-  display:grid;
-
-  gap:10px;
-
-}
-
-.achievement-card{
-
-  padding:14px;
-
-  display:flex;
-
-  align-items:center;
-
-  gap:13px;
-
-}
-
-.achievement-token{
-
-  width:46px;
-
-  height:46px;
-
-  flex:0 0 46px;
-
-  border-radius:50%;
-
-  display:grid;
-
-  place-items:center;
-
-  font-size:21px;
-
-  font-weight:850;
-
-  background:var(--green-soft);
-
-  color:var(--done-slider);
-
-  border:1px solid var(--done-border);
-
-}
-
-.achievement-card.locked{
-
-  opacity:.42;
-
-}
-
-.achievement-card.locked .achievement-token{
-
-  background:#eceeeb;
-
-  color:#8b918d;
-
-  border-color:#d8dcd8;
-
-}
-
-.achievement-name{
-
-  font-size:16px;
-
-  font-weight:750;
-
-}
-
-.achievement-copy{
-
-  color:var(--muted);
-
-  font-size:12px;
-
-  margin-top:2px;
-
-}
-
-.achievement-date{
-
-  margin-left:auto;
-
-  color:var(--muted);
-
-  font-size:11px;
-
-  white-space:nowrap;
-
-}
-
-/* ==================================================
-
-   TO DO
-
-   ================================================== */
-
-.todo-card{
-
-  padding:16px 18px;
-
-  transition:background .2s,border-color .2s;
-
-}
-
-.todo-card.todo{
-
-  background:var(--todo-bg);
-
-  border-color:var(--todo-border);
-
-}
-
-.todo-card.pending{
-
-  background:var(--pending-bg);
-
-  border-color:var(--pending-border);
-
-}
-
-.todo-card.due{
-
-  background:var(--due-bg);
-
-  border-color:var(--due-border);
-
-}
-
-.todo-card.overdue{
-
-  background:var(--overdue-bg);
-
-  border-color:var(--overdue-border);
-
-}
-
-.todo-card.completed{
-
-  background:var(--todo-done-bg);
-
-  border-color:var(--todo-done-border);
-
-}
-
-.todo-left{
-
-  display:flex;
-
-  align-items:flex-start;
-
-  gap:12px;
-
-  min-width:0;
-
-}
-
-.todo-copy{
-
-  min-width:0;
-
-}
-
-.todo-bottom{
-
-  margin-top:10px;
-
-  color:var(--muted);
-
-  font-size:11px;
-
-}
-
-.todo-edit{
-
-  border:0;
-
-  background:none;
-
-  color:var(--ink);
-
-  text-decoration:underline;
-
-  text-underline-offset:3px;
-
-  padding:2px 0;
-
-}
-
-.todo-check{
-
-  position:relative;
-
-  width:30px;
-
-  height:30px;
-
-  flex:0 0 30px;
-
-  margin-top:1px;
-
-}
-
-.todo-check input{
-
-  position:absolute;
-
-  opacity:0;
-
-  width:0;
-
-  height:0;
-
-}
-
-.todo-check span{
-
-  position:absolute;
-
-  inset:0;
-
-  border-radius:8px;
-
-  border:2px solid var(--todo-slider);
-
-  background:rgba(255,255,255,.72);
-
-  display:grid;
-
-  place-items:center;
-
-  font-weight:900;
-
-  color:#fff;
-
-}
-
-.todo-check input:checked+span{
-
-  background:var(--todo-done-slider);
-
-  border-color:var(--todo-done-slider);
-
-}
-
-.todo-check input:checked+span:after{
-
-  content:"✓";
-
-}
-
-.todo-card.pending .todo-check span{
-
-  border-color:var(--pending-slider);
-
-}
-
-.todo-card.due .todo-check span{
-
-  border-color:var(--due-slider);
-
-}
-
-.todo-card.overdue .todo-check span{
-
-  border-color:var(--overdue-slider);
-
-}
-
-.todo-summary{
-
-  margin:0 0 16px;
-
-  color:var(--muted);
-
-  font-size:13px;
-
-}
-
-.todo-actions{
-
-  display:flex;
-
-  gap:8px;
-
-  align-items:center;
-
-}
-
-/* ==================================================
-
-   DIALOGS
-
-   ================================================== */
-
-dialog{
-
-  width:min(520px,calc(100% - 24px));
-
-  border:0;
-
-  border-radius:20px;
-
-  padding:0;
-
-  box-shadow:0 25px 80px #0004;
-
-}
-
-dialog::backdrop{
-
-  background:#0004;
-
-  backdrop-filter:blur(2px);
-
-}
-
-.modal{
-
-  padding:21px;
-
-}
-
-.modal h2{
-
-  margin:0 0 16px;
-
-  font-size:25px;
-
-}
-
-.field{
-
-  display:grid;
-
-  gap:6px;
-
-  margin:12px 0;
-
-}
-
-.field label{
-
-  font-size:13px;
-
-  color:var(--muted);
-
-  font-weight:700;
-
-}
-
-.pair{
-
-  display:grid;
-
-  grid-template-columns:1fr 1fr;
-
-  gap:10px;
-
-}
-
-input,select{
-
-  width:100%;
-
-  padding:11px;
-
-  border:1px solid var(--line);
-
-  border-radius:11px;
-
-  background:#fff;
-
-  color:var(--ink);
-
-}
-
-.fine{
-
-  font-size:12px;
-
-  color:var(--muted);
-
-  line-height:1.45;
-
-  margin:10px 0 0;
-
-}
-
-.modal-actions{
-
-  margin-top:18px;
-
-}
-
-.right-actions{
-
-  display:flex;
-
-  gap:8px;
-
-}
-
-.ghost,.delete{
-
-  border:1px solid var(--line);
-
-  border-radius:999px;
-
-  padding:10px 13px;
-
-  background:#fff;
-
-}
-
-.delete{
-
-  color:var(--overdue-slider);
-
-}
-
-@media(max-width:600px){
-
-  h1{
-
-    font-size:36px;
-
-  }
-
-  .header-actions{
-
-    flex-direction:column-reverse;
-
-    align-items:flex-end;
-
-  }
-
-  .pair{
-
-    grid-template-columns:1fr;
-
-  }
-
-  .status{
-
-    align-items:flex-start;
-
-  }
-
-  .award-row{
-
-    gap:5px;
-
-  }
-
-  .award-number{
-
-    font-size:11px;
-
-  }
-
-  .award-state{
-
-    font-size:9px;
-
-  }
-
-  .day-cell{
-
-    min-height:59px;
-
-    padding:5px;
-
-  }
-
-  .day-mark{
-
-    font-size:21px;
-
-  }
-
-  .page-header{
-
-    align-items:flex-start;
-
-  }
-
-  .todo-actions{
-
-    flex-direction:column;
-
-    align-items:flex-end;
-
-  }
-
-}
-
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink)}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{width:min(820px,100%);margin:auto;padding:22px 16px 56px}
+header,.status,.task-top,.task-bottom,.modal-actions,.page-header,.todo-top,.todo-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-size:14px;margin-top:3px}
+.header-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.add,.save{border:0;border-radius:999px;background:var(--ink);color:#fff;padding:11px 15px;font-weight:700}
+.secondary-button,.back-button{border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);padding:10px 13px;font-weight:650}
+.status,.award-task,.achievement-card,.calendar-card,.todo-card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 26px rgba(20,30,24,.055)}
+.status{padding:19px;margin:18px 0}.status h2{font-size:28px;letter-spacing:-.03em;margin:0}.status-copy{color:var(--muted);font-size:14px;margin-top:4px}
+.badge{min-width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--green-soft);color:var(--done-slider);font-weight:800;font-size:18px}
+.recovery{display:none;margin:-7px 0 15px;padding:10px 13px;border-radius:12px;background:#fff8d8;border:1px solid #e4d395;font-size:12px;color:#625925}
+.section-title{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin:18px 0 10px}
+.tasks,.todos{display:grid;gap:11px}
+.task{padding:18px;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 26px rgba(20,30,24,.055);transition:background .2s,border-color .2s}
+.task.done{background:var(--done-bg);border-color:var(--done-border)}.task.pending{background:var(--pending-bg);border-color:var(--pending-border)}.task.due{background:var(--due-bg);border-color:var(--due-border)}.task.overdue{background:var(--overdue-bg);border-color:var(--overdue-border)}.task.paused{background:var(--paused-bg);border-color:var(--paused-border)}
+.task-name,.todo-name{font-size:20px;font-weight:750;letter-spacing:-.02em}.meta{color:var(--muted);font-size:14px;margin-top:4px;line-height:1.35}
+.task-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px}.task-streak{color:var(--muted);font-size:11px;white-space:nowrap}.task-medals{display:flex;gap:4px;min-height:28px;justify-content:flex-end;flex-wrap:wrap;max-width:170px}
+.mini-medal{width:28px;height:28px;border-radius:7px;border:1px solid #ffffffaa;box-shadow:0 1px 4px #0002;background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");background-repeat:no-repeat}
+.bar{height:8px;background:rgba(255,255,255,.5);border-radius:99px;overflow:hidden;margin:14px 0}.bar>div{height:100%;border-radius:inherit}
+.done .bar>div{background:var(--done-slider)}.pending .bar>div{background:var(--pending-slider)}.due .bar>div{background:var(--due-slider)}.overdue .bar>div{background:var(--overdue-slider)}.paused .bar>div{background:var(--paused-slider)}
+.task-bottom{font-size:12px;color:var(--muted);flex-wrap:wrap}.stats{display:flex;gap:13px;flex-wrap:wrap}.edit{border:0;background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.switch{position:relative;width:64px;height:34px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.switch span{position:absolute;inset:0;border-radius:99px;transition:.18s}.switch span:before{content:"";position:absolute;width:26px;height:26px;left:4px;top:4px;background:#fff;border-radius:50%;box-shadow:0 2px 6px #0002;transition:.18s}
+.done .switch span{background:var(--done-slider)}.done .switch span:before{transform:translateX(30px)}.pending .switch span{background:var(--pending-slider)}.due .switch span{background:var(--due-slider)}.overdue .switch span{background:var(--overdue-slider)}.paused .switch span{background:var(--paused-slider)}.paused .switch input:disabled+span{opacity:.78}
+.empty{padding:34px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}.hidden{display:none!important}
+.page-header{margin-bottom:18px}.page-header h1{font-size:36px}
+.awards-list{display:grid;gap:14px}.award-task{padding:18px}.award-task-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}.award-task-name{font-size:22px;font-weight:750}.award-task-streak{color:var(--muted);font-size:13px;margin-top:3px}.next-target{background:var(--green-soft);color:var(--done-slider);border-radius:12px;padding:8px 10px;font-size:12px;font-weight:700;text-align:right}
+.award-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.award-item{text-align:center}.award-art{width:100%;aspect-ratio:1;border-radius:12px;background-image:url("A61C74DB-3742-4125-B1DD-9320E405935F.png");background-repeat:no-repeat;box-shadow:0 2px 8px #0002}.award-item.locked .award-art{opacity:.25;filter:grayscale(.8)}.award-number{margin-top:5px;font-size:12px;font-weight:750}.award-state{color:var(--muted);font-size:10px;margin-top:1px}
+.medal10,.art10{background-size:300% 200%;background-position:0 0}.medal20,.art20{background-size:300% 200%;background-position:50% 0}.medal50,.art50{background-size:300% 200%;background-position:100% 0}.medal100,.art100{background-size:200% 200%;background-position:0 100%}.medal200,.art200{background-size:200% 200%;background-position:100% 100%}
+.calendar-card{padding:16px}.calendar-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.calendar-month{font-size:21px;font-weight:750;letter-spacing:-.02em}.month-button{border:1px solid var(--line);background:#fff;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:20px}.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.weekday{color:var(--muted);text-align:center;font-size:11px;font-weight:700;padding:4px 0}.day-cell{min-height:68px;border:1px solid var(--line);border-radius:11px;padding:6px;background:#fafbf9;position:relative}.day-cell.other{visibility:hidden}.day-cell.future,.day-cell.before-tracking{opacity:.35}.day-cell.clean{background:var(--done-bg);border-color:var(--done-border)}.day-cell.failed{background:var(--overdue-bg);border-color:var(--overdue-border)}.day-cell.excused{background:var(--paused-bg);border-color:var(--paused-border)}.day-cell.today{outline:2px solid var(--ink);outline-offset:-2px}.day-number{font-size:12px;font-weight:700}.day-mark{position:absolute;left:50%;top:50%;transform:translate(-50%,-42%);font-size:25px;font-weight:850}.day-cell.clean .day-mark{color:var(--done-slider)}.day-cell.failed .day-mark{color:var(--overdue-slider)}.day-cell.excused .day-mark{color:var(--paused-slider)}.day-caption{position:absolute;bottom:5px;left:5px;right:5px;font-size:8px;color:var(--muted);text-align:center}
+.achievement-list{display:grid;gap:10px}.achievement-card{padding:14px;display:flex;align-items:center;gap:13px}.achievement-token{width:46px;height:46px;flex:0 0 46px;border-radius:50%;display:grid;place-items:center;font-size:21px;font-weight:850;background:var(--green-soft);color:var(--done-slider);border:1px solid var(--done-border)}.achievement-card.locked{opacity:.42}.achievement-card.locked .achievement-token{background:#eceeeb;color:#8b918d;border-color:#d8dcd8}.achievement-name{font-size:16px;font-weight:750}.achievement-copy{color:var(--muted);font-size:12px;margin-top:2px}.achievement-date{margin-left:auto;color:var(--muted);font-size:11px;white-space:nowrap}
+/* To Do */
+.todo-card{padding:16px 18px;transition:background .2s,border-color .2s}.todo-card.todo{background:var(--todo-bg);border-color:var(--todo-border)}.todo-card.pending{background:var(--pending-bg);border-color:var(--pending-border)}.todo-card.due{background:var(--due-bg);border-color:var(--due-border)}.todo-card.overdue{background:var(--overdue-bg);border-color:var(--overdue-border)}.todo-card.completed{background:var(--todo-done-bg);border-color:var(--todo-done-border)}
+.todo-left{display:flex;align-items:flex-start;gap:12px;min-width:0}.todo-copy{min-width:0}.todo-bottom{margin-top:10px;color:var(--muted);font-size:11px}.todo-edit{border:0;background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px;padding:2px 0}.todo-check{position:relative;width:30px;height:30px;flex:0 0 30px;margin-top:1px}.todo-check input{position:absolute;opacity:0;width:0;height:0}.todo-check span{position:absolute;inset:0;border-radius:8px;border:2px solid var(--todo-slider);background:rgba(255,255,255,.72);display:grid;place-items:center;font-weight:900;color:#fff}.todo-check input:checked+span{background:var(--todo-done-slider);border-color:var(--todo-done-slider)}.todo-check input:checked+span:after{content:"✓"}.todo-card.pending .todo-check span{border-color:var(--pending-slider)}.todo-card.due .todo-check span{border-color:var(--due-slider)}.todo-card.overdue .todo-check span{border-color:var(--overdue-slider)}
+.todo-summary{margin:0 0 16px;color:var(--muted);font-size:13px}.todo-actions{display:flex;gap:8px;align-items:center}
+
+/* planned pauses + emergency days */
+.pause-section{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.pause-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.pause-heading strong{font-size:13px;color:var(--muted)}
+.pause-list{display:grid;gap:7px;margin:8px 0}
+.pause-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:#fafbf9}
+.pause-row-copy{font-size:12px;color:var(--ink)}
+.pause-row-actions{display:flex;gap:6px}
+.small-button{border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);padding:6px 9px;font-size:11px}
+.pause-editor{padding:11px;margin-top:8px;border:1px solid var(--paused-border);border-radius:12px;background:var(--paused-bg)}
+.emergency-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.emergency-row:first-of-type{border-top:0}
+.emergency-date{font-weight:750}
+.emergency-state{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* dialogs */
+dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;box-shadow:0 25px 80px #0004}dialog::backdrop{background:#0004;backdrop-filter:blur(2px)}.modal{padding:21px}.modal h2{margin:0 0 16px;font-size:25px}.field{display:grid;gap:6px;margin:12px 0}.field label{font-size:13px;color:var(--muted);font-weight:700}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink)}.fine{font-size:12px;color:var(--muted);line-height:1.45;margin:10px 0 0}.modal-actions{margin-top:18px}.right-actions{display:flex;gap:8px}.ghost,.delete{border:1px solid var(--line);border-radius:999px;padding:10px 13px;background:#fff}.delete{color:var(--overdue-slider)}
+@media(max-width:600px){h1{font-size:36px}.header-actions{flex-direction:column-reverse;align-items:flex-end}.pair{grid-template-columns:1fr}.status{align-items:flex-start}.award-row{gap:5px}.award-number{font-size:11px}.award-state{font-size:9px}.day-cell{min-height:59px;padding:5px}.day-mark{font-size:21px}.page-header{align-items:flex-start}.todo-actions{flex-direction:column;align-items:flex-end}}
 </style>
-
 </head>
-
 <body>
 
-<!-- ==================================================
-
-     CHORES
-
-     ================================================== -->
-
 <main class="app" id="mainView">
-
 <header>
-
-  <div>
-
-    <h1>Chores</h1>
-
-    <div class="date" id="date"></div>
-
-  </div>
-
+  <div><h1>Chores</h1><div class="date" id="date"></div></div>
   <div class="header-actions">
-
-    <button
-
-      class="secondary-button"
-
-      id="todoBtn">
-
-      To Do
-
-    </button>
-
-    <button
-
-      class="secondary-button"
-
-      id="calendarBtn">
-
-      Calendar
-
-    </button>
-
-    <button
-
-      class="secondary-button"
-
-      id="awardsBtn">
-
-      Awards
-
-    </button>
-
-    <button
-
-      class="add"
-
-      id="addBtn">
-
-      ＋ Add task
-
-    </button>
-
+    <button class="secondary-button" id="todoBtn">To Do</button>
+    <button class="secondary-button" id="calendarBtn">Calendar</button>
+    <button class="secondary-button" id="awardsBtn">Awards</button>
+    <button class="secondary-button" id="emergencyBtn">Emergency</button>
+    <button class="add" id="addBtn">＋ Add task</button>
   </div>
-
 </header>
-
-<div
-
-  class="recovery"
-
-  id="recoveryNotice">
-
-</div>
-
+<div class="recovery" id="recoveryNotice"></div>
 <section class="status">
-
-  <div>
-
-    <h2 id="statusTitle">
-
-      No tasks overdue
-
-    </h2>
-
-    <div
-
-      class="status-copy"
-
-      id="statusCopy">
-
-      The field is clear.
-
-    </div>
-
-  </div>
-
-  <div
-
-    class="badge"
-
-    id="statusBadge">
-
-    ✓
-
-  </div>
-
+  <div><h2 id="statusTitle">No tasks overdue</h2><div class="status-copy" id="statusCopy">The field is clear.</div></div>
+  <div class="badge" id="statusBadge">✓</div>
 </section>
-
-<div class="section-title">
-
-  Your tasks
-
-</div>
-
-<section
-
-  class="tasks"
-
-  id="taskList">
-
-</section>
-
+<div class="section-title">Your tasks</div>
+<section class="tasks" id="taskList"></section>
 </main>
 
-<!-- ==================================================
-
-     AWARDS
-
-     ================================================== -->
-
-<main
-
-  class="app hidden"
-
-  id="awardsView">
-
-  <div class="page-header">
-
-    <div>
-
-      <h1>Awards</h1>
-
-      <div class="date">
-
-        Every task has its own trophy case.
-
-      </div>
-
-    </div>
-
-    <button
-
-      class="back-button"
-
-      id="awardsBackBtn">
-
-      ← Chores
-
-    </button>
-
-  </div>
-
-  <section
-
-    class="awards-list"
-
-    id="awardsList">
-
-  </section>
-
+<main class="app hidden" id="awardsView">
+  <div class="page-header"><div><h1>Awards</h1><div class="date">Every task has its own trophy case.</div></div><button class="back-button" id="awardsBackBtn">← Chores</button></div>
+  <section class="awards-list" id="awardsList"></section>
 </main>
 
-<!-- ==================================================
-
-     CALENDAR
-
-     ================================================== -->
-
-<main
-
-  class="app hidden"
-
-  id="calendarView">
-
-  <div class="page-header">
-
-    <div>
-
-      <h1>Calendar</h1>
-
-      <div class="date">
-
-        A Clean Sweep means everything that actually had to be done that day got done.
-
-      </div>
-
-    </div>
-
-    <button
-
-      class="back-button"
-
-      id="calendarBackBtn">
-
-      ← Chores
-
-    </button>
-
-  </div>
-
+<main class="app hidden" id="calendarView">
+  <div class="page-header"><div><h1>Calendar</h1><div class="date">A Clean Sweep means everything that actually had to be done that day got done.</div></div><button class="back-button" id="calendarBackBtn">← Chores</button></div>
   <section class="calendar-card">
-
-    <div class="calendar-toolbar">
-
-      <button
-
-        class="month-button"
-
-        id="previousMonthBtn">
-
-        ‹
-
-      </button>
-
-      <div
-
-        class="calendar-month"
-
-        id="calendarMonth">
-
-      </div>
-
-      <button
-
-        class="month-button"
-
-        id="nextMonthBtn">
-
-        ›
-
-      </button>
-
-    </div>
-
-    <div
-
-      class="calendar-grid"
-
-      id="calendarGrid">
-
-    </div>
-
+    <div class="calendar-toolbar"><button class="month-button" id="previousMonthBtn">‹</button><div class="calendar-month" id="calendarMonth"></div><button class="month-button" id="nextMonthBtn">›</button></div>
+    <div class="calendar-grid" id="calendarGrid"></div>
   </section>
-
-  <div class="section-title">
-
-    Special achievements
-
-  </div>
-
-  <section
-
-    class="achievement-list"
-
-    id="achievementList">
-
-  </section>
-
+  <div class="section-title">Special achievements</div>
+  <section class="achievement-list" id="achievementList"></section>
 </main>
 
-<!-- ==================================================
-
-     TO DO
-
-     ================================================== -->
-
-<main
-
-  class="app hidden"
-
-  id="todoView">
-
+<main class="app hidden" id="todoView">
   <div class="page-header">
-
-    <div>
-
-      <h1>To Do</h1>
-
-      <div class="date">
-
-        One-off tasks and miscellaneous obligations.
-
-      </div>
-
-    </div>
-
-    <div class="todo-actions">
-
-      <button
-
-        class="add"
-
-        id="addTodoBtn">
-
-        ＋ Add item
-
-      </button>
-
-      <button
-
-        class="back-button"
-
-        id="todoBackBtn">
-
-        ← Chores
-
-      </button>
-
-    </div>
-
+    <div><h1>To Do</h1><div class="date">One-off tasks and miscellaneous obligations.</div></div>
+    <div class="todo-actions"><button class="add" id="addTodoBtn">＋ Add item</button><button class="back-button" id="todoBackBtn">← Chores</button></div>
   </div>
-
-  <p class="todo-summary">
-
-    Pending means it cannot reasonably be started yet.
-
-    Finished items remain here for seven days.
-
-  </p>
-
-  <section
-
-    class="todos"
-
-    id="todoList">
-
-  </section>
-
+  <p class="todo-summary">Pending means it cannot reasonably be started yet. Finished items remain here for seven days.</p>
+  <section class="todos" id="todoList"></section>
 </main>
-
-<!-- ==================================================
-
-     RECURRING TASK EDITOR
-
-     ================================================== -->
 
 <dialog id="taskDialog">
+<form class="modal" id="taskForm">
+<h2 id="dialogTitle">Add task</h2>
+<input type="hidden" id="taskId">
+<div class="field"><label for="taskName">Task</label><input id="taskName" maxlength="80" required placeholder="e.g. Laundry"></div>
+<div class="field"><label for="taskType">Type</label><select id="taskType"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="interval">Every N days</option></select></div>
+<div id="weeklyFields" class="hidden">
+  <div class="pair">
+    <div class="field"><label for="pendingWeekday">Resets to Pending</label><select id="pendingWeekday"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5" selected>Friday</option><option value="6">Saturday</option></select></div>
+    <div class="field"><label for="overdueWeekday">Becomes Overdue</label><select id="overdueWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
+  </div>
+  <p class="fine">A completed weekly task remains Done until the next “Resets to Pending” day. The day immediately before “Becomes Overdue” is Due Today.</p>
+</div>
+<div id="intervalFields" class="hidden">
+  <div class="field"><label for="maxDays">Maximum days between completions</label><input id="maxDays" type="number" min="1" step="1" value="7"></div>
+  <div class="field"><label for="pendingWindow">Pending window</label><input id="pendingWindow" type="number" min="1" step="1" value="2"></div>
+  <p class="fine">Example: Maximum 7 days and Pending window 2 days. If completed Monday, it remains Done through Saturday, is Pending Sunday, is Due Today the following Monday, and becomes Overdue Tuesday.</p>
+</div>
+<div id="dailyNote" class="fine">Daily tasks are Due Today until completed. If a whole day passes without completion, they become Overdue.</div>
 
-<form
-
-  class="modal"
-
-  id="taskForm">
-
-<h2 id="dialogTitle">
-
-  Add task
-
-</h2>
-
-<input
-
-  type="hidden"
-
-  id="taskId">
-
-<div class="field">
-
-<label for="taskName">
-
-  Task
-
-</label>
-
-<input
-
-  id="taskName"
-
-  maxlength="80"
-
-  required
-
-  placeholder="e.g. Laundry">
-
+<div class="pause-section hidden" id="pauseSection">
+  <div class="pause-heading">
+    <strong>Planned pauses</strong>
+    <button type="button" class="small-button" id="newPauseBtn">＋ Add pause</button>
+  </div>
+  <div class="pause-list" id="pauseList"></div>
+  <div class="pause-editor hidden" id="pauseEditor">
+    <input type="hidden" id="pauseId">
+    <div class="pair">
+      <div class="field"><label for="pauseStartDate">Starts</label><input id="pauseStartDate" type="date"></div>
+      <div class="field"><label for="pauseEndDate">Ends</label><input id="pauseEndDate" type="date"></div>
+    </div>
+    <div class="right-actions">
+      <button type="button" class="ghost" id="cancelPauseBtn">Cancel</button>
+      <button type="button" class="save" id="savePauseBtn">Save pause</button>
+    </div>
+  </div>
+  <p class="fine">A new pause must begin at least 7 days from today. Paused days do not count toward or against a streak. Planned pauses do not spoil a Clean Sweep.</p>
 </div>
 
-<div class="field">
-
-<label for="taskType">
-
-  Type
-
-</label>
-
-<select id="taskType">
-
-<option value="daily">
-
-  Daily
-
-</option>
-
-<option value="weekly">
-
-  Weekly
-
-</option>
-
-<option value="interval">
-
-  Every N days
-
-</option>
-
-</select>
-
-</div>
-
-<!-- WEEKLY -->
-
-<div
-
-  id="weeklyFields"
-
-  class="hidden">
-
-<div class="pair">
-
-<div class="field">
-
-<label for="pendingWeekday">
-
-  Resets to Pending
-
-</label>
-
-<select id="pendingWeekday">
-
-<option value="0">Sunday</option>
-
-<option value="1">Monday</option>
-
-<option value="2">Tuesday</option>
-
-<option value="3">Wednesday</option>
-
-<option value="4">Thursday</option>
-
-<option value="5" selected>Friday</option>
-
-<option value="6">Saturday</option>
-
-</select>
-
-</div>
-
-<div class="field">
-
-<label for="overdueWeekday">
-
-  Becomes Overdue
-
-</label>
-
-<select id="overdueWeekday">
-
-<option value="0">Sunday</option>
-
-<option value="1" selected>Monday</option>
-
-<option value="2">Tuesday</option>
-
-<option value="3">Wednesday</option>
-
-<option value="4">Thursday</option>
-
-<option value="5">Friday</option>
-
-<option value="6">Saturday</option>
-
-</select>
-
-</div>
-
-</div>
-
-<p class="fine">
-
-A completed weekly task remains Done until the next
-
-“Resets to Pending” day.
-
-The day immediately before “Becomes Overdue” is Due Today.
-
-</p>
-
-</div>
-
-<!-- EVERY N DAYS -->
-
-<div
-
-  id="intervalFields"
-
-  class="hidden">
-
-<div class="field">
-
-<label for="maxDays">
-
-  Maximum days between completions
-
-</label>
-
-<input
-
-  id="maxDays"
-
-  type="number"
-
-  min="1"
-
-  step="1"
-
-  value="7">
-
-</div>
-
-<div class="field">
-
-<label for="pendingWindow">
-
-  Pending window
-
-</label>
-
-<input
-
-  id="pendingWindow"
-
-  type="number"
-
-  min="1"
-
-  step="1"
-
-  value="2">
-
-</div>
-
-<p class="fine">
-
-Example: Maximum 7 days and Pending window 2 days.
-
-If completed Monday, it remains Done through Saturday,
-
-is Pending Sunday, is Due Today the following Monday,
-
-and becomes Overdue Tuesday.
-
-</p>
-
-</div>
-
-<!-- DAILY -->
-
-<div
-
-  id="dailyNote"
-
-  class="fine">
-
-Daily tasks are Due Today until completed.
-
-If a whole day passes without completion,
-
-they become Overdue.
-
-</div>
-
-<div class="modal-actions">
-
-<button
-
-  type="button"
-
-  class="delete"
-
-  id="deleteBtn"
-
-  hidden>
-
-  Delete
-
-</button>
-
-<div class="right-actions">
-
-<button
-
-  type="button"
-
-  class="ghost"
-
-  id="cancelBtn">
-
-  Cancel
-
-</button>
-
-<button class="save">
-
-  Save
-
-</button>
-
-</div>
-
-</div>
-
+<div class="modal-actions"><button type="button" class="delete" id="deleteBtn" hidden>Delete</button><div class="right-actions"><button type="button" class="ghost" id="cancelBtn">Cancel</button><button class="save">Save</button></div></div>
 </form>
-
 </dialog>
-
-<!-- ==================================================
-
-     TO-DO EDITOR
-
-     ================================================== -->
 
 <dialog id="todoDialog">
-
-<form
-
-  class="modal"
-
-  id="todoForm">
-
-<h2 id="todoDialogTitle">
-
-  Add to-do
-
-</h2>
-
-<input
-
-  type="hidden"
-
-  id="todoId">
-
-<div class="field">
-
-<label for="todoName">
-
-  Task
-
-</label>
-
-<input
-
-  id="todoName"
-
-  maxlength="100"
-
-  required
-
-  placeholder="e.g. Replace bathroom light bulb">
-
-</div>
-
-<div class="field">
-
-<label for="todoStartDate">
-
-  Can start
-
-  <span style="font-weight:400">
-
-    (optional)
-
-  </span>
-
-</label>
-
-<input
-
-  id="todoStartDate"
-
-  type="date">
-
-</div>
-
-<div class="field">
-
-<label for="todoDueDate">
-
-  Due by
-
-  <span style="font-weight:400">
-
-    (optional)
-
-  </span>
-
-</label>
-
-<input
-
-  id="todoDueDate"
-
-  type="date">
-
-</div>
-
-<p class="fine">
-
-Before “Can start,” the item is Pending.
-
-On that date it becomes To Do.
-
-On its Due by date it is Due Today;
-
-the following day it becomes Overdue.
-
-Leave either date blank if it does not apply.
-
-</p>
-
-<div class="modal-actions">
-
-<button
-
-  type="button"
-
-  class="delete"
-
-  id="deleteTodoBtn"
-
-  hidden>
-
-  Delete
-
-</button>
-
-<div class="right-actions">
-
-<button
-
-  type="button"
-
-  class="ghost"
-
-  id="cancelTodoBtn">
-
-  Cancel
-
-</button>
-
-<button class="save">
-
-  Save
-
-</button>
-
-</div>
-
-</div>
-
+<form class="modal" id="todoForm">
+<h2 id="todoDialogTitle">Add to-do</h2>
+<input type="hidden" id="todoId">
+<div class="field"><label for="todoName">Task</label><input id="todoName" maxlength="100" required placeholder="e.g. Replace bathroom light bulb"></div>
+<div class="field"><label for="todoStartDate">Can start <span style="font-weight:400">(optional)</span></label><input id="todoStartDate" type="date"></div>
+<div class="field"><label for="todoDueDate">Due by <span style="font-weight:400">(optional)</span></label><input id="todoDueDate" type="date"></div>
+<p class="fine">Before “Can start,” the item is Pending. On that date it becomes To Do. On its Due by date it is Due Today; the following day it becomes Overdue. Leave either date blank if it does not apply.</p>
+<div class="modal-actions"><button type="button" class="delete" id="deleteTodoBtn" hidden>Delete</button><div class="right-actions"><button type="button" class="ghost" id="cancelTodoBtn">Cancel</button><button class="save">Save</button></div></div>
 </form>
-
 </dialog>
 
-<script>
 
+<dialog id="emergencyDialog">
+<form class="modal" method="dialog">
+<h2>Emergency Day</h2>
+<p class="fine">An Emergency Day excuses recurring chores without pretending they were completed. Streaks freeze, the day is marked Excused on the calendar, and it cannot count as a Clean Sweep or Perfect Week. To Do items are unaffected.</p>
+<div class="emergency-row">
+  <div>
+    <div class="emergency-date" id="emergencyTodayLabel"></div>
+    <div class="emergency-state" id="emergencyTodayState"></div>
+  </div>
+  <button type="button" class="ghost" id="emergencyTodayToggle"></button>
+</div>
+<div class="emergency-row">
+  <div>
+    <div class="emergency-date" id="emergencyYesterdayLabel"></div>
+    <div class="emergency-state" id="emergencyYesterdayState"></div>
+  </div>
+  <button type="button" class="ghost" id="emergencyYesterdayToggle"></button>
+</div>
+<div class="modal-actions">
+  <span></span>
+  <div class="right-actions">
+    <button type="button" class="save" id="closeEmergencyBtn">Close</button>
+  </div>
+</div>
+</form>
+</dialog>
+
+
+<script>
 "use strict";
 
 /* ==================================================
-
    CONSTANTS
-
    ================================================== */
 
-const STORAGE_KEY =
-
-  "chores2-v2";
-
-const BACKUP_KEYS = [
-
-  "chores2-v2-backup-1",
-
-  "chores2-v2-backup-2",
-
-  "chores2-v2-backup-3"
-
+const STORAGE_KEY="chores2-v2";
+const BACKUP_KEYS=["chores2-v2-backup-1","chores2-v2-backup-2","chores2-v2-backup-3"];
+const AWARDS=[10,20,50,100,200];
+const SPECIAL_ACHIEVEMENTS=[
+  {id:"perfect-week",symbol:"7",name:"Perfect Week",description:"Earn 7 consecutive Clean Sweeps."},
+  {id:"rescue-mission",symbol:"↗",name:"Rescue Mission",description:"Begin a day with something Overdue and finish the day with nothing Overdue."},
+  {id:"full-house",symbol:"★",name:"Full House",description:"Complete a Daily, Weekly, and Every-N-Days task on the same day."}
 ];
 
-const AWARDS =
+const $=id=>document.getElementById(id);
+const uid=()=>globalThis.crypto&&typeof globalThis.crypto.randomUUID==="function"
+  ?globalThis.crypto.randomUUID()
+  :"item-"+Date.now()+"-"+Math.random().toString(36).slice(2);
 
-  [10,20,50,100,200];
-
-const SPECIAL_ACHIEVEMENTS = [
-
-  {
-
-    id:"perfect-week",
-
-    symbol:"7",
-
-    name:"Perfect Week",
-
-    description:
-
-      "Earn 7 consecutive Clean Sweeps."
-
-  },
-
-  {
-
-    id:"rescue-mission",
-
-    symbol:"↗",
-
-    name:"Rescue Mission",
-
-    description:
-
-      "Begin a day with something Overdue and finish the day with nothing Overdue."
-
-  },
-
-  {
-
-    id:"full-house",
-
-    symbol:"★",
-
-    name:"Full House",
-
-    description:
-
-      "Complete a Daily, Weekly, and Every-N-Days task on the same day."
-
-  }
-
-];
-
-const $ =
-
-  id =>
-
-  document.getElementById(id);
-
-const uid =
-
-  () =>
-
-  globalThis.crypto &&
-
-  typeof globalThis.crypto.randomUUID ===
-
-  "function"
-
-  ? globalThis.crypto.randomUUID()
-
-  : "item-" +
-
-    Date.now() +
-
-    "-" +
-
-    Math.random()
-
-      .toString(36)
-
-      .slice(2);
 
 /* ==================================================
-
    DATE HELPERS
-
    ================================================== */
 
-function localDateKey(
-
-  date = new Date()
-
-){
-
-  const y =
-
-    date.getFullYear();
-
-  const m =
-
-    String(
-
-      date.getMonth()+1
-
-    ).padStart(
-
-      2,
-
-      "0"
-
-    );
-
-  const d =
-
-    String(
-
-      date.getDate()
-
-    ).padStart(
-
-      2,
-
-      "0"
-
-    );
-
+function localDateKey(date=new Date()){
+  const y=date.getFullYear();
+  const m=String(date.getMonth()+1).padStart(2,"0");
+  const d=String(date.getDate()).padStart(2,"0");
   return `${y}-${m}-${d}`;
-
 }
 
 function dateFromKey(key){
-
-  const [y,m,d] =
-
-    key
-
-    .split("-")
-
-    .map(Number);
-
-  return new Date(
-
-    y,
-
-    m-1,
-
-    d
-
-  );
-
+  const [y,m,d]=key.split("-").map(Number);
+  return new Date(y,m-1,d);
 }
 
-function addDaysKey(
-
-  key,
-
-  days
-
-){
-
-  const d =
-
-    dateFromKey(
-
-      key
-
-    );
-
-  d.setDate(
-
-    d.getDate() +
-
-    days
-
-  );
-
-  return localDateKey(
-
-    d
-
-  );
-
+function addDaysKey(key,days){
+  const d=dateFromKey(key);
+  d.setDate(d.getDate()+days);
+  return localDateKey(d);
 }
 
-function diffCalendarDays(
-
-  fromKey,
-
-  toKey
-
-){
-
-  return Math.round(
-
-    (
-
-      dateFromKey(toKey) -
-
-      dateFromKey(fromKey)
-
-    )
-
-    /
-
-    86400000
-
-  );
-
+function diffCalendarDays(fromKey,toKey){
+  return Math.round((dateFromKey(toKey)-dateFromKey(fromKey))/86400000);
 }
 
 function prettyDate(key){
-
-  return new Intl.DateTimeFormat(
-
-    undefined,
-
-    {
-
-      month:"short",
-
-      day:"numeric",
-
-      year:"numeric"
-
-    }
-
-  ).format(
-
-    dateFromKey(
-
-      key
-
-    )
-
-  );
-
+  return new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric",year:"numeric"}).format(dateFromKey(key));
 }
 
-function nextWeekdayAfter(
-
-  dateKey,
-
-  weekday
-
-){
-
-  const d =
-
-    dateFromKey(
-
-      dateKey
-
-    );
-
-  let delta =
-
-    (
-
-      Number(weekday) -
-
-      d.getDay() +
-
-      7
-
-    ) % 7;
-
-  if(
-
-    delta === 0
-
-  ){
-
-    delta=7;
-
-  }
-
-  return addDaysKey(
-
-    dateKey,
-
-    delta
-
-  );
-
+function nextWeekdayAfter(dateKey,weekday){
+  const d=dateFromKey(dateKey);
+  let delta=(Number(weekday)-d.getDay()+7)%7;
+  if(delta===0)delta=7;
+  return addDaysKey(dateKey,delta);
 }
 
-function daysFromWeekdayToWeekday(
-
-  fromWeekday,
-
-  toWeekday
-
-){
-
-  return (
-
-    Number(toWeekday) -
-
-    Number(fromWeekday) +
-
-    7
-
-  ) % 7;
-
+function daysFromWeekdayToWeekday(fromWeekday,toWeekday){
+  return (Number(toWeekday)-Number(fromWeekday)+7)%7;
 }
 
-function defaultPendingWeekday(
-
-  overdueWeekday
-
-){
-
-  return (
-
-    Number(overdueWeekday) +
-
-    4
-
-  ) % 7;
-
+function defaultPendingWeekday(overdueWeekday){
+  return (Number(overdueWeekday)+4)%7;
 }
+
 
 /* ==================================================
-
-   WEEKLY HELPERS
-
-   ================================================== */
-
-function weeklySettings(task){
-
-  const overdue =
-
-    Number(
-
-      task.overdueWeekday ??
-
-      task.resetWeekday ??
-
-      1
-
-    );
-
-  const pending =
-
-    Number(
-
-      task.pendingWeekday ??
-
-      defaultPendingWeekday(
-
-        overdue
-
-      )
-
-    );
-
-  return{
-
-    pending,
-
-    overdue
-
-  };
-
-}
-
-function weeklyCycleAfterCompletion(
-
-  task,
-
-  completionDate
-
-){
-
-  const s =
-
-    weeklySettings(
-
-      task
-
-    );
-
-  const pendingDate =
-
-    nextWeekdayAfter(
-
-      completionDate,
-
-      s.pending
-
-    );
-
-  const overdueDate =
-
-    nextWeekdayAfter(
-
-      pendingDate,
-
-      s.overdue
-
-    );
-
-  return{
-
-    pendingDate,
-
-    dueDate:
-
-      addDaysKey(
-
-        overdueDate,
-
-        -1
-
-      ),
-
-    overdueDate
-
-  };
-
-}
-
-function firstWeeklyCycle(task){
-
-  const s =
-
-    weeklySettings(
-
-      task
-
-    );
-
-  const createdDate =
-
-    localDateKey(
-
-      new Date(
-
-        task.createdAt
-
-      )
-
-    );
-
-  const overdueDate =
-
-    nextWeekdayAfter(
-
-      createdDate,
-
-      s.overdue
-
-    );
-
-  return{
-
-    dueDate:
-
-      addDaysKey(
-
-        overdueDate,
-
-        -1
-
-      ),
-
-    overdueDate
-
-  };
-
-}
-
-/* ==================================================
-
    OBJECT CREATION
-
    ================================================== */
 
-function makeTask(
-
-  name,
-
-  type="daily",
-
-  maxDays=7,
-
-  pendingWindow=2
-
-){
-
+function makeTask(name,type="daily",maxDays=7,pendingWindow=2){
   return{
-
     id:uid(),
-
     name,
-
     type,
-
     maxDays,
-
     pendingWindow,
-
     resetWeekday:1,
-
     pendingWeekday:5,
-
     overdueWeekday:1,
-
+    plannedPauses:[],
     lastDoneDate:null,
-
     previousDoneDate:null,
-
     totalCompletions:0,
-
     completionDates:[],
-
     completionEvents:[],
-
     streakStartDate:null,
-
     previousStreakStartDate:null,
-
     bestStreakDays:0,
-
     unlockedAwards:[],
-
+    lastStreakBreak:null,
     createdAt:Date.now()
-
   };
-
 }
 
-function makeTodo(
-
-  name,
-
-  startDate=null,
-
-  dueDate=null
-
-){
-
+function makeTodo(name,startDate=null,dueDate=null){
   return{
-
     id:uid(),
-
     name,
-
-    startDate:
-
-      startDate ||
-
-      null,
-
-    dueDate:
-
-      dueDate ||
-
-      null,
-
+    startDate:startDate||null,
+    dueDate:dueDate||null,
     doneDate:null,
-
     createdAt:Date.now()
-
   };
-
 }
+
 
 /* ==================================================
-
    STORAGE RECOVERY
-
    ================================================== */
 
 function parseState(raw){
-
-  if(
-
-    !raw
-
-  ){
-
-    return null;
-
-  }
-
+  if(!raw)return null;
   try{
-
-    const x =
-
-      JSON.parse(
-
-        raw
-
-      );
-
-    return (
-
-      x &&
-
-      Array.isArray(
-
-        x.tasks
-
-      )
-
-    )
-
-    ? x
-
-    : null;
-
-  }
-
-  catch(e){
-
+    const x=JSON.parse(raw);
+    return x&&Array.isArray(x.tasks)?x:null;
+  }catch(e){
     return null;
-
   }
-
 }
 
 function candidateScore(x){
-
-  if(
-
-    !x ||
-
-    !Array.isArray(
-
-      x.tasks
-
-    )
-
-  ){
-
-    return -1;
-
+  if(!x||!Array.isArray(x.tasks))return -1;
+  let score=x.tasks.length*100+(Array.isArray(x.todos)?x.todos.length:0)*10;
+  for(const task of x.tasks){
+    if(task.lastDoneDate)score+=3;
+    if(Number(task.totalCompletions)>0)score+=1;
   }
-
-  let score =
-
-    x.tasks.length *
-
-    100;
-
-  score +=
-
-    (
-
-      Array.isArray(
-
-        x.todos
-
-      )
-
-      ? x.todos.length
-
-      : 0
-
-    )
-
-    * 10;
-
-  for(
-
-    const task
-
-    of x.tasks
-
-  ){
-
-    if(
-
-      task.lastDoneDate
-
-    ){
-
-      score += 3;
-
-    }
-
-    if(
-
-      Number(
-
-        task.totalCompletions
-
-      ) > 0
-
-    ){
-
-      score += 1;
-
-    }
-
-  }
-
   return score;
-
 }
 
-let recoverySource =
-
-  null;
+let recoverySource=null;
 
 function findBestStoredState(){
+  const primary=parseState(localStorage.getItem(STORAGE_KEY));
+  if(primary&&primary.tasks.length>0)return primary;
 
-  const primary =
-
-    parseState(
-
-      localStorage.getItem(
-
-        STORAGE_KEY
-
-      )
-
-    );
-
-  if(
-
-    primary &&
-
-    primary.tasks.length > 0
-
-  ){
-
-    return primary;
-
-  }
-
-  let best =
-
-    primary;
-
-  let bestKey =
-
-    primary
-
-    ? STORAGE_KEY
-
-    : null;
-
-  let bestScore =
-
-    candidateScore(
-
-      primary
-
-    );
-
+  let best=primary;
+  let bestKey=primary?STORAGE_KEY:null;
+  let bestScore=candidateScore(primary);
   const keys=[];
 
-  for(
-
-    let i=0;
-
-    i<localStorage.length;
-
-    i++
-
-  ){
-
-    const key =
-
-      localStorage.key(
-
-        i
-
-      );
-
-    if(
-
-      key
-
-    ){
-
-      keys.push(
-
-        key
-
-      );
-
-    }
-
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(key)keys.push(key);
   }
 
-  for(
-
-    const key
-
-    of keys
-
-  ){
-
-    if(
-
-      key ===
-
-      STORAGE_KEY
-
-    ){
-
-      continue;
-
+  for(const key of keys){
+    if(key===STORAGE_KEY)continue;
+    const candidate=parseState(localStorage.getItem(key));
+    const score=candidateScore(candidate);
+    if(score>bestScore){
+      best=candidate;
+      bestScore=score;
+      bestKey=key;
     }
-
-    const candidate =
-
-      parseState(
-
-        localStorage.getItem(
-
-          key
-
-        )
-
-      );
-
-    const score =
-
-      candidateScore(
-
-        candidate
-
-      );
-
-    if(
-
-      score >
-
-      bestScore
-
-    ){
-
-      best =
-
-        candidate;
-
-      bestScore =
-
-        score;
-
-      bestKey =
-
-        key;
-
-    }
-
   }
 
-  if(
-
-    best &&
-
-    bestKey &&
-
-    bestKey !==
-
-    STORAGE_KEY
-
-  ){
-
-    recoverySource =
-
-      bestKey;
-
-  }
-
+  if(best&&bestKey&&bestKey!==STORAGE_KEY)recoverySource=bestKey;
   return best;
-
 }
 
+
 /* ==================================================
-
    MIGRATION
-
    ================================================== */
 
 function migrateState(parsed){
+  if(!parsed.dailySnapshots||typeof parsed.dailySnapshots!=="object")parsed.dailySnapshots={};
+  if(!Array.isArray(parsed.specialAchievements))parsed.specialAchievements=[];
+  if(!parsed.calendarTrackingStart)parsed.calendarTrackingStart=localDateKey();
+  if(!Array.isArray(parsed.todos))parsed.todos=[];
+  if(!Array.isArray(parsed.emergencyDays))parsed.emergencyDays=[];
 
-  if(
+  parsed.emergencyDays=[...new Set(parsed.emergencyDays.filter(Boolean))].sort();
 
-    !parsed.dailySnapshots ||
-
-    typeof parsed.dailySnapshots !==
-
-    "object"
-
-  ){
-
-    parsed.dailySnapshots={};
-
+  for(const todo of parsed.todos){
+    if(!todo.id)todo.id=uid();
+    if(!todo.name)todo.name="Untitled";
+    if(todo.startDate===undefined)todo.startDate=null;
+    if(todo.dueDate===undefined)todo.dueDate=null;
+    if(todo.doneDate===undefined)todo.doneDate=null;
+    if(!todo.createdAt)todo.createdAt=Date.now();
   }
 
-  if(
-
-    !Array.isArray(
-
-      parsed.specialAchievements
-
-    )
-
-  ){
-
-    parsed.specialAchievements=[];
-
-  }
-
-  if(
-
-    !parsed.calendarTrackingStart
-
-  ){
-
-    parsed.calendarTrackingStart =
-
-      localDateKey();
-
-  }
-
-  if(
-
-    !Array.isArray(
-
-      parsed.todos
-
-    )
-
-  ){
-
-    parsed.todos=[];
-
-  }
-
-  for(
-
-    const todo
-
-    of parsed.todos
-
-  ){
-
-    if(
-
-      !todo.id
-
-    ){
-
-      todo.id=uid();
-
-    }
-
-    if(
-
-      !todo.name
-
-    ){
-
-      todo.name="Untitled";
-
-    }
-
-    if(
-
-      todo.startDate ===
-
-      undefined
-
-    ){
-
-      todo.startDate=null;
-
-    }
-
-    if(
-
-      todo.dueDate ===
-
-      undefined
-
-    ){
-
-      todo.dueDate=null;
-
-    }
-
-    if(
-
-      todo.doneDate ===
-
-      undefined
-
-    ){
-
-      todo.doneDate=null;
-
-    }
-
-    if(
-
-      !todo.createdAt
-
-    ){
-
-      todo.createdAt =
-
-        Date.now();
-
-    }
-
-  }
-
-  for(
-
-    const task
-
-    of parsed.tasks
-
-  ){
-
-    if(
-
-      task.pendingWindow ==
-
-      null
-
-    ){
-
-      if(
-
-        task.type ===
-
-        "interval"
-
-      ){
-
-        const old =
-
-          Number(
-
-            task.pendingAfter ??
-
-            5
-
-          );
-
-        const max =
-
-          Number(
-
-            task.maxDays ??
-
-            7
-
-          );
-
-        task.pendingWindow =
-
-          Math.max(
-
-            1,
-
-            max-old
-
-          );
-
-      }
-
-      else{
-
+  for(const task of parsed.tasks){
+    if(task.pendingWindow==null){
+      if(task.type==="interval"){
+        const old=Number(task.pendingAfter??5);
+        const max=Number(task.maxDays??7);
+        task.pendingWindow=Math.max(1,max-old);
+      }else{
         task.pendingWindow=1;
-
       }
-
     }
 
-    if(
-
-      task.type ===
-
-      "weekly"
-
-    ){
-
-      if(
-
-        task.overdueWeekday ==
-
-        null
-
-      ){
-
-        task.overdueWeekday =
-
-          Number(
-
-            task.resetWeekday ??
-
-            1
-
-          );
-
-      }
-
-      if(
-
-        task.pendingWeekday ==
-
-        null
-
-      ){
-
-        task.pendingWeekday =
-
-          defaultPendingWeekday(
-
-            task.overdueWeekday
-
-          );
-
-      }
-
-      task.resetWeekday =
-
-        Number(
-
-          task.overdueWeekday
-
-        );
-
+    if(task.type==="weekly"){
+      if(task.overdueWeekday==null)task.overdueWeekday=Number(task.resetWeekday??1);
+      if(task.pendingWeekday==null)task.pendingWeekday=defaultPendingWeekday(task.overdueWeekday);
+      task.resetWeekday=Number(task.overdueWeekday);
+    }else{
+      if(task.resetWeekday==null)task.resetWeekday=1;
+      if(task.overdueWeekday==null)task.overdueWeekday=Number(task.resetWeekday);
+      if(task.pendingWeekday==null)task.pendingWeekday=defaultPendingWeekday(task.overdueWeekday);
     }
 
-    else{
+    if(!Array.isArray(task.plannedPauses))task.plannedPauses=[];
+    task.plannedPauses=task.plannedPauses
+      .filter(p=>p&&p.startDate&&p.endDate)
+      .map(p=>({
+        id:p.id||uid(),
+        startDate:p.startDate,
+        endDate:p.endDate,
+        createdAt:p.createdAt||Date.now()
+      }))
+      .sort((a,b)=>a.startDate.localeCompare(b.startDate));
 
-      if(
+    if(task.previousDoneDate===undefined)task.previousDoneDate=null;
+    if(task.totalCompletions==null)task.totalCompletions=0;
 
-        task.resetWeekday ==
-
-        null
-
-      ){
-
-        task.resetWeekday=1;
-
-      }
-
-      if(
-
-        task.overdueWeekday ==
-
-        null
-
-      ){
-
-        task.overdueWeekday =
-
-          Number(
-
-            task.resetWeekday
-
-          );
-
-      }
-
-      if(
-
-        task.pendingWeekday ==
-
-        null
-
-      ){
-
-        task.pendingWeekday =
-
-          defaultPendingWeekday(
-
-            task.overdueWeekday
-
-          );
-
-      }
-
-    }
-
-    if(
-
-      task.previousDoneDate ===
-
-      undefined
-
-    ){
-
-      task.previousDoneDate=null;
-
-    }
-
-    if(
-
-      task.totalCompletions ==
-
-      null
-
-    ){
-
-      task.totalCompletions=0;
-
-    }
-
-    if(
-
-      !Array.isArray(
-
-        task.completionDates
-
-      )
-
-    ){
-
+    if(!Array.isArray(task.completionDates)){
       task.completionDates=[];
+      if(task.lastDoneDate)task.completionDates.push(task.lastDoneDate);
+    }
+    task.completionDates=[...new Set(task.completionDates.filter(Boolean))].sort();
 
-      if(
+    if(!Array.isArray(task.completionEvents))task.completionEvents=[];
+    if(task.streakStartDate===undefined)task.streakStartDate=task.lastDoneDate||null;
+    if(task.previousStreakStartDate===undefined)task.previousStreakStartDate=null;
+    if(task.bestStreakDays===undefined)task.bestStreakDays=Number(task.bestStreak??0)||0;
+    if(task.lastStreakBreak===undefined)task.lastStreakBreak=null;
+    if(!Array.isArray(task.unlockedAwards))task.unlockedAwards=[];
 
-        task.lastDoneDate
-
-      ){
-
-        task.completionDates.push(
-
-          task.lastDoneDate
-
-        );
-
+    for(const milestone of AWARDS){
+      if(Number(task.bestStreakDays)>=milestone&&!task.unlockedAwards.includes(milestone)){
+        task.unlockedAwards.push(milestone);
       }
-
     }
 
-    task.completionDates =
+    task.unlockedAwards.sort((a,b)=>a-b);
 
-      [
-
-        ...new Set(
-
-          task.completionDates
-
-          .filter(Boolean)
-
-        )
-
-      ]
-
-      .sort();
-
-    if(
-
-      !Array.isArray(
-
-        task.completionEvents
-
-      )
-
-    ){
-
-      task.completionEvents=[];
-
-    }
-
-    if(
-
-      task.streakStartDate ===
-
-      undefined
-
-    ){
-
-      task.streakStartDate =
-
-        task.lastDoneDate ||
-
-        null;
-
-    }
-
-    if(
-
-      task.previousStreakStartDate ===
-
-      undefined
-
-    ){
-
-      task.previousStreakStartDate =
-
-        null;
-
-    }
-
-    if(
-
-      task.bestStreakDays ===
-
-      undefined
-
-    ){
-
-      task.bestStreakDays =
-
-        Number(
-
-          task.bestStreak ??
-
-          0
-
-        ) || 0;
-
-    }
-
-    if(
-
-      !Array.isArray(
-
-        task.unlockedAwards
-
-      )
-
-    ){
-
-      task.unlockedAwards=[];
-
-    }
-
-    for(
-
-      const milestone
-
-      of AWARDS
-
-    ){
-
-      if(
-
-        Number(
-
-          task.bestStreakDays
-
-        ) >= milestone
-
-        &&
-
-        !task.unlockedAwards.includes(
-
-          milestone
-
-        )
-
-      ){
-
-        task.unlockedAwards.push(
-
-          milestone
-
-        );
-
-      }
-
-    }
-
-    task.unlockedAwards.sort(
-
-      (a,b)=>a-b
-
-    );
-
-    if(
-
-      !task.createdAt
-
-    ){
-
-      task.createdAt =
-
-        Date.now();
-
-    }
-
-    if(
-
-      !task.type
-
-    ){
-
-      task.type =
-
-        "daily";
-
-    }
-
+    if(!task.createdAt)task.createdAt=Date.now();
+    if(!task.type)task.type="daily";
   }
 
   return parsed;
-
 }
-
-/* ==================================================
-
-   DEFAULT STATE
-
-   ================================================== */
 
 function defaultState(){
-
   return{
-
-    calendarTrackingStart:
-
-      localDateKey(),
-
+    calendarTrackingStart:localDateKey(),
     dailySnapshots:{},
-
     specialAchievements:[],
-
+    emergencyDays:[],
     todos:[],
-
     tasks:[
-
-      makeTask(
-
-        "Shave",
-
-        "daily"
-
-      ),
-
-      makeTask(
-
-        "Laundry",
-
-        "interval",
-
-        7,
-
-        2
-
-      ),
-
-      makeTask(
-
-        "Wash hair",
-
-        "interval",
-
-        3,
-
-        1
-
-      ),
-
-      makeTask(
-
-        "Trim fingernails",
-
-        "interval",
-
-        14,
-
-        4
-
-      )
-
+      makeTask("Shave","daily"),
+      makeTask("Laundry","interval",7,2),
+      makeTask("Wash hair","interval",3,1),
+      makeTask("Trim fingernails","interval",14,4)
     ]
-
   };
-
 }
 
-let state =
+let state=migrateState(findBestStoredState()||defaultState());
 
-  migrateState(
-
-    findBestStoredState() ||
-
-    defaultState()
-
-  );
 
 /* ==================================================
-
    SAVING + BACKUPS
-
    ================================================== */
 
 function rotateBackups(){
-
-  const current =
-
-    localStorage.getItem(
-
-      STORAGE_KEY
-
-    );
-
-  if(
-
-    !current ||
-
-    !parseState(
-
-      current
-
-    )
-
-  ){
-
-    return;
-
-  }
+  const current=localStorage.getItem(STORAGE_KEY);
+  if(!current||!parseState(current))return;
 
   try{
+    const b1=localStorage.getItem(BACKUP_KEYS[0]);
+    const b2=localStorage.getItem(BACKUP_KEYS[1]);
 
-    const b1 =
-
-      localStorage.getItem(
-
-        BACKUP_KEYS[0]
-
-      );
-
-    const b2 =
-
-      localStorage.getItem(
-
-        BACKUP_KEYS[1]
-
-      );
-
-    if(
-
-      b2
-
-    ){
-
-      localStorage.setItem(
-
-        BACKUP_KEYS[2],
-
-        b2
-
-      );
-
-    }
-
-    if(
-
-      b1
-
-    ){
-
-      localStorage.setItem(
-
-        BACKUP_KEYS[1],
-
-        b1
-
-      );
-
-    }
-
-    localStorage.setItem(
-
-      BACKUP_KEYS[0],
-
-      current
-
-    );
-
-  }
-
-  catch(e){}
-
+    if(b2)localStorage.setItem(BACKUP_KEYS[2],b2);
+    if(b1)localStorage.setItem(BACKUP_KEYS[1],b1);
+    localStorage.setItem(BACKUP_KEYS[0],current);
+  }catch(e){}
 }
 
 function saveState(){
-
   rotateBackups();
-
-  localStorage.setItem(
-
-    STORAGE_KEY,
-
-    JSON.stringify(
-
-      state
-
-    )
-
-  );
-
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
 }
+
 
 /* ==================================================
-
-   COMPLETION HISTORY
-
+   EXCUSED DAYS
    ================================================== */
 
-function hasCompletionOn(
-
-  task,
-
-  dateKey
-
-){
-
-  return (
-
-    Array.isArray(
-
-      task.completionDates
-
-    )
-
-    &&
-
-    task.completionDates.includes(
-
-      dateKey
-
-    )
-
-  );
-
+function isEmergencyDay(dateKey){
+  return state.emergencyDays.includes(dateKey);
 }
 
-function latestCompletionOnOrBefore(
+function plannedPauseForDate(task,dateKey){
+  return (task.plannedPauses||[]).find(
+    pause=>pause.startDate<=dateKey&&pause.endDate>=dateKey
+  )||null;
+}
 
-  task,
+function isPlannedPausedOn(task,dateKey){
+  return Boolean(plannedPauseForDate(task,dateKey));
+}
 
-  dateKey
+function isTaskExcusedOn(task,dateKey){
+  return isEmergencyDay(dateKey)||isPlannedPausedOn(task,dateKey);
+}
 
-){
+function pauseDetail(task,dateKey){
+  if(isEmergencyDay(dateKey))return "Paused — Emergency Day";
+  const pause=plannedPauseForDate(task,dateKey);
+  if(pause){
+    if(pause.startDate===pause.endDate)return `Paused — ${prettyDate(pause.startDate)}`;
+    return `Paused — through ${prettyDate(pause.endDate)}`;
+  }
+  return "Paused";
+}
 
-  const arr =
+function endOfExcuseRun(task,dateKey){
+  let day=dateKey;
+  let guard=0;
+  while(guard<4000&&isTaskExcusedOn(task,addDaysKey(day,1))){
+    day=addDaysKey(day,1);
+    guard++;
+  }
+  return day;
+}
 
-    Array.isArray(
+function nextActiveDate(task,dateKey){
+  let day=addDaysKey(dateKey,1);
+  let guard=0;
+  while(guard<4000&&isTaskExcusedOn(task,day)){
+    day=addDaysKey(day,1);
+    guard++;
+  }
+  return day;
+}
 
-      task.completionDates
+function previousActiveDate(task,dateKey){
+  let day=addDaysKey(dateKey,-1);
+  let guard=0;
+  while(guard<4000&&isTaskExcusedOn(task,day)){
+    day=addDaysKey(day,-1);
+    guard++;
+  }
+  return day;
+}
 
-    )
+function activeDaysAfter(task,fromKey,toKey){
+  if(toKey<=fromKey)return 0;
+  let day=addDaysKey(fromKey,1);
+  let count=0;
+  let guard=0;
 
-    ? task.completionDates
-
-    : [];
-
-  for(
-
-    let i =
-
-      arr.length-1;
-
-    i>=0;
-
-    i--
-
-  ){
-
-    if(
-
-      arr[i] <=
-
-      dateKey
-
-    ){
-
-      return arr[i];
-
-    }
-
+  while(day<=toKey&&guard<4000){
+    if(!isTaskExcusedOn(task,day))count++;
+    day=addDaysKey(day,1);
+    guard++;
   }
 
-  return null;
-
+  return count;
 }
 
+function advanceActiveDays(task,fromKey,count){
+  let day=fromKey;
+  let seen=0;
+  let guard=0;
+
+  while(seen<count&&guard<4000){
+    day=addDaysKey(day,1);
+    if(!isTaskExcusedOn(task,day))seen++;
+    guard++;
+  }
+
+  return day;
+}
+
+function activeDaysInclusive(task,startKey,endKey){
+  if(!startKey||endKey<startKey)return 0;
+
+  let day=startKey;
+  let count=0;
+  let guard=0;
+
+  while(day<=endKey&&guard<4000){
+    if(!isTaskExcusedOn(task,day))count++;
+    day=addDaysKey(day,1);
+    guard++;
+  }
+
+  return count;
+}
+
+
 /* ==================================================
-
-   RECURRING TASK STATUS
-
+   WEEKLY CYCLE HELPERS
    ================================================== */
 
-function statusAt(
+function weeklySettings(task){
+  const overdue=Number(task.overdueWeekday??task.resetWeekday??1);
+  const pending=Number(task.pendingWeekday??defaultPendingWeekday(overdue));
+  return{pending,overdue};
+}
 
-  task,
+function weeklyCycleIsExcused(task,dueDate,overdueDate){
+  return isTaskExcusedOn(task,dueDate)||isTaskExcusedOn(task,overdueDate);
+}
 
-  dateKey,
+function advanceWeeklyCyclePastExcuses(task,pendingDate,overdueDate){
+  const s=weeklySettings(task);
+  let dueDate=addDaysKey(overdueDate,-1);
+  let guard=0;
 
-  includeSameDay=true
+  while(guard<100&&weeklyCycleIsExcused(task,dueDate,overdueDate)){
+    let anchor=dueDate;
 
-){
+    if(isTaskExcusedOn(task,dueDate)){
+      anchor=endOfExcuseRun(task,dueDate);
+    }
 
-  let latest =
+    if(isTaskExcusedOn(task,overdueDate)){
+      const end=endOfExcuseRun(task,overdueDate);
+      if(end>anchor)anchor=end;
+    }
 
-    latestCompletionOnOrBefore(
+    pendingDate=nextWeekdayAfter(anchor,s.pending);
+    overdueDate=nextWeekdayAfter(pendingDate,s.overdue);
+    dueDate=addDaysKey(overdueDate,-1);
+    guard++;
+  }
 
-      task,
+  return{pendingDate,dueDate,overdueDate};
+}
 
-      dateKey
+function weeklyCycleAfterCompletion(task,completionDate){
+  const s=weeklySettings(task);
+  const pendingDate=nextWeekdayAfter(completionDate,s.pending);
+  const overdueDate=nextWeekdayAfter(pendingDate,s.overdue);
+  return advanceWeeklyCyclePastExcuses(task,pendingDate,overdueDate);
+}
 
-    );
+function firstWeeklyCycle(task){
+  const s=weeklySettings(task);
+  const createdDate=localDateKey(new Date(task.createdAt));
+  const overdueDate=nextWeekdayAfter(createdDate,s.overdue);
+  return advanceWeeklyCyclePastExcuses(task,createdDate,overdueDate);
+}
 
-  if(
 
-    !includeSameDay &&
+/* ==================================================
+   COMPLETION HISTORY
+   ================================================== */
 
-    latest ===
+function hasCompletionOn(task,dateKey){
+  return Array.isArray(task.completionDates)&&task.completionDates.includes(dateKey);
+}
 
-    dateKey
+function latestCompletionOnOrBefore(task,dateKey){
+  const arr=Array.isArray(task.completionDates)?task.completionDates:[];
+  for(let i=arr.length-1;i>=0;i--){
+    if(arr[i]<=dateKey)return arr[i];
+  }
+  return null;
+}
 
-  ){
 
-    latest =
+/* ==================================================
+   RECURRING TASK STATUS
+   ================================================== */
 
-      latestCompletionOnOrBefore(
+function statusAt(task,dateKey,includeSameDay=true){
+  if(isTaskExcusedOn(task,dateKey)){
+    return{state:"paused",progress:.5,detail:pauseDetail(task,dateKey)};
+  }
 
-        task,
+  let latest=latestCompletionOnOrBefore(task,dateKey);
 
-        addDaysKey(
-
-          dateKey,
-
-          -1
-
-        )
-
-      );
-
+  if(!includeSameDay&&latest===dateKey){
+    latest=latestCompletionOnOrBefore(task,addDaysKey(dateKey,-1));
   }
 
   /* DAILY */
 
-  if(
-
-    task.type ===
-
-    "daily"
-
-  ){
-
-    if(
-
-      includeSameDay &&
-
-      latest ===
-
-      dateKey
-
-    ){
-
-      return{
-
-        state:"done",
-
-        progress:1,
-
-        detail:"Done for today"
-
-      };
-
+  if(task.type==="daily"){
+    if(includeSameDay&&latest===dateKey){
+      return{state:"done",progress:1,detail:"Done for today"};
     }
 
-    const yesterday =
+    const createdKey=localDateKey(new Date(task.createdAt));
+    const previous=previousActiveDate(task,dateKey);
 
-      addDaysKey(
-
-        dateKey,
-
-        -1
-
-      );
-
-    if(
-
-      latest ===
-
-      yesterday
-
-    ){
-
-      return{
-
-        state:"due",
-
-        progress:0,
-
-        detail:"Due Today"
-
-      };
-
+    if(previous<createdKey){
+      return{state:"due",progress:0,detail:"Due Today"};
     }
 
-    const createdKey =
-
-      localDateKey(
-
-        new Date(
-
-          task.createdAt
-
-        )
-
-      );
-
-    if(
-
-      dateKey <=
-
-      createdKey &&
-
-      !latest
-
-    ){
-
-      return{
-
-        state:"due",
-
-        progress:0,
-
-        detail:"Due Today"
-
-      };
-
+    if(latest===previous){
+      return{state:"due",progress:0,detail:"Due Today"};
     }
 
-    return{
+    if(dateKey<=createdKey&&!latest){
+      return{state:"due",progress:0,detail:"Due Today"};
+    }
 
-      state:"overdue",
-
-      progress:0,
-
-      detail:"Overdue"
-
-    };
-
+    return{state:"overdue",progress:0,detail:"Overdue"};
   }
 
   /* WEEKLY */
 
-  if(
+  if(task.type==="weekly"){
+    const cycle=latest
+      ?weeklyCycleAfterCompletion(task,latest)
+      :firstWeeklyCycle(task);
 
-    task.type ===
-
-    "weekly"
-
-  ){
-
-    if(
-
-      latest
-
-    ){
-
-      const cycle =
-
-        weeklyCycleAfterCompletion(
-
-          task,
-
-          latest
-
-        );
-
-      if(
-
-        dateKey <
-
-        cycle.pendingDate
-
-      ){
-
-        return{
-
-          state:"done",
-
-          progress:1,
-
-          detail:"Done"
-
-        };
-
-      }
-
-      if(
-
-        dateKey <
-
-        cycle.dueDate
-
-      ){
-
-        const left =
-
-          diffCalendarDays(
-
-            dateKey,
-
-            cycle.dueDate
-
-          ) + 1;
-
-        return{
-
-          state:"pending",
-
-          progress:
-
-            Math.max(
-
-              0,
-
-              Math.min(
-
-                1,
-
-                left/7
-
-              )
-
-            ),
-
-          detail:
-
-            `Pending — ${left} day${left===1?"":"s"} left`
-
-        };
-
-      }
-
-      if(
-
-        dateKey ===
-
-        cycle.dueDate
-
-      ){
-
-        return{
-
-          state:"due",
-
-          progress:0,
-
-          detail:"Due Today"
-
-        };
-
-      }
-
-      return{
-
-        state:"overdue",
-
-        progress:0,
-
-        detail:"Overdue"
-
-      };
-
+    if(dateKey<cycle.pendingDate){
+      return{state:"done",progress:1,detail:"Done"};
     }
 
-    const cycle =
-
-      firstWeeklyCycle(
-
-        task
-
-      );
-
-    if(
-
-      dateKey <
-
-      cycle.dueDate
-
-    ){
-
-      const left =
-
-        diffCalendarDays(
-
-          dateKey,
-
-          cycle.dueDate
-
-        ) + 1;
-
+    if(dateKey<cycle.dueDate){
+      const left=diffCalendarDays(dateKey,cycle.dueDate)+1;
       return{
-
         state:"pending",
-
-        progress:
-
-          Math.max(
-
-            0,
-
-            Math.min(
-
-              1,
-
-              left/7
-
-            )
-
-          ),
-
-        detail:
-
-          `Pending — ${left} day${left===1?"":"s"} left`
-
+        progress:Math.max(0,Math.min(1,left/7)),
+        detail:`Pending — ${left} day${left===1?"":"s"} left`
       };
-
     }
 
-    if(
-
-      dateKey ===
-
-      cycle.dueDate
-
-    ){
-
-      return{
-
-        state:"due",
-
-        progress:0,
-
-        detail:"Due Today"
-
-      };
-
+    if(dateKey===cycle.dueDate){
+      return{state:"due",progress:0,detail:"Due Today"};
     }
 
-    return{
-
-      state:"overdue",
-
-      progress:0,
-
-      detail:"Overdue"
-
-    };
-
+    return{state:"overdue",progress:0,detail:"Overdue"};
   }
 
   /* EVERY N DAYS */
 
-  if(
-
-    !latest
-
-  ){
-
-    return{
-
-      state:"pending",
-
-      progress:0,
-
-      detail:"Pending — not yet completed"
-
-    };
-
+  if(!latest){
+    return{state:"pending",progress:0,detail:"Pending — not yet completed"};
   }
 
-  const daysSince =
+  const elapsed=activeDaysAfter(task,latest,dateKey);
+  const until=Number(task.maxDays)-elapsed;
 
-    diffCalendarDays(
-
-      latest,
-
-      dateKey
-
-    );
-
-  const until =
-
-    Number(
-
-      task.maxDays
-
-    ) -
-
-    daysSince;
-
-  if(
-
-    until < 0
-
-  ){
-
-    const late =
-
-      Math.abs(
-
-        until
-
-      );
-
+  if(until<0){
+    const late=Math.abs(until);
     return{
-
       state:"overdue",
-
       progress:0,
-
-      detail:
-
-        `Overdue — ${late} day${late===1?"":"s"} late`
-
+      detail:`Overdue — ${late} active day${late===1?"":"s"} late`
     };
-
   }
 
-  if(
-
-    until === 0
-
-  ){
-
-    return{
-
-      state:"due",
-
-      progress:0,
-
-      detail:"Due Today"
-
-    };
-
+  if(until===0){
+    return{state:"due",progress:0,detail:"Due Today"};
   }
 
-  const left =
+  const left=until+1;
 
-    until + 1;
-
-  if(
-
-    left <=
-
-    Number(
-
-      task.pendingWindow
-
-    )
-
-  ){
-
+  if(left<=Number(task.pendingWindow)){
     return{
-
       state:"pending",
-
-      progress:
-
-        Math.max(
-
-          0,
-
-          Math.min(
-
-            1,
-
-            left /
-
-            Math.max(
-
-              1,
-
-              Number(
-
-                task.pendingWindow
-
-              )
-
-            )
-
-          )
-
-        ),
-
-      detail:
-
-        `Pending — ${left} day${left===1?"":"s"} left`
-
+      progress:Math.max(0,Math.min(1,left/Math.max(1,Number(task.pendingWindow)))),
+      detail:`Pending — ${left} active day${left===1?"":"s"} left`
     };
-
   }
 
   return{
-
     state:"done",
-
-    progress:
-
-      Math.max(
-
-        0,
-
-        Math.min(
-
-          1,
-
-          left /
-
-          Math.max(
-
-            1,
-
-            Number(
-
-              task.maxDays
-
-            ) + 1
-
-          )
-
-        )
-
-      ),
-
-    detail:
-
-      `Done — ${left} day${left===1?"":"s"} left`
-
+    progress:Math.max(0,Math.min(1,left/Math.max(1,Number(task.maxDays)+1))),
+    detail:`Done — ${left} active day${left===1?"":"s"} left`
   };
-
 }
 
 function status(task){
-
-  return statusAt(
-
-    task,
-
-    localDateKey(),
-
-    true
-
-  );
-
+  return statusAt(task,localDateKey(),true);
 }
 
+
 /* ==================================================
-
    CLEAN SWEEPS
-
    ================================================== */
 
-function dayQualifiesForCleanSweep(
+function dayQualifiesForCleanSweep(dateKey){
+  if(isEmergencyDay(dateKey))return false;
 
-  dateKey
+  for(const task of state.tasks){
+    const createdKey=localDateKey(new Date(task.createdAt));
+    if(createdKey>dateKey)continue;
 
-){
-
-  for(
-
-    const task
-
-    of state.tasks
-
-  ){
-
-    const createdKey =
-
-      localDateKey(
-
-        new Date(
-
-          task.createdAt
-
-        )
-
-      );
-
-    if(
-
-      createdKey >
-
-      dateKey
-
-    ){
-
+    if(isPlannedPausedOn(task,dateKey)){
       continue;
-
     }
 
-    if(
-
-      task.type ===
-
-      "daily"
-
-    ){
-
-      if(
-
-        !hasCompletionOn(
-
-          task,
-
-          dateKey
-
-        )
-
-      ){
-
-        return false;
-
-      }
-
+    if(task.type==="daily"){
+      if(!hasCompletionOn(task,dateKey))return false;
       continue;
-
     }
 
-    const s =
-
-      statusAt(
-
-        task,
-
-        dateKey,
-
-        true
-
-      ).state;
-
-    if(
-
-      s === "due" ||
-
-      s === "overdue"
-
-    ){
-
-      return false;
-
-    }
-
+    const s=statusAt(task,dateKey,true).state;
+    if(s==="due"||s==="overdue")return false;
   }
 
   return true;
-
 }
 
-function dayHadOverdueAtStart(
+function dayHadOverdueAtStart(dateKey){
+  if(isEmergencyDay(dateKey))return false;
 
-  dateKey
-
-){
-
-  return state.tasks.some(
-
-    task =>
-
-      localDateKey(
-
-        new Date(
-
-          task.createdAt
-
-        )
-
-      ) <= dateKey
-
-      &&
-
-      statusAt(
-
-        task,
-
-        dateKey,
-
-        false
-
-      ).state ===
-
-      "overdue"
-
-  );
-
+  return state.tasks.some(task=>{
+    const createdKey=localDateKey(new Date(task.createdAt));
+    if(createdKey>dateKey)return false;
+    return statusAt(task,dateKey,false).state==="overdue";
+  });
 }
 
-function dayHasOverdueAtEnd(
+function dayHasOverdueAtEnd(dateKey){
+  if(isEmergencyDay(dateKey))return false;
 
-  dateKey
-
-){
-
-  return state.tasks.some(
-
-    task =>
-
-      localDateKey(
-
-        new Date(
-
-          task.createdAt
-
-        )
-
-      ) <= dateKey
-
-      &&
-
-      statusAt(
-
-        task,
-
-        dateKey,
-
-        true
-
-      ).state ===
-
-      "overdue"
-
-  );
-
+  return state.tasks.some(task=>{
+    const createdKey=localDateKey(new Date(task.createdAt));
+    if(createdKey>dateKey)return false;
+    return statusAt(task,dateKey,true).state==="overdue";
+  });
 }
 
-function completedTypesOn(
+function completedTypesOn(dateKey){
+  const types=new Set();
 
-  dateKey
-
-){
-
-  const types =
-
-    new Set();
-
-  for(
-
-    const task
-
-    of state.tasks
-
-  ){
-
-    for(
-
-      const event
-
-      of (
-
-        Array.isArray(
-
-          task.completionEvents
-
-        )
-
-        ? task.completionEvents
-
-        : []
-
-      )
-
-    ){
-
-      if(
-
-        event.date ===
-
-        dateKey
-
-      ){
-
-        types.add(
-
-          event.type
-
-        );
-
-      }
-
+  for(const task of state.tasks){
+    for(const event of(Array.isArray(task.completionEvents)?task.completionEvents:[])){
+      if(event.date===dateKey)types.add(event.type);
     }
-
   }
 
   return types;
-
 }
 
+
 /* ==================================================
-
    SPECIAL ACHIEVEMENTS
-
    ================================================== */
 
 function achievementEarned(id){
-
-  return state.specialAchievements
-
-    .find(
-
-      achievement =>
-
-      achievement.id ===
-
-      id
-
-    );
-
+  return state.specialAchievements.find(a=>a.id===id);
 }
 
-function grantAchievement(
-
-  id,
-
-  dateKey
-
-){
-
-  if(
-
-    !achievementEarned(
-
-      id
-
-    )
-
-  ){
-
-    state.specialAchievements.push(
-
-      {
-
-        id,
-
-        date:dateKey
-
-      }
-
-    );
-
+function grantAchievement(id,dateKey){
+  if(!achievementEarned(id)){
+    state.specialAchievements.push({id,date:dateKey});
   }
-
 }
 
-function evaluateSpecialAchievements(
+function evaluateSpecialAchievements(dateKey){
+  const snapshot=state.dailySnapshots[dateKey];
+  if(!snapshot||snapshot.excused)return;
 
-  dateKey
+  if(snapshot.rescue)grantAchievement("rescue-mission",dateKey);
+  if(snapshot.fullHouse)grantAchievement("full-house",dateKey);
 
-){
+  let perfect=true;
 
-  const snapshot =
-
-    state.dailySnapshots[
-
-      dateKey
-
-    ];
-
-  if(
-
-    !snapshot
-
-  ){
-
-    return;
-
-  }
-
-  if(
-
-    snapshot.rescue
-
-  ){
-
-    grantAchievement(
-
-      "rescue-mission",
-
-      dateKey
-
-    );
-
-  }
-
-  if(
-
-    snapshot.fullHouse
-
-  ){
-
-    grantAchievement(
-
-      "full-house",
-
-      dateKey
-
-    );
-
-  }
-
-  let perfect =
-
-    true;
-
-  for(
-
-    let i=0;
-
-    i<7;
-
-    i++
-
-  ){
-
-    if(
-
-      !state.dailySnapshots[
-
-        addDaysKey(
-
-          dateKey,
-
-          -i
-
-        )
-
-      ]?.cleanSweep
-
-    ){
-
+  for(let i=0;i<7;i++){
+    if(!state.dailySnapshots[addDaysKey(dateKey,-i)]?.cleanSweep){
       perfect=false;
-
       break;
-
     }
-
   }
 
-  if(
-
-    perfect
-
-  ){
-
-    grantAchievement(
-
-      "perfect-week",
-
-      dateKey
-
-    );
-
-  }
-
+  if(perfect)grantAchievement("perfect-week",dateKey);
 }
+
 
 /* ==================================================
-
    DAILY SNAPSHOTS
-
    ================================================== */
 
-function finalizeDay(
+function finalizeDay(dateKey){
+  if(state.dailySnapshots[dateKey])return;
 
-  dateKey
-
-){
-
-  if(
-
-    state.dailySnapshots[
-
-      dateKey
-
-    ]
-
-  ){
-
+  if(isEmergencyDay(dateKey)){
+    state.dailySnapshots[dateKey]={
+      excused:true,
+      cleanSweep:false,
+      rescue:false,
+      fullHouse:false
+    };
     return;
-
   }
 
-  const types =
+  const types=completedTypesOn(dateKey);
 
-    completedTypesOn(
-
-      dateKey
-
-    );
-
-  state.dailySnapshots[
-
-    dateKey
-
-  ] = {
-
-    cleanSweep:
-
-      dayQualifiesForCleanSweep(
-
-        dateKey
-
-      ),
-
-    rescue:
-
-      (
-
-        dayHadOverdueAtStart(
-
-          dateKey
-
-        )
-
-        &&
-
-        !dayHasOverdueAtEnd(
-
-          dateKey
-
-        )
-
-      ),
-
-    fullHouse:
-
-      (
-
-        types.has(
-
-          "daily"
-
-        )
-
-        &&
-
-        types.has(
-
-          "weekly"
-
-        )
-
-        &&
-
-        types.has(
-
-          "interval"
-
-        )
-
-      )
-
+  state.dailySnapshots[dateKey]={
+    excused:false,
+    cleanSweep:dayQualifiesForCleanSweep(dateKey),
+    rescue:dayHadOverdueAtStart(dateKey)&&!dayHasOverdueAtEnd(dateKey),
+    fullHouse:types.has("daily")&&types.has("weekly")&&types.has("interval")
   };
 
-  evaluateSpecialAchievements(
-
-    dateKey
-
-  );
-
+  evaluateSpecialAchievements(dateKey);
 }
 
 function finalizePastDays(){
-
-  const today =
-
-    localDateKey();
-
-  let day =
-
-    state.calendarTrackingStart;
-
+  const today=localDateKey();
+  let day=state.calendarTrackingStart;
   let guard=0;
 
-  while(
-
-    day < today &&
-
-    guard < 4000
-
-  ){
-
-    finalizeDay(
-
-      day
-
-    );
-
-    day =
-
-      addDaysKey(
-
-        day,
-
-        1
-
-      );
-
+  while(day<today&&guard<4000){
+    finalizeDay(day);
+    day=addDaysKey(day,1);
     guard++;
-
   }
-
 }
 
+
 /* ==================================================
-
    STREAKS
-
    ================================================== */
 
 function lastGoodDate(task){
+  if(!task.lastDoneDate)return null;
 
-  if(
-
-    !task.lastDoneDate
-
-  ){
-
-    return null;
-
+  if(task.type==="daily"){
+    return nextActiveDate(task,task.lastDoneDate);
   }
 
-  if(
-
-    task.type ===
-
-    "daily"
-
-  ){
-
-    return addDaysKey(
-
-      task.lastDoneDate,
-
-      1
-
-    );
-
+  if(task.type==="weekly"){
+    return weeklyCycleAfterCompletion(task,task.lastDoneDate).dueDate;
   }
 
-  if(
-
-    task.type ===
-
-    "weekly"
-
-  ){
-
-    return weeklyCycleAfterCompletion(
-
-      task,
-
-      task.lastDoneDate
-
-    ).dueDate;
-
-  }
-
-  return addDaysKey(
-
-    task.lastDoneDate,
-
-    Number(
-
-      task.maxDays
-
-    )
-
-  );
-
+  return advanceActiveDays(task,task.lastDoneDate,Number(task.maxDays));
 }
 
 function currentStreakDays(task){
-
-  if(
-
-    !task.streakStartDate ||
-
-    status(task).state ===
-
-    "overdue"
-
-  ){
-
-    return 0;
-
-  }
-
-  return Math.max(
-
-    0,
-
-    diffCalendarDays(
-
-      task.streakStartDate,
-
-      localDateKey()
-
-    ) + 1
-
-  );
-
+  if(!task.streakStartDate||status(task).state==="overdue")return 0;
+  return activeDaysInclusive(task,task.streakStartDate,localDateKey());
 }
 
 function reconcileStreaks(){
-
   let changed=false;
+  const today=localDateKey();
 
-  for(
+  for(const task of state.tasks){
+    if(task.streakStartDate&&status(task).state==="overdue"){
+      const end=lastGoodDate(task);
 
-    const task
-
-    of state.tasks
-
-  ){
-
-    if(
-
-      task.streakStartDate &&
-
-      status(task).state ===
-
-      "overdue"
-
-    ){
-
-      const end =
-
-        lastGoodDate(
-
-          task
-
-        );
-
-      if(
-
-        end
-
-      ){
-
-        const len =
-
-          Math.max(
-
-            0,
-
-            diffCalendarDays(
-
-              task.streakStartDate,
-
-              end
-
-            ) + 1
-
-          );
-
-        task.bestStreakDays =
-
-          Math.max(
-
-            Number(
-
-              task.bestStreakDays ||
-
-              0
-
-            ),
-
-            len
-
-          );
-
+      if(end){
+        const len=Math.max(0,activeDaysInclusive(task,task.streakStartDate,end));
+        task.bestStreakDays=Math.max(Number(task.bestStreakDays||0),len);
       }
 
-      task.streakStartDate =
+      task.lastStreakBreak={
+        detectedDate:today,
+        streakStartDate:task.streakStartDate
+      };
 
-        null;
-
+      task.streakStartDate=null;
       changed=true;
-
     }
-
   }
 
   return changed;
-
 }
 
-/* ==================================================
+function restoreRecentBreaksAfterEmergency(){
+  const today=localDateKey();
 
-   STREAK AWARDS
-
-   ================================================== */
-
-function updateTaskAwards(task){
-
-  if(
-
-    !Array.isArray(
-
-      task.unlockedAwards
-
-    )
-
-  ){
-
-    task.unlockedAwards=[];
-
-  }
-
-  const current =
-
-    currentStreakDays(
-
-      task
-
-    );
-
-  task.bestStreakDays =
-
-    Math.max(
-
-      Number(
-
-        task.bestStreakDays ||
-
-        0
-
-      ),
-
-      current
-
-    );
-
-  for(
-
-    const milestone
-
-    of AWARDS
-
-  ){
+  for(const task of state.tasks){
+    const broken=task.lastStreakBreak;
 
     if(
-
-      task.bestStreakDays >=
-
-      milestone
-
-      &&
-
-      !task.unlockedAwards.includes(
-
-        milestone
-
-      )
-
+      broken &&
+      broken.detectedDate===today &&
+      !task.streakStartDate &&
+      status(task).state!=="overdue"
     ){
-
-      task.unlockedAwards.push(
-
-        milestone
-
-      );
-
+      task.streakStartDate=broken.streakStartDate;
+      task.lastStreakBreak=null;
     }
+  }
+}
 
+function updateTaskAwards(task){
+  if(!Array.isArray(task.unlockedAwards))task.unlockedAwards=[];
+
+  const current=currentStreakDays(task);
+  task.bestStreakDays=Math.max(Number(task.bestStreakDays||0),current);
+
+  for(const milestone of AWARDS){
+    if(task.bestStreakDays>=milestone&&!task.unlockedAwards.includes(milestone)){
+      task.unlockedAwards.push(milestone);
+    }
   }
 
-  task.unlockedAwards.sort(
-
-    (a,b)=>a-b
-
-  );
-
+  task.unlockedAwards.sort((a,b)=>a-b);
 }
 
 function updateAllTaskAwards(){
-
-  for(
-
-    const task
-
-    of state.tasks
-
-  ){
-
-    updateTaskAwards(
-
-      task
-
-    );
-
-  }
-
+  for(const task of state.tasks)updateTaskAwards(task);
 }
 
+
 /* ==================================================
-
    COMPLETE / UNDO RECURRING TASKS
-
    ================================================== */
 
 function markDone(task){
+  const today=localDateKey();
 
-  const today =
-
-    localDateKey();
-
-  if(
-
-    task.lastDoneDate ===
-
-    today
-
-  ){
-
-    return;
-
-  }
+  if(status(task).state==="paused")return;
+  if(task.lastDoneDate===today)return;
 
   reconcileStreaks();
 
-  task.previousDoneDate =
+  task.previousDoneDate=task.lastDoneDate;
+  task.previousStreakStartDate=task.streakStartDate;
 
-    task.lastDoneDate;
+  if(!task.streakStartDate)task.streakStartDate=today;
 
-  task.previousStreakStartDate =
+  task.lastDoneDate=today;
+  task.lastStreakBreak=null;
 
-    task.streakStartDate;
-
-  if(
-
-    !task.streakStartDate
-
-  ){
-
-    task.streakStartDate =
-
-      today;
-
-  }
-
-  task.lastDoneDate =
-
-    today;
-
-  if(
-
-    !task.completionDates.includes(
-
-      today
-
-    )
-
-  ){
-
-    task.completionDates.push(
-
-      today
-
-    );
-
-  }
-
+  if(!task.completionDates.includes(today))task.completionDates.push(today);
   task.completionDates.sort();
 
-  task.completionEvents.push(
+  task.completionEvents.push({date:today,type:task.type});
+  task.totalCompletions=Number(task.totalCompletions||0)+1;
 
-    {
-
-      date:today,
-
-      type:task.type
-
-    }
-
-  );
-
-  task.totalCompletions =
-
-    Number(
-
-      task.totalCompletions ||
-
-      0
-
-    ) + 1;
-
-  updateTaskAwards(
-
-    task
-
-  );
-
+  updateTaskAwards(task);
   saveState();
-
   render();
-
 }
 
 function undoDone(task){
+  const today=localDateKey();
 
-  const today =
-
-    localDateKey();
-
-  if(
-
-    task.lastDoneDate !==
-
-    today
-
-  ){
-
+  if(task.lastDoneDate!==today){
     render();
-
     return;
-
   }
 
-  task.lastDoneDate =
+  task.lastDoneDate=task.previousDoneDate;
+  task.previousDoneDate=null;
+  task.streakStartDate=task.previousStreakStartDate;
+  task.previousStreakStartDate=null;
 
-    task.previousDoneDate;
+  task.completionDates=task.completionDates.filter(date=>date!==today);
 
-  task.previousDoneDate =
-
-    null;
-
-  task.streakStartDate =
-
-    task.previousStreakStartDate;
-
-  task.previousStreakStartDate =
-
-    null;
-
-  task.completionDates =
-
-    task.completionDates
-
-    .filter(
-
-      date =>
-
-      date !==
-
-      today
-
-    );
-
-  for(
-
-    let i =
-
-      task.completionEvents.length-1;
-
-    i>=0;
-
-    i--
-
-  ){
-
-    if(
-
-      task.completionEvents[i].date ===
-
-      today
-
-    ){
-
-      task.completionEvents.splice(
-
-        i,
-
-        1
-
-      );
-
+  for(let i=task.completionEvents.length-1;i>=0;i--){
+    if(task.completionEvents[i].date===today){
+      task.completionEvents.splice(i,1);
       break;
-
     }
-
   }
 
-  if(
-
-    task.totalCompletions > 0
-
-  ){
-
-    task.totalCompletions--;
-
-  }
+  if(task.totalCompletions>0)task.totalCompletions--;
 
   saveState();
-
   render();
-
 }
 
+
 /* ==================================================
-
    DISPLAY HELPERS
-
    ================================================== */
 
 function escapeHtml(text){
-
-  return String(text)
-
-    .replace(
-
-      /[&<>"']/g,
-
-      c=>({
-
-        "&":"&amp;",
-
-        "<":"&lt;",
-
-        ">":"&gt;",
-
-        "\"":"&quot;",
-
-        "'":"&#039;"
-
-      }[c])
-
-    );
-
+  return String(text).replace(/[&<>"']/g,c=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    "\"":"&quot;",
+    "'":"&#039;"
+  }[c]));
 }
 
 function medalsForTask(task){
-
-  return (
-
-    task.unlockedAwards ||
-
-    []
-
-  )
-
-  .filter(
-
-    milestone =>
-
-    AWARDS.includes(
-
-      milestone
-
+  return(task.unlockedAwards||[])
+    .filter(milestone=>AWARDS.includes(milestone))
+    .map(milestone=>
+      `<div class="mini-medal medal${milestone}" title="${milestone}-day award"></div>`
     )
-
-  )
-
-  .map(
-
-    milestone =>
-
-    `<div
-
-      class="mini-medal medal${milestone}"
-
-      title="${milestone}-day award">
-
-    </div>`
-
-  )
-
-  .join("");
-
+    .join("");
 }
 
+
 /* ==================================================
-
    MAIN CHORES SCREEN
-
    ================================================== */
 
 function render(){
-
   finalizePastDays();
 
-  const changed =
-
-    reconcileStreaks();
-
+  const changed=reconcileStreaks();
   updateAllTaskAwards();
 
-  $("date").textContent =
+  $("date").textContent=new Intl.DateTimeFormat(undefined,{
+    weekday:"long",
+    month:"long",
+    day:"numeric"
+  }).format(new Date());
 
-    new Intl.DateTimeFormat(
-
-      undefined,
-
-      {
-
-        weekday:"long",
-
-        month:"long",
-
-        day:"numeric"
-
-      }
-
-    ).format(
-
-      new Date()
-
-    );
-
-  if(
-
-    recoverySource
-
-  ){
-
-    const notice =
-
-      $("recoveryNotice");
-
-    notice.style.display =
-
-      "block";
-
-    notice.textContent =
-
-      `Recovered ${state.tasks.length} task${state.tasks.length===1?"":"s"} from local backup data (${recoverySource}).`;
-
+  if(recoverySource){
+    const notice=$("recoveryNotice");
+    notice.style.display="block";
+    notice.textContent=`Recovered ${state.tasks.length} task${state.tasks.length===1?"":"s"} from local backup data (${recoverySource}).`;
   }
 
-  const rank = {
+  const rank={overdue:0,due:1,pending:2,paused:3,done:4};
 
-    overdue:0,
+  const tasks=[...state.tasks].sort(
+    (a,b)=>
+      rank[status(a).state]-rank[status(b).state]
+      ||Number(a.createdAt)-Number(b.createdAt)
+  );
 
-    due:1,
-
-    pending:2,
-
-    done:3
-
-  };
-
-  const tasks =
-
-    [...state.tasks]
-
-    .sort(
-
-      (a,b) =>
-
-      rank[
-
-        status(a).state
-
-      ]
-
-      -
-
-      rank[
-
-        status(b).state
-
-      ]
-
-      ||
-
-      Number(
-
-        a.createdAt
-
-      )
-
-      -
-
-      Number(
-
-        b.createdAt
-
-      )
-
-    );
-
-  const list =
-
-    $("taskList");
-
+  const list=$("taskList");
   list.innerHTML="";
 
-  if(
-
-    !tasks.length
-
-  ){
-
-    list.innerHTML =
-
-      '<div class="empty">No tasks yet.</div>';
-
+  if(!tasks.length){
+    list.innerHTML='<div class="empty">No tasks yet.</div>';
   }
 
-  for(
+  for(const task of tasks){
+    const s=status(task);
+    const streak=currentStreakDays(task);
+    const card=document.createElement("article");
 
-    const task
+    card.className=`task ${s.state}`;
 
-    of tasks
-
-  ){
-
-    const s =
-
-      status(
-
-        task
-
-      );
-
-    const streak =
-
-      currentStreakDays(
-
-        task
-
-      );
-
-    const card =
-
-      document.createElement(
-
-        "article"
-
-      );
-
-    card.className =
-
-      `task ${s.state}`;
-
-    card.innerHTML = `
-
+    card.innerHTML=`
       <div class="task-top">
-
         <div>
-
-          <div class="task-name">
-
-            ${escapeHtml(task.name)}
-
-          </div>
-
-          <div class="meta">
-
-            ${s.detail}
-
-          </div>
-
+          <div class="task-name">${escapeHtml(task.name)}</div>
+          <div class="meta">${s.detail}</div>
         </div>
 
         <div class="task-right">
-
           <label class="switch">
-
             <input
-
               type="checkbox"
-
-              ${
-
-                s.state === "done"
-
-                ? "checked"
-
-                : ""
-
-              }>
-
+              ${s.state==="done"?"checked":""}
+              ${s.state==="paused"?"disabled":""}>
             <span></span>
-
           </label>
 
-          <div class="task-medals">
-
-            ${medalsForTask(task)}
-
-          </div>
-
-          <div class="task-streak">
-
-            ${streak}-day streak
-
-          </div>
-
+          <div class="task-medals">${medalsForTask(task)}</div>
+          <div class="task-streak">${streak}-day streak</div>
         </div>
-
       </div>
 
       <div class="bar">
-
-        <div
-
-          style="
-
-            width:
-
-            ${
-
-              Math.round(
-
-                Math.max(
-
-                  0,
-
-                  Math.min(
-
-                    1,
-
-                    s.progress
-
-                  )
-
-                )
-
-                *100
-
-              )
-
-            }%
-
-          ">
-
-        </div>
-
+        <div style="width:${Math.round(Math.max(0,Math.min(1,s.progress))*100)}%"></div>
       </div>
 
       <div class="task-bottom">
-
         <div class="stats">
-
-          <span>
-
-            Best
-
-            ${task.bestStreakDays}
-
-            days
-
-          </span>
-
-          <span>
-
-            Total
-
-            ${task.totalCompletions}
-
-            completions
-
-          </span>
-
+          <span>Best ${task.bestStreakDays} days</span>
+          <span>Total ${task.totalCompletions} completions</span>
         </div>
-
-        <button class="edit">
-
-          Edit
-
-        </button>
-
+        <button class="edit">Edit</button>
       </div>
-
     `;
 
-    card
+    const checkbox=card.querySelector("input");
 
-      .querySelector("input")
+    checkbox.addEventListener("change",event=>{
+      event.target.checked?markDone(task):undoDone(task);
+    });
 
-      .addEventListener(
-
-        "change",
-
-        event =>
-
-        event.target.checked
-
-        ? markDone(
-
-            task
-
-          )
-
-        : undoDone(
-
-            task
-
-          )
-
-      );
-
-    card
-
-      .querySelector(".edit")
-
-      .addEventListener(
-
-        "click",
-
-        () =>
-
-        openEdit(
-
-          task
-
-        )
-
-      );
-
-    list.appendChild(
-
-      card
-
-    );
-
+    card.querySelector(".edit").addEventListener("click",()=>openEdit(task));
+    list.appendChild(card);
   }
 
   updateSummary();
 
-  if(
-
-    changed
-
-  ){
-
-    saveState();
-
-  }
-
+  if(changed)saveState();
 }
 
+
 /* ==================================================
-
    CHORES SUMMARY
-
    ================================================== */
 
 function updateSummary(){
+  const states=state.tasks.map(task=>status(task).state);
 
-  const states =
+  const overdue=states.filter(x=>x==="overdue").length;
+  const due=states.filter(x=>x==="due").length;
+  const pending=states.filter(x=>x==="pending").length;
+  const paused=states.filter(x=>x==="paused").length;
 
-    state.tasks.map(
+  if(overdue){
+    $("statusTitle").textContent=`${overdue} task${overdue===1?"":"s"} overdue`;
 
-      task =>
+    const waiting=due+pending;
 
-      status(task).state
+    $("statusCopy").textContent=waiting
+      ?`${waiting} more waiting.${paused?` ${paused} paused.`:""}`
+      :paused
+        ?`${paused} task${paused===1?" is":"s are"} paused.`
+        :"Nothing else is waiting.";
 
-    );
-
-  const overdue =
-
-    states.filter(
-
-      x =>
-
-      x ===
-
-      "overdue"
-
-    ).length;
-
-  const due =
-
-    states.filter(
-
-      x =>
-
-      x ===
-
-      "due"
-
-    ).length;
-
-  const pending =
-
-    states.filter(
-
-      x =>
-
-      x ===
-
-      "pending"
-
-    ).length;
-
-  if(
-
-    overdue
-
-  ){
-
-    $("statusTitle")
-
-      .textContent =
-
-      `${overdue} task${overdue===1?"":"s"} overdue`;
-
-    $("statusCopy")
-
-      .textContent =
-
-      due +
-
-      pending
-
-      ? `${due+pending} more waiting.`
-
-      : "Nothing else is waiting.";
-
-    $("statusBadge")
-
-      .textContent =
-
-      overdue;
-
-    $("statusBadge")
-
-      .style.background =
-
-      "var(--red-soft)";
-
-    $("statusBadge")
-
-      .style.color =
-
-      "var(--overdue-slider)";
-
+    $("statusBadge").textContent=overdue;
+    $("statusBadge").style.background="var(--red-soft)";
+    $("statusBadge").style.color="var(--overdue-slider)";
     return;
-
   }
 
-  if(
+  if(due){
+    $("statusTitle").textContent=`${due} task${due===1?"":"s"} due today`;
+    $("statusCopy").textContent=pending
+      ?`${pending} more pending.${paused?` ${paused} paused.`:""}`
+      :paused
+        ?`${paused} task${paused===1?" is":"s are"} paused.`
+        :"Nothing is overdue.";
 
-    due
-
-  ){
-
-    $("statusTitle")
-
-      .textContent =
-
-      `${due} task${due===1?"":"s"} due today`;
-
-    $("statusCopy")
-
-      .textContent =
-
-      pending
-
-      ? `${pending} more pending.`
-
-      : "Nothing is overdue.";
-
-    $("statusBadge")
-
-      .textContent =
-
-      due;
-
-    $("statusBadge")
-
-      .style.background =
-
-      "var(--orange-soft)";
-
-    $("statusBadge")
-
-      .style.color =
-
-      "var(--due-slider)";
-
+    $("statusBadge").textContent=due;
+    $("statusBadge").style.background="var(--orange-soft)";
+    $("statusBadge").style.color="var(--due-slider)";
     return;
-
   }
 
-  if(
+  if(pending){
+    $("statusTitle").textContent="No tasks overdue";
+    $("statusCopy").textContent=
+      `${pending} task${pending===1?" is":"s are"} pending.${paused?` ${paused} paused.`:""}`;
 
-    pending
-
-  ){
-
-    $("statusTitle")
-
-      .textContent =
-
-      "No tasks overdue";
-
-    $("statusCopy")
-
-      .textContent =
-
-      `${pending} task${pending===1?" is":"s are"} pending.`;
-
-    $("statusBadge")
-
-      .textContent =
-
-      "✓";
-
-    $("statusBadge")
-
-      .style.background =
-
-      "var(--green-soft)";
-
-    $("statusBadge")
-
-      .style.color =
-
-      "var(--done-slider)";
-
+    $("statusBadge").textContent="✓";
+    $("statusBadge").style.background="var(--green-soft)";
+    $("statusBadge").style.color="var(--done-slider)";
     return;
-
   }
 
-  $("statusTitle")
+  $("statusTitle").textContent="No tasks pending";
 
-    .textContent =
+  $("statusCopy").textContent=paused
+    ?`${paused} task${paused===1?" is":"s are"} paused.`
+    :"The field is clear.";
 
-    "No tasks pending";
-
-  $("statusCopy")
-
-    .textContent =
-
-    "The field is clear.";
-
-  $("statusBadge")
-
-    .textContent =
-
-    "✓";
-
-  $("statusBadge")
-
-    .style.background =
-
-    "var(--green-soft)";
-
-  $("statusBadge")
-
-    .style.color =
-
-    "var(--done-slider)";
-
+  $("statusBadge").textContent="✓";
+  $("statusBadge").style.background="var(--green-soft)";
+  $("statusBadge").style.color="var(--done-slider)";
 }
 
+
 /* ==================================================
-
    AWARDS PAGE
-
    ================================================== */
 
 function renderAwards(){
-
   finalizePastDays();
-
   reconcileStreaks();
-
   updateAllTaskAwards();
 
-  const list =
-
-    $("awardsList");
-
+  const list=$("awardsList");
   list.innerHTML="";
 
-  if(
-
-    !state.tasks.length
-
-  ){
-
-    list.innerHTML =
-
-      '<div class="empty">No tasks yet.</div>';
-
+  if(!state.tasks.length){
+    list.innerHTML='<div class="empty">No tasks yet.</div>';
     return;
-
   }
 
-  for(
-
-    const task
-
-    of state.tasks
-
-  ){
-
-    const streak =
-
-      currentStreakDays(
-
-        task
-
-      );
-
-    const next =
-
-      AWARDS.find(
-
-        milestone =>
-
-        !(
-
-          task.unlockedAwards ||
-
-          []
-
-        ).includes(
-
-          milestone
-
-        )
-
-      );
-
-    const remaining =
-
-      next
-
-      ? Math.max(
-
-          0,
-
-          next-streak
-
-        )
-
-      : 0;
-
-    const nextText =
-
-      next
-
-      ? `${remaining} day${remaining===1?"":"s"} to ${next}`
-
-      : "All awards earned";
-
-    const items =
-
-      AWARDS.map(
-
-        milestone =>{
-
-          const earned =
-
-            (
-
-              task.unlockedAwards ||
-
-              []
-
-            ).includes(
-
-              milestone
-
-            );
-
-          return `
-
-            <div
-
-              class="award-item ${
-
-                earned
-
-                ? ""
-
-                : "locked"
-
-              }">
-
-              <div
-
-                class="award-art art${milestone}">
-
-              </div>
-
-              <div class="award-number">
-
-                ${milestone}
-
-              </div>
-
-              <div class="award-state">
-
-                ${
-
-                  earned
-
-                  ? "Earned"
-
-                  : "Locked"
-
-                }
-
-              </div>
-
-            </div>
-
-          `;
-
-        }
-
-      ).join("");
-
-    const card =
-
-      document.createElement(
-
-        "article"
-
-      );
-
-    card.className =
-
-      "award-task";
-
-    card.innerHTML = `
-
+  for(const task of state.tasks){
+    const streak=currentStreakDays(task);
+
+    const next=AWARDS.find(
+      milestone=>!(task.unlockedAwards||[]).includes(milestone)
+    );
+
+    const remaining=next?Math.max(0,next-streak):0;
+    const nextText=next
+      ?`${remaining} day${remaining===1?"":"s"} to ${next}`
+      :"All awards earned";
+
+    const items=AWARDS.map(milestone=>{
+      const earned=(task.unlockedAwards||[]).includes(milestone);
+
+      return`
+        <div class="award-item ${earned?"":"locked"}">
+          <div class="award-art art${milestone}"></div>
+          <div class="award-number">${milestone}</div>
+          <div class="award-state">${earned?"Earned":"Locked"}</div>
+        </div>
+      `;
+    }).join("");
+
+    const card=document.createElement("article");
+    card.className="award-task";
+
+    card.innerHTML=`
       <div class="award-task-top">
-
         <div>
-
-          <div class="award-task-name">
-
-            ${escapeHtml(task.name)}
-
-          </div>
-
+          <div class="award-task-name">${escapeHtml(task.name)}</div>
           <div class="award-task-streak">
-
-            Current streak:
-
-            ${streak}
-
-            day${streak===1?"":"s"}
-
-            · Best:
-
-            ${task.bestStreakDays}
-
+            Current streak: ${streak} day${streak===1?"":"s"} · Best: ${task.bestStreakDays}
           </div>
-
         </div>
-
-        <div class="next-target">
-
-          ${nextText}
-
-        </div>
-
+        <div class="next-target">${nextText}</div>
       </div>
-
-      <div class="award-row">
-
-        ${items}
-
-      </div>
-
+      <div class="award-row">${items}</div>
     `;
 
-    list.appendChild(
-
-      card
-
-    );
-
+    list.appendChild(card);
   }
-
 }
 
+
 /* ==================================================
-
    CALENDAR
-
    ================================================== */
 
-let calendarCursor =
-
-  new Date(
-
-    new Date().getFullYear(),
-
-    new Date().getMonth(),
-
-    1
-
-  );
+let calendarCursor=new Date(
+  new Date().getFullYear(),
+  new Date().getMonth(),
+  1
+);
 
 function renderCalendar(){
-
   finalizePastDays();
 
-  const year =
+  const year=calendarCursor.getFullYear();
+  const month=calendarCursor.getMonth();
 
-    calendarCursor.getFullYear();
+  $("calendarMonth").textContent=new Intl.DateTimeFormat(undefined,{
+    month:"long",
+    year:"numeric"
+  }).format(calendarCursor);
 
-  const month =
-
-    calendarCursor.getMonth();
-
-  $("calendarMonth")
-
-    .textContent =
-
-    new Intl.DateTimeFormat(
-
-      undefined,
-
-      {
-
-        month:"long",
-
-        year:"numeric"
-
-      }
-
-    ).format(
-
-      calendarCursor
-
-    );
-
-  const grid =
-
-    $("calendarGrid");
-
+  const grid=$("calendarGrid");
   grid.innerHTML="";
 
-  for(
-
-    const name
-
-    of [
-
-      "Sun",
-
-      "Mon",
-
-      "Tue",
-
-      "Wed",
-
-      "Thu",
-
-      "Fri",
-
-      "Sat"
-
-    ]
-
-  ){
-
-    const el =
-
-      document.createElement(
-
-        "div"
-
-      );
-
-    el.className =
-
-      "weekday";
-
-    el.textContent =
-
-      name;
-
-    grid.appendChild(
-
-      el
-
-    );
-
+  for(const name of["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]){
+    const el=document.createElement("div");
+    el.className="weekday";
+    el.textContent=name;
+    grid.appendChild(el);
   }
 
-  const offset =
+  const offset=new Date(year,month,1).getDay();
+  const days=new Date(year,month+1,0).getDate();
 
-    new Date(
-
-      year,
-
-      month,
-
-      1
-
-    ).getDay();
-
-  const days =
-
-    new Date(
-
-      year,
-
-      month+1,
-
-      0
-
-    ).getDate();
-
-  for(
-
-    let i=0;
-
-    i<offset;
-
-    i++
-
-  ){
-
-    const blank =
-
-      document.createElement(
-
-        "div"
-
-      );
-
-    blank.className =
-
-      "day-cell other";
-
-    grid.appendChild(
-
-      blank
-
-    );
-
+  for(let i=0;i<offset;i++){
+    const blank=document.createElement("div");
+    blank.className="day-cell other";
+    grid.appendChild(blank);
   }
 
-  const today =
+  const today=localDateKey();
 
-    localDateKey();
+  for(let day=1;day<=days;day++){
+    const key=localDateKey(new Date(year,month,day));
+    const cell=document.createElement("div");
 
-  for(
+    cell.className="day-cell";
 
-    let day=1;
-
-    day<=days;
-
-    day++
-
-  ){
-
-    const key =
-
-      localDateKey(
-
-        new Date(
-
-          year,
-
-          month,
-
-          day
-
-        )
-
-      );
-
-    const cell =
-
-      document.createElement(
-
-        "div"
-
-      );
-
-    cell.className =
-
-      "day-cell";
-
-    if(
-
-      key ===
-
-      today
-
-    ){
-
-      cell.classList.add(
-
-        "today"
-
-      );
-
-    }
+    if(key===today)cell.classList.add("today");
 
     let mark="";
-
     let caption="";
 
-    if(
-
-      key >
-
-      today
-
-    ){
-
-      cell.classList.add(
-
-        "future"
-
-      );
-
+    if(key>today){
+      cell.classList.add("future");
     }
 
-    else if(
-
-      key <
-
-      state.calendarTrackingStart
-
-    ){
-
-      cell.classList.add(
-
-        "before-tracking"
-
-      );
-
+    else if(key<state.calendarTrackingStart){
+      cell.classList.add("before-tracking");
       caption="—";
-
     }
 
-    else if(
-
-      key ===
-
-      today
-
-    ){
-
-      if(
-
-        dayQualifiesForCleanSweep(
-
-          key
-
-        )
-
-      ){
-
-        cell.classList.add(
-
-          "clean"
-
-        );
-
+    else if(key===today){
+      if(isEmergencyDay(key)){
+        cell.classList.add("excused");
+        mark="E";
+        caption="Excused";
+      }
+      else if(dayQualifiesForCleanSweep(key)){
+        cell.classList.add("clean");
         mark="✓";
-
         caption="so far";
-
       }
-
       else{
-
         caption="today";
-
       }
-
     }
 
     else{
+      const snapshot=state.dailySnapshots[key];
 
-      const snapshot =
-
-        state.dailySnapshots[
-
-          key
-
-        ];
-
-      if(
-
-        snapshot?.cleanSweep
-
-      ){
-
-        cell.classList.add(
-
-          "clean"
-
-        );
-
+      if(snapshot?.excused){
+        cell.classList.add("excused");
+        mark="E";
+        caption="Excused";
+      }
+      else if(snapshot?.cleanSweep){
+        cell.classList.add("clean");
         mark="✓";
-
         caption="Clean Sweep";
-
       }
-
       else{
-
-        cell.classList.add(
-
-          "failed"
-
-        );
-
+        cell.classList.add("failed");
         mark="·";
-
         caption="missed";
-
       }
-
     }
 
-    cell.innerHTML = `
-
-      <div class="day-number">
-
-        ${day}
-
-      </div>
-
-      <div class="day-mark">
-
-        ${mark}
-
-      </div>
-
-      <div class="day-caption">
-
-        ${caption}
-
-      </div>
-
+    cell.innerHTML=`
+      <div class="day-number">${day}</div>
+      <div class="day-mark">${mark}</div>
+      <div class="day-caption">${caption}</div>
     `;
 
-    grid.appendChild(
-
-      cell
-
-    );
-
+    grid.appendChild(cell);
   }
 
   renderAchievements();
-
 }
-
-/* ==================================================
-
-   ACHIEVEMENTS DISPLAY
-
-   ================================================== */
 
 function renderAchievements(){
-
-  const list =
-
-    $("achievementList");
-
+  const list=$("achievementList");
   list.innerHTML="";
 
-  for(
+  for(const def of SPECIAL_ACHIEVEMENTS){
+    const earned=achievementEarned(def.id);
+    const card=document.createElement("article");
 
-    const definition
+    card.className="achievement-card"+(earned?"":" locked");
 
-    of SPECIAL_ACHIEVEMENTS
-
-  ){
-
-    const earned =
-
-      achievementEarned(
-
-        definition.id
-
-      );
-
-    const card =
-
-      document.createElement(
-
-        "article"
-
-      );
-
-    card.className =
-
-      "achievement-card" +
-
-      (
-
-        earned
-
-        ? ""
-
-        : " locked"
-
-      );
-
-    card.innerHTML = `
-
-      <div class="achievement-token">
-
-        ${definition.symbol}
-
-      </div>
-
+    card.innerHTML=`
+      <div class="achievement-token">${def.symbol}</div>
       <div>
-
-        <div class="achievement-name">
-
-          ${definition.name}
-
-        </div>
-
-        <div class="achievement-copy">
-
-          ${definition.description}
-
-        </div>
-
+        <div class="achievement-name">${def.name}</div>
+        <div class="achievement-copy">${def.description}</div>
       </div>
-
-      <div class="achievement-date">
-
-        ${
-
-          earned
-
-          ? prettyDate(
-
-              earned.date
-
-            )
-
-          : "Locked"
-
-        }
-
-      </div>
-
+      <div class="achievement-date">${earned?prettyDate(earned.date):"Locked"}</div>
     `;
 
-    list.appendChild(
-
-      card
-
-    );
-
+    list.appendChild(card);
   }
-
 }
 
+
 /* ==================================================
-
-   TO-DO STATUS
-
+   TO DO
    ================================================== */
 
-function todoStatus(
-
-  item,
-
-  dateKey=localDateKey()
-
-){
-
-  if(
-
-    item.doneDate
-
-  ){
-
-    return{
-
-      state:"completed",
-
-      detail:
-
-        `Done — ${prettyDate(item.doneDate)}`
-
-    };
-
+function todoStatus(item,dateKey=localDateKey()){
+  if(item.doneDate){
+    return{state:"completed",detail:`Done — ${prettyDate(item.doneDate)}`};
   }
 
-  if(
-
-    item.dueDate &&
-
-    dateKey >
-
-    item.dueDate
-
-  ){
-
-    const late =
-
-      diffCalendarDays(
-
-        item.dueDate,
-
-        dateKey
-
-      );
-
+  if(item.dueDate&&dateKey>item.dueDate){
+    const late=diffCalendarDays(item.dueDate,dateKey);
     return{
-
       state:"overdue",
-
-      detail:
-
-        `Overdue — ${late} day${late===1?"":"s"} late`
-
+      detail:`Overdue — ${late} day${late===1?"":"s"} late`
     };
-
   }
 
-  if(
-
-    item.dueDate &&
-
-    dateKey ===
-
-    item.dueDate
-
-  ){
-
-    return{
-
-      state:"due",
-
-      detail:
-
-        "Due Today"
-
-    };
-
+  if(item.dueDate&&dateKey===item.dueDate){
+    return{state:"due",detail:"Due Today"};
   }
 
-  if(
-
-    item.startDate &&
-
-    dateKey <
-
-    item.startDate
-
-  ){
-
+  if(item.startDate&&dateKey<item.startDate){
     return{
-
       state:"pending",
-
-      detail:
-
-        `Pending — can start ${prettyDate(item.startDate)}`
-
+      detail:`Pending — can start ${prettyDate(item.startDate)}`
     };
-
   }
 
-  if(
-
-    item.dueDate
-
-  ){
-
-    return{
-
-      state:"todo",
-
-      detail:
-
-        `To Do — due ${prettyDate(item.dueDate)}`
-
-    };
-
+  if(item.dueDate){
+    return{state:"todo",detail:`To Do — due ${prettyDate(item.dueDate)}`};
   }
 
-  return{
-
-    state:"todo",
-
-    detail:"To Do"
-
-  };
-
+  return{state:"todo",detail:"To Do"};
 }
 
 function todoVisible(item){
-
-  if(
-
-    !item.doneDate
-
-  ){
-
-    return true;
-
-  }
-
-  return (
-
-    diffCalendarDays(
-
-      item.doneDate,
-
-      localDateKey()
-
-    )
-
-    < 7
-
-  );
-
+  if(!item.doneDate)return true;
+  return diffCalendarDays(item.doneDate,localDateKey())<7;
 }
 
-function todoSort(
+function todoSort(a,b){
+  const rank={overdue:0,due:1,todo:2,pending:3,completed:4};
+  const sa=todoStatus(a);
+  const sb=todoStatus(b);
 
-  a,
-
-  b
-
-){
-
-  const rank = {
-
-    overdue:0,
-
-    due:1,
-
-    todo:2,
-
-    pending:3,
-
-    completed:4
-
-  };
-
-  const sa =
-
-    todoStatus(a);
-
-  const sb =
-
-    todoStatus(b);
-
-  if(
-
-    rank[sa.state] !==
-
-    rank[sb.state]
-
-  ){
-
-    return (
-
-      rank[sa.state] -
-
-      rank[sb.state]
-
-    );
-
+  if(rank[sa.state]!==rank[sb.state]){
+    return rank[sa.state]-rank[sb.state];
   }
 
-  if(
-
-    sa.state ===
-
-    "overdue"
-
-    ||
-
-    sa.state ===
-
-    "due"
-
-    ||
-
-    sa.state ===
-
-    "todo"
-
-  ){
-
-    const ad =
-
-      a.dueDate ||
-
-      "9999-12-31";
-
-    const bd =
-
-      b.dueDate ||
-
-      "9999-12-31";
-
-    if(
-
-      ad !==
-
-      bd
-
-    ){
-
-      return ad.localeCompare(
-
-        bd
-
-      );
-
-    }
-
+  if(sa.state==="overdue"||sa.state==="due"||sa.state==="todo"){
+    const ad=a.dueDate||"9999-12-31";
+    const bd=b.dueDate||"9999-12-31";
+    if(ad!==bd)return ad.localeCompare(bd);
   }
 
-  if(
-
-    sa.state ===
-
-    "pending"
-
-  ){
-
-    const ad =
-
-      a.startDate ||
-
-      "9999-12-31";
-
-    const bd =
-
-      b.startDate ||
-
-      "9999-12-31";
-
-    if(
-
-      ad !==
-
-      bd
-
-    ){
-
-      return ad.localeCompare(
-
-        bd
-
-      );
-
-    }
-
+  if(sa.state==="pending"){
+    const ad=a.startDate||"9999-12-31";
+    const bd=b.startDate||"9999-12-31";
+    if(ad!==bd)return ad.localeCompare(bd);
   }
 
-  if(
-
-    sa.state ===
-
-    "completed"
-
-  ){
-
-    return String(
-
-      b.doneDate ||
-
-      ""
-
-    ).localeCompare(
-
-      String(
-
-        a.doneDate ||
-
-        ""
-
-      )
-
-    );
-
+  if(sa.state==="completed"){
+    return String(b.doneDate||"").localeCompare(String(a.doneDate||""));
   }
 
-  return (
-
-    Number(
-
-      a.createdAt
-
-    )
-
-    -
-
-    Number(
-
-      b.createdAt
-
-    )
-
-  );
-
+  return Number(a.createdAt)-Number(b.createdAt);
 }
-
-/* ==================================================
-
-   RENDER TO-DO LIST
-
-   ================================================== */
 
 function renderTodos(){
-
-  const list =
-
-    $("todoList");
-
-  const items =
-
-    state.todos
-
-    .filter(
-
-      todoVisible
-
-    )
-
-    .sort(
-
-      todoSort
-
-    );
+  const list=$("todoList");
+  const items=state.todos.filter(todoVisible).sort(todoSort);
 
   list.innerHTML="";
 
-  if(
-
-    !items.length
-
-  ){
-
-    list.innerHTML =
-
-      '<div class="empty">Nothing on the list.</div>';
-
+  if(!items.length){
+    list.innerHTML='<div class="empty">Nothing on the list.</div>';
     return;
-
   }
 
-  for(
+  for(const item of items){
+    const s=todoStatus(item);
+    const card=document.createElement("article");
 
-    const item
+    card.className=`todo-card ${s.state}`;
 
-    of items
-
-  ){
-
-    const s =
-
-      todoStatus(
-
-        item
-
-      );
-
-    const card =
-
-      document.createElement(
-
-        "article"
-
-      );
-
-    card.className =
-
-      `todo-card ${s.state}`;
-
-    card.innerHTML = `
-
+    card.innerHTML=`
       <div class="todo-top">
-
         <div class="todo-left">
-
           <label class="todo-check">
-
-            <input
-
-              type="checkbox"
-
-              ${
-
-                item.doneDate
-
-                ? "checked"
-
-                : ""
-
-              }>
-
+            <input type="checkbox" ${item.doneDate?"checked":""}>
             <span></span>
-
           </label>
 
           <div class="todo-copy">
-
-            <div class="todo-name">
-
-              ${escapeHtml(item.name)}
-
-            </div>
-
-            <div class="meta">
-
-              ${s.detail}
-
-            </div>
-
+            <div class="todo-name">${escapeHtml(item.name)}</div>
+            <div class="meta">${s.detail}</div>
           </div>
-
         </div>
 
-        <button class="todo-edit">
-
-          Edit
-
-        </button>
-
+        <button class="todo-edit">Edit</button>
       </div>
 
       <div class="todo-bottom">
-
         <span>
-
-          ${
-
-            item.startDate
-
-            ? `Can start ${prettyDate(item.startDate)}`
-
-            : "Available now"
-
-          }
-
-          ${
-
-            item.dueDate
-
-            ? ` · Due ${prettyDate(item.dueDate)}`
-
-            : " · No deadline"
-
-          }
-
+          ${item.startDate?`Can start ${prettyDate(item.startDate)}`:"Available now"}
+          ${item.dueDate?` · Due ${prettyDate(item.dueDate)}`:" · No deadline"}
         </span>
-
       </div>
-
     `;
 
-    card
+    card.querySelector("input").addEventListener("change",event=>{
+      item.doneDate=event.target.checked?localDateKey():null;
+      saveState();
+      renderTodos();
+    });
 
-      .querySelector("input")
-
-      .addEventListener(
-
-        "change",
-
-        event=>{
-
-          item.doneDate =
-
-            event.target.checked
-
-            ? localDateKey()
-
-            : null;
-
-          saveState();
-
-          renderTodos();
-
-        }
-
-      );
-
-    card
-
-      .querySelector(".todo-edit")
-
-      .addEventListener(
-
-        "click",
-
-        () =>
-
-        openTodoEdit(
-
-          item
-
-        )
-
-      );
-
-    list.appendChild(
-
-      card
-
-    );
-
+    card.querySelector(".todo-edit").addEventListener("click",()=>openTodoEdit(item));
+    list.appendChild(card);
   }
-
 }
 
+
 /* ==================================================
-
    PAGE NAVIGATION
-
    ================================================== */
 
 function showOnly(id){
-
-  for(
-
-    const view
-
-    of [
-
-      "mainView",
-
-      "awardsView",
-
-      "calendarView",
-
-      "todoView"
-
-    ]
-
-  ){
-
-    $(view)
-
-      .classList
-
-      .toggle(
-
-        "hidden",
-
-        view !==
-
-        id
-
-      );
-
+  for(const view of["mainView","awardsView","calendarView","todoView"]){
+    $(view).classList.toggle("hidden",view!==id);
   }
 
-  window.scrollTo(
-
-    0,
-
-    0
-
-  );
-
+  window.scrollTo(0,0);
 }
 
-$("awardsBtn")
+$("awardsBtn").addEventListener("click",()=>{
+  renderAwards();
+  showOnly("awardsView");
+});
 
-  .addEventListener(
+$("calendarBtn").addEventListener("click",()=>{
+  calendarCursor=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+  renderCalendar();
+  showOnly("calendarView");
+});
 
-    "click",
+$("todoBtn").addEventListener("click",()=>{
+  renderTodos();
+  showOnly("todoView");
+});
 
-    ()=>{
+$("awardsBackBtn").addEventListener("click",()=>{
+  render();
+  showOnly("mainView");
+});
 
-      renderAwards();
+$("calendarBackBtn").addEventListener("click",()=>{
+  render();
+  showOnly("mainView");
+});
 
-      showOnly(
+$("todoBackBtn").addEventListener("click",()=>{
+  render();
+  showOnly("mainView");
+});
 
-        "awardsView"
-
-      );
-
-    }
-
+$("previousMonthBtn").addEventListener("click",()=>{
+  calendarCursor=new Date(
+    calendarCursor.getFullYear(),
+    calendarCursor.getMonth()-1,
+    1
   );
+  renderCalendar();
+});
 
-$("calendarBtn")
-
-  .addEventListener(
-
-    "click",
-
-    ()=>{
-
-      calendarCursor =
-
-        new Date(
-
-          new Date().getFullYear(),
-
-          new Date().getMonth(),
-
-          1
-
-        );
-
-      renderCalendar();
-
-      showOnly(
-
-        "calendarView"
-
-      );
-
-    }
-
+$("nextMonthBtn").addEventListener("click",()=>{
+  calendarCursor=new Date(
+    calendarCursor.getFullYear(),
+    calendarCursor.getMonth()+1,
+    1
   );
+  renderCalendar();
+});
 
-$("todoBtn")
-
-  .addEventListener(
-
-    "click",
-
-    ()=>{
-
-      renderTodos();
-
-      showOnly(
-
-        "todoView"
-
-      );
-
-    }
-
-  );
-
-$("awardsBackBtn")
-
-  .addEventListener(
-
-    "click",
-
-    ()=>{
-
-      render();
-
-      showOnly(
-
-        "mainView"
-
-      );
-
-    }
-
-  );
-
-$("calendarBackBtn")
-
-  .addEventListener(
-
-    "click",
-
-    ()=>{
-
-      render();
-
-      showOnly(
-
-        "mainView"
-
-      );
-
-    }
-
-  );
-
-$("todoBackBtn")
-
-  .addEventListener(
-
-    "click",
-
-    ()=>{
-
-      render();
-
-      showOnly(
-
-        "mainView"
-
-      );
-
-    }
-
-  );
-
-$("previousMonthBtn")
-
-  .addEventListener(
-
-    "click",
-
-    ()=>{
-
-      calendarCursor =
-
-        new Date(
-
-          calendarCursor.getFullYear(),
-
-          calendarCursor.getMonth()-1,
-
-          1
-
-        );
-
-      renderCalendar();
-
-    }
-
-  );
-
-$("nextMonthBtn")
-
-  .addEventListener(
-
-    "click",
-
-    ()=>{
-
-      calendarCursor =
-
-        new Date(
-
-          calendarCursor.getFullYear(),
-
-          calendarCursor.getMonth()+1,
-
-          1
-
-        );
-
-      renderCalendar();
-
-    }
-
-  );
 
 /* ==================================================
-
-   RECURRING TASK EDITOR
-
+   EMERGENCY DAYS
    ================================================== */
 
-const dialog =
+const emergencyDialog=$("emergencyDialog");
 
-  $("taskDialog");
+function renderEmergencyDialog(){
+  const today=localDateKey();
+  const yesterday=addDaysKey(today,-1);
 
-const form =
+  $("emergencyTodayLabel").textContent=`Today · ${prettyDate(today)}`;
+  $("emergencyYesterdayLabel").textContent=`Yesterday · ${prettyDate(yesterday)}`;
 
-  $("taskForm");
+  const todayExcused=isEmergencyDay(today);
+  const yesterdayExcused=isEmergencyDay(yesterday);
+
+  $("emergencyTodayState").textContent=todayExcused
+    ?"Recurring chores are excused."
+    :"Normal rules are in force.";
+
+  $("emergencyYesterdayState").textContent=yesterdayExcused
+    ?"Recurring chores were excused."
+    :"Normal rules were in force.";
+
+  $("emergencyTodayToggle").textContent=todayExcused
+    ?"Remove excuse"
+    :"Excuse today";
+
+  $("emergencyYesterdayToggle").textContent=yesterdayExcused
+    ?"Remove excuse"
+    :"Excuse yesterday";
+}
+
+function setEmergencyDay(dateKey,enabled){
+  const today=localDateKey();
+  const yesterday=addDaysKey(today,-1);
+
+  if(dateKey!==today&&dateKey!==yesterday){
+    return;
+  }
+
+  if(enabled){
+    if(!state.emergencyDays.includes(dateKey)){
+      state.emergencyDays.push(dateKey);
+      state.emergencyDays.sort();
+    }
+  }else{
+    state.emergencyDays=state.emergencyDays.filter(day=>day!==dateKey);
+  }
+
+  if(dateKey<today){
+    delete state.dailySnapshots[dateKey];
+    finalizeDay(dateKey);
+  }
+
+  if(enabled){
+    restoreRecentBreaksAfterEmergency();
+  }
+
+  saveState();
+  renderEmergencyDialog();
+  render();
+}
+
+$("emergencyBtn").addEventListener("click",()=>{
+  renderEmergencyDialog();
+  emergencyDialog.showModal();
+});
+
+$("emergencyTodayToggle").addEventListener("click",()=>{
+  const today=localDateKey();
+  setEmergencyDay(today,!isEmergencyDay(today));
+});
+
+$("emergencyYesterdayToggle").addEventListener("click",()=>{
+  const yesterday=addDaysKey(localDateKey(),-1);
+  setEmergencyDay(yesterday,!isEmergencyDay(yesterday));
+});
+
+$("closeEmergencyBtn").addEventListener("click",()=>{
+  emergencyDialog.close();
+});
+
+
+/* ==================================================
+   RECURRING TASK EDITOR
+   ================================================== */
+
+const dialog=$("taskDialog");
+const form=$("taskForm");
 
 function updateTypeFields(){
+  const type=$("taskType").value;
 
-  const type =
-
-    $("taskType").value;
-
-  $("weeklyFields")
-
-    .classList
-
-    .toggle(
-
-      "hidden",
-
-      type !==
-
-      "weekly"
-
-    );
-
-  $("intervalFields")
-
-    .classList
-
-    .toggle(
-
-      "hidden",
-
-      type !==
-
-      "interval"
-
-    );
-
-  $("dailyNote")
-
-    .classList
-
-    .toggle(
-
-      "hidden",
-
-      type !==
-
-      "daily"
-
-    );
-
+  $("weeklyFields").classList.toggle("hidden",type!=="weekly");
+  $("intervalFields").classList.toggle("hidden",type!=="interval");
+  $("dailyNote").classList.toggle("hidden",type!=="daily");
 }
 
-$("taskType")
+function currentEditedTask(){
+  const id=$("taskId").value;
+  if(!id)return null;
+  return state.tasks.find(task=>task.id===id)||null;
+}
 
-  .addEventListener(
+function pauseRangeText(pause){
+  return pause.startDate===pause.endDate
+    ?prettyDate(pause.startDate)
+    :`${prettyDate(pause.startDate)} – ${prettyDate(pause.endDate)}`;
+}
 
-    "change",
+function renderPauseList(task){
+  const list=$("pauseList");
+  list.innerHTML="";
 
-    updateTypeFields
+  if(!task){
+    $("pauseSection").classList.add("hidden");
+    return;
+  }
 
-  );
+  $("pauseSection").classList.remove("hidden");
 
-$("addBtn")
+  const today=localDateKey();
 
-  .addEventListener(
+  const visible=(task.plannedPauses||[])
+    .filter(pause=>pause.endDate>=today)
+    .sort((a,b)=>a.startDate.localeCompare(b.startDate));
 
-    "click",
+  if(!visible.length){
+    list.innerHTML='<div class="fine">No planned pauses.</div>';
+    return;
+  }
 
-    ()=>{
+  for(const pause of visible){
+    const row=document.createElement("div");
+    row.className="pause-row";
 
-      form.reset();
+    row.innerHTML=`
+      <div class="pause-row-copy">${pauseRangeText(pause)}</div>
+      <div class="pause-row-actions">
+        <button type="button" class="small-button edit-pause">Change</button>
+        <button type="button" class="small-button remove-pause">Remove</button>
+      </div>
+    `;
 
-      $("taskId").value="";
+    row.querySelector(".edit-pause").addEventListener("click",()=>{
+      $("pauseId").value=pause.id;
+      $("pauseStartDate").value=pause.startDate;
+      $("pauseEndDate").value=pause.endDate;
+      $("pauseEditor").classList.remove("hidden");
+    });
 
-      $("dialogTitle")
+    row.querySelector(".remove-pause").addEventListener("click",()=>{
+      if(confirm(`Remove planned pause ${pauseRangeText(pause)}?`)){
+        task.plannedPauses=task.plannedPauses.filter(p=>p.id!==pause.id);
+        saveState();
+        renderPauseList(task);
+        render();
+      }
+    });
 
-        .textContent =
+    list.appendChild(row);
+  }
+}
 
-        "Add task";
+function clearPauseEditor(){
+  $("pauseId").value="";
+  $("pauseStartDate").value="";
+  $("pauseEndDate").value="";
+  $("pauseEditor").classList.add("hidden");
+}
 
-      $("taskType").value =
+function rangeContains(startDate,endDate,dateKey){
+  return startDate<=dateKey&&dateKey<=endDate;
+}
 
-        "daily";
+function pauseEditAddsTooSoon(oldPause,newStart,newEnd){
+  const threshold=addDaysKey(localDateKey(),7);
 
-      $("pendingWeekday").value =
+  let day=newStart;
+  let guard=0;
 
-        "5";
+  while(day<=newEnd&&guard<4000){
+    const wasAlreadyExcused=oldPause
+      ?rangeContains(oldPause.startDate,oldPause.endDate,day)
+      :false;
 
-      $("overdueWeekday").value =
-
-        "1";
-
-      $("maxDays").value =
-
-        "7";
-
-      $("pendingWindow").value =
-
-        "2";
-
-      $("deleteBtn").hidden =
-
-        true;
-
-      updateTypeFields();
-
-      dialog.showModal();
-
+    if(!wasAlreadyExcused&&day<threshold){
+      return true;
     }
 
-  );
+    day=addDaysKey(day,1);
+    guard++;
+  }
 
-$("cancelBtn")
+  return false;
+}
 
-  .addEventListener(
+function overlapsOtherPause(task,pauseId,startDate,endDate){
+  return(task.plannedPauses||[]).some(pause=>{
+    if(pause.id===pauseId)return false;
+    return startDate<=pause.endDate&&endDate>=pause.startDate;
+  });
+}
 
-    "click",
+$("taskType").addEventListener("change",updateTypeFields);
 
-    ()=>
+$("addBtn").addEventListener("click",()=>{
+  form.reset();
 
-    dialog.close()
+  $("taskId").value="";
+  $("dialogTitle").textContent="Add task";
+  $("taskType").value="daily";
+  $("pendingWeekday").value="5";
+  $("overdueWeekday").value="1";
+  $("maxDays").value="7";
+  $("pendingWindow").value="2";
+  $("deleteBtn").hidden=true;
 
-  );
-
-function openEdit(task){
-
-  $("taskId").value =
-
-    task.id;
-
-  $("dialogTitle")
-
-    .textContent =
-
-    "Edit task";
-
-  $("taskName").value =
-
-    task.name;
-
-  $("taskType").value =
-
-    task.type;
-
-  const settings =
-
-    weeklySettings(
-
-      task
-
-    );
-
-  $("pendingWeekday").value =
-
-    String(
-
-      settings.pending
-
-    );
-
-  $("overdueWeekday").value =
-
-    String(
-
-      settings.overdue
-
-    );
-
-  $("maxDays").value =
-
-    String(
-
-      task.maxDays ??
-
-      7
-
-    );
-
-  $("pendingWindow").value =
-
-    String(
-
-      task.pendingWindow ??
-
-      2
-
-    );
-
-  $("deleteBtn").hidden =
-
-    false;
+  clearPauseEditor();
+  $("pauseSection").classList.add("hidden");
 
   updateTypeFields();
-
   dialog.showModal();
+});
 
+$("cancelBtn").addEventListener("click",()=>{
+  dialog.close();
+});
+
+function openEdit(task){
+  $("taskId").value=task.id;
+  $("dialogTitle").textContent="Edit task";
+  $("taskName").value=task.name;
+  $("taskType").value=task.type;
+
+  const s=weeklySettings(task);
+
+  $("pendingWeekday").value=String(s.pending);
+  $("overdueWeekday").value=String(s.overdue);
+  $("maxDays").value=String(task.maxDays??7);
+  $("pendingWindow").value=String(task.pendingWindow??2);
+  $("deleteBtn").hidden=false;
+
+  clearPauseEditor();
+  renderPauseList(task);
+  updateTypeFields();
+  dialog.showModal();
 }
 
-form.addEventListener(
-
-  "submit",
-
-  event=>{
-
-    event.preventDefault();
-
-    const id =
-
-      $("taskId").value;
-
-    const name =
-
-      $("taskName")
-
-      .value
-
-      .trim();
-
-    const type =
-
-      $("taskType").value;
-
-    const pendingWeekday =
-
-      Number(
-
-        $("pendingWeekday").value
-
-      );
-
-    const overdueWeekday =
-
-      Number(
-
-        $("overdueWeekday").value
-
-      );
-
-    const max =
-
-      Number(
-
-        $("maxDays").value
-
-      );
-
-    const pendingWindow =
-
-      Number(
-
-        $("pendingWindow").value
-
-      );
-
-    if(
-
-      !name
-
-    ){
-
-      return;
-
-    }
-
-    if(
-
-      type ===
-
-      "interval"
-
-      &&
-
-      (
-
-        !Number.isInteger(
-
-          max
-
-        )
-
-        ||
-
-        !Number.isInteger(
-
-          pendingWindow
-
-        )
-
-        ||
-
-        max < 1
-
-        ||
-
-        pendingWindow < 1
-
-        ||
-
-        pendingWindow >
-
-        max
-
-      )
-
-    ){
-
-      alert(
-
-        "Maximum days and Pending window must be whole numbers, and Pending window cannot exceed Maximum days."
-
-      );
-
-      return;
-
-    }
-
-    if(
-
-      type ===
-
-      "weekly"
-
-    ){
-
-      const gap =
-
-        daysFromWeekdayToWeekday(
-
-          pendingWeekday,
-
-          overdueWeekday
-
-        );
-
-      if(
-
-        gap < 2
-
-      ){
-
-        alert(
-
-          "“Resets to Pending” must be at least one full day before Due Today. Choose a Pending day at least two days before the Overdue day."
-
-        );
-
-        return;
-
-      }
-
-    }
-
-    if(
-
-      id
-
-    ){
-
-      const task =
-
-        state.tasks.find(
-
-          task =>
-
-          task.id ===
-
-          id
-
-        );
-
-      if(
-
-        !task
-
-      ){
-
-        return;
-
-      }
-
-      task.name =
-
-        name;
-
-      task.type =
-
-        type;
-
-      task.pendingWeekday =
-
-        pendingWeekday;
-
-      task.overdueWeekday =
-
-        overdueWeekday;
-
-      task.resetWeekday =
-
-        overdueWeekday;
-
-      task.maxDays =
-
-        max;
-
-      task.pendingWindow =
-
-        pendingWindow;
-
-    }
-
-    else{
-
-      const task =
-
-        makeTask(
-
-          name,
-
-          type,
-
-          max,
-
-          pendingWindow
-
-        );
-
-      task.pendingWeekday =
-
-        pendingWeekday;
-
-      task.overdueWeekday =
-
-        overdueWeekday;
-
-      task.resetWeekday =
-
-        overdueWeekday;
-
-      state.tasks.push(
-
-        task
-
-      );
-
-    }
-
-    saveState();
-
-    dialog.close();
-
-    render();
-
+$("newPauseBtn").addEventListener("click",()=>{
+  const task=currentEditedTask();
+  if(!task)return;
+
+  $("pauseId").value="";
+  $("pauseStartDate").value=addDaysKey(localDateKey(),7);
+  $("pauseEndDate").value=addDaysKey(localDateKey(),7);
+  $("pauseEditor").classList.remove("hidden");
+});
+
+$("cancelPauseBtn").addEventListener("click",()=>{
+  clearPauseEditor();
+});
+
+$("savePauseBtn").addEventListener("click",()=>{
+  const task=currentEditedTask();
+  if(!task)return;
+
+  const pauseId=$("pauseId").value;
+  const startDate=$("pauseStartDate").value;
+  const endDate=$("pauseEndDate").value;
+
+  if(!startDate||!endDate){
+    alert("Choose both a start date and an end date.");
+    return;
   }
 
-);
+  if(endDate<startDate){
+    alert("The pause cannot end before it starts.");
+    return;
+  }
 
-$("deleteBtn")
+  const oldPause=pauseId
+    ?task.plannedPauses.find(p=>p.id===pauseId)||null
+    :null;
 
-  .addEventListener(
+  if(pauseEditAddsTooSoon(oldPause,startDate,endDate)){
+    alert("Newly excused days must be scheduled at least 7 days in advance. You may still shorten or remove an existing pause.");
+    return;
+  }
 
-    "click",
+  if(overlapsOtherPause(task,pauseId,startDate,endDate)){
+    alert("That overlaps another planned pause for this task.");
+    return;
+  }
 
-    ()=>{
+  if(oldPause){
+    oldPause.startDate=startDate;
+    oldPause.endDate=endDate;
+  }else{
+    task.plannedPauses.push({
+      id:uid(),
+      startDate,
+      endDate,
+      createdAt:Date.now()
+    });
+  }
 
-      const id =
+  task.plannedPauses.sort((a,b)=>a.startDate.localeCompare(b.startDate));
 
-        $("taskId").value;
+  saveState();
+  clearPauseEditor();
+  renderPauseList(task);
+  render();
+});
 
-      const task =
+form.addEventListener("submit",event=>{
+  event.preventDefault();
 
-        state.tasks.find(
+  const id=$("taskId").value;
+  const name=$("taskName").value.trim();
+  const type=$("taskType").value;
+  const pendingWeekday=Number($("pendingWeekday").value);
+  const overdueWeekday=Number($("overdueWeekday").value);
+  const max=Number($("maxDays").value);
+  const pendingWindow=Number($("pendingWindow").value);
 
-          task =>
+  if(!name)return;
 
-          task.id ===
+  if(
+    type==="interval"&&
+    (
+      !Number.isInteger(max)||
+      !Number.isInteger(pendingWindow)||
+      max<1||
+      pendingWindow<1||
+      pendingWindow>max
+    )
+  ){
+    alert("Maximum days and Pending window must be whole numbers, and Pending window cannot exceed Maximum days.");
+    return;
+  }
 
-          id
+  if(type==="weekly"){
+    const gap=daysFromWeekdayToWeekday(pendingWeekday,overdueWeekday);
 
-        );
-
-      if(
-
-        task
-
-        &&
-
-        confirm(
-
-          `Delete "${task.name}"?`
-
-        )
-
-      ){
-
-        state.tasks =
-
-          state.tasks.filter(
-
-            item =>
-
-            item.id !==
-
-            id
-
-          );
-
-        saveState();
-
-        dialog.close();
-
-        render();
-
-      }
-
+    if(gap<2){
+      alert("“Resets to Pending” must be at least one full day before Due Today. Choose a Pending day at least two days before the Overdue day.");
+      return;
     }
+  }
 
-  );
+  if(id){
+    const task=state.tasks.find(task=>task.id===id);
+    if(!task)return;
+
+    task.name=name;
+    task.type=type;
+    task.pendingWeekday=pendingWeekday;
+    task.overdueWeekday=overdueWeekday;
+    task.resetWeekday=overdueWeekday;
+    task.maxDays=max;
+    task.pendingWindow=pendingWindow;
+  }else{
+    const task=makeTask(name,type,max,pendingWindow);
+
+    task.pendingWeekday=pendingWeekday;
+    task.overdueWeekday=overdueWeekday;
+    task.resetWeekday=overdueWeekday;
+
+    state.tasks.push(task);
+  }
+
+  saveState();
+  dialog.close();
+  render();
+});
+
+$("deleteBtn").addEventListener("click",()=>{
+  const id=$("taskId").value;
+  const task=state.tasks.find(task=>task.id===id);
+
+  if(task&&confirm(`Delete "${task.name}"?`)){
+    state.tasks=state.tasks.filter(item=>item.id!==id);
+    saveState();
+    dialog.close();
+    render();
+  }
+});
+
 
 /* ==================================================
-
    TO-DO EDITOR
-
    ================================================== */
 
-const todoDialog =
+const todoDialog=$("todoDialog");
+const todoForm=$("todoForm");
 
-  $("todoDialog");
+$("addTodoBtn").addEventListener("click",()=>{
+  todoForm.reset();
 
-const todoForm =
-
-  $("todoForm");
-
-$("addTodoBtn")
-
-  .addEventListener(
-
-    "click",
-
-    ()=>{
-
-      todoForm.reset();
-
-      $("todoId").value="";
-
-      $("todoDialogTitle")
-
-        .textContent =
-
-        "Add to-do";
-
-      $("deleteTodoBtn").hidden =
-
-        true;
-
-      todoDialog.showModal();
-
-    }
-
-  );
-
-$("cancelTodoBtn")
-
-  .addEventListener(
-
-    "click",
-
-    ()=>
-
-    todoDialog.close()
-
-  );
-
-function openTodoEdit(item){
-
-  $("todoId").value =
-
-    item.id;
-
-  $("todoDialogTitle")
-
-    .textContent =
-
-    "Edit to-do";
-
-  $("todoName").value =
-
-    item.name;
-
-  $("todoStartDate").value =
-
-    item.startDate ||
-
-    "";
-
-  $("todoDueDate").value =
-
-    item.dueDate ||
-
-    "";
-
-  $("deleteTodoBtn").hidden =
-
-    false;
+  $("todoId").value="";
+  $("todoDialogTitle").textContent="Add to-do";
+  $("deleteTodoBtn").hidden=true;
 
   todoDialog.showModal();
+});
 
+$("cancelTodoBtn").addEventListener("click",()=>{
+  todoDialog.close();
+});
+
+function openTodoEdit(item){
+  $("todoId").value=item.id;
+  $("todoDialogTitle").textContent="Edit to-do";
+  $("todoName").value=item.name;
+  $("todoStartDate").value=item.startDate||"";
+  $("todoDueDate").value=item.dueDate||"";
+  $("deleteTodoBtn").hidden=false;
+
+  todoDialog.showModal();
 }
 
-todoForm.addEventListener(
-
-  "submit",
-
-  event=>{
-
-    event.preventDefault();
-
-    const id =
-
-      $("todoId").value;
-
-    const name =
-
-      $("todoName")
-
-      .value
-
-      .trim();
-
-    const startDate =
-
-      $("todoStartDate").value ||
-
-      null;
-
-    const dueDate =
-
-      $("todoDueDate").value ||
-
-      null;
-
-    if(
-
-      !name
-
-    ){
-
-      return;
-
-    }
-
-    if(
-
-      startDate &&
-
-      dueDate &&
-
-      dueDate <
-
-      startDate
-
-    ){
-
-      alert(
-
-        "Due by cannot be earlier than Can start."
-
-      );
-
-      return;
-
-    }
-
-    if(
-
-      id
-
-    ){
-
-      const item =
-
-        state.todos.find(
-
-          item =>
-
-          item.id ===
-
-          id
-
-        );
-
-      if(
-
-        !item
-
-      ){
-
-        return;
-
-      }
-
-      item.name =
-
-        name;
-
-      item.startDate =
-
-        startDate;
-
-      item.dueDate =
-
-        dueDate;
-
-    }
-
-    else{
-
-      state.todos.push(
-
-        makeTodo(
-
-          name,
-
-          startDate,
-
-          dueDate
-
-        )
-
-      );
-
-    }
-
-    saveState();
-
-    todoDialog.close();
-
-    renderTodos();
-
+todoForm.addEventListener("submit",event=>{
+  event.preventDefault();
+
+  const id=$("todoId").value;
+  const name=$("todoName").value.trim();
+  const startDate=$("todoStartDate").value||null;
+  const dueDate=$("todoDueDate").value||null;
+
+  if(!name)return;
+
+  if(startDate&&dueDate&&dueDate<startDate){
+    alert("Due by cannot be earlier than Can start.");
+    return;
   }
 
-);
+  if(id){
+    const item=state.todos.find(item=>item.id===id);
+    if(!item)return;
 
-$("deleteTodoBtn")
+    item.name=name;
+    item.startDate=startDate;
+    item.dueDate=dueDate;
+  }else{
+    state.todos.push(makeTodo(name,startDate,dueDate));
+  }
 
-  .addEventListener(
+  saveState();
+  todoDialog.close();
+  renderTodos();
+});
 
-    "click",
+$("deleteTodoBtn").addEventListener("click",()=>{
+  const id=$("todoId").value;
+  const item=state.todos.find(item=>item.id===id);
 
-    ()=>{
+  if(item&&confirm(`Delete "${item.name}"?`)){
+    state.todos=state.todos.filter(candidate=>candidate.id!==id);
+    saveState();
+    todoDialog.close();
+    renderTodos();
+  }
+});
 
-      const id =
-
-        $("todoId").value;
-
-      const item =
-
-        state.todos.find(
-
-          item =>
-
-          item.id ===
-
-          id
-
-        );
-
-      if(
-
-        item
-
-        &&
-
-        confirm(
-
-          `Delete "${item.name}"?`
-
-        )
-
-      ){
-
-        state.todos =
-
-          state.todos.filter(
-
-            candidate =>
-
-            candidate.id !==
-
-            id
-
-          );
-
-        saveState();
-
-        todoDialog.close();
-
-        renderTodos();
-
-      }
-
-    }
-
-  );
 
 /* ==================================================
-
    STARTUP
-
    ================================================== */
 
 finalizePastDays();
-
 saveState();
-
 render();
 
-setInterval(
+setInterval(()=>{
+  finalizePastDays();
 
-  ()=>{
+  if(!$("mainView").classList.contains("hidden")){
+    render();
+  }
 
-    finalizePastDays();
+  else if(!$("calendarView").classList.contains("hidden")){
+    renderCalendar();
+  }
 
-    if(
-
-      !$("mainView")
-
-        .classList
-
-        .contains(
-
-          "hidden"
-
-        )
-
-    ){
-
-      render();
-
-    }
-
-    else if(
-
-      !$("calendarView")
-
-        .classList
-
-        .contains(
-
-          "hidden"
-
-        )
-
-    ){
-
-      renderCalendar();
-
-    }
-
-    else if(
-
-      !$("todoView")
-
-        .classList
-
-        .contains(
-
-          "hidden"
-
-        )
-
-    ){
-
-      renderTodos();
-
-    }
-
-  },
-
-  60000
-
-);
+  else if(!$("todoView").classList.contains("hidden")){
+    renderTodos();
+  }
+},60000);
 
 </script>
 
 </body>
-
 </html>
