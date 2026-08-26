@@ -1249,11 +1249,11 @@ function updateSummary(){
     return;
   }
 
-  $("statusTitle").textContent="No tasks pending";
+  $("statusTitle").textContent="Everything is done!";
 
   $("statusCopy").textContent=paused
     ?`${paused} task${paused===1?" is":"s are"} paused.`
-    :"The field is clear.";
+    :"Well done! Take the rest of the day off.";
 
   $("statusBadge").textContent="✓";
   $("statusBadge").style.background="var(--green-soft)";
