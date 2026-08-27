@@ -1249,11 +1249,11 @@ function updateSummary(){
     return;
   }
 
-  $("statusTitle").textContent="Everything is done!";
+  $("statusTitle").textContent="Everything is done! <br> But you could clear off some more things";
 
   $("statusCopy").textContent=paused
     ?`${paused} task${paused===1?" is":"s are"} paused.`
-    :"Well done! Take the rest of the day off.";
+    :"Well done! <br> Take the rest of the day off.";
 
   $("statusBadge").textContent="✓";
   $("statusBadge").style.background="var(--green-soft)";
