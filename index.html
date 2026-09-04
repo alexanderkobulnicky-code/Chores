@@ -47,6 +47,7 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .task-bottom{font-size:12px;color:var(--muted);flex-wrap:wrap}.stats{display:flex;gap:13px;flex-wrap:wrap}.edit{border:0;background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .switch{position:relative;width:64px;height:34px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.switch span{position:absolute;inset:0;border-radius:99px;transition:.18s}.switch span:before{content:"";position:absolute;width:26px;height:26px;left:4px;top:4px;background:#fff;border-radius:50%;box-shadow:0 2px 6px #0002;transition:.18s}
 .done .switch span{background:var(--done-slider)}.done .switch span:before{transform:translateX(30px)}.pending .switch span{background:var(--pending-slider)}.due .switch span{background:var(--due-slider)}.overdue .switch span{background:var(--overdue-slider)}.paused .switch span{background:var(--paused-slider)}.paused .switch input:disabled+span{opacity:.78}
+.quota-control{display:flex;align-items:center;gap:7px}.quota-button{width:36px;height:36px;border:1px solid rgba(29,34,31,.16);border-radius:50%;background:rgba(255,255,255,.72);color:var(--ink);font-size:20px;font-weight:800;display:grid;place-items:center;padding:0;line-height:1}.quota-button:disabled{opacity:.32;cursor:default}.quota-count{min-width:58px;text-align:center;font-size:18px;font-weight:800;letter-spacing:-.02em}.quota-note{font-size:10px;color:var(--muted);text-align:right}.paused .quota-button{border-color:var(--paused-border)}
 .empty{padding:34px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}.hidden{display:none!important}
 .page-header{margin-bottom:18px}.page-header h1{font-size:36px}
 .awards-list{display:grid;gap:14px}.award-task{padding:18px}.award-task-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}.award-task-name{font-size:22px;font-weight:750}.award-task-streak{color:var(--muted);font-size:13px;margin-top:3px}.next-target{background:var(--green-soft);color:var(--done-slider);border-radius:12px;padding:8px 10px;font-size:12px;font-weight:700;text-align:right}
@@ -130,7 +131,7 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 <h2 id="dialogTitle">Add task</h2>
 <input type="hidden" id="taskId">
 <div class="field"><label for="taskName">Task</label><input id="taskName" maxlength="80" required placeholder="e.g. Laundry"></div>
-<div class="field"><label for="taskType">Type</label><select id="taskType"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="interval">Every N days</option></select></div>
+<div class="field"><label for="taskType">Type</label><select id="taskType"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="interval">Every N days</option><option value="quota">Times per Week</option></select></div>
 <div id="weeklyFields" class="hidden">
   <div class="pair">
     <div class="field"><label for="pendingWeekday">Resets to Pending</label><select id="pendingWeekday"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5" selected>Friday</option><option value="6">Saturday</option></select></div>
@@ -143,6 +144,15 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
   <div class="field"><label for="pendingWindow">Pending window</label><input id="pendingWindow" type="number" min="1" step="1" value="2"></div>
   <p class="fine">Example: Maximum 7 days and Pending window 2 days. If completed Monday, it remains Done through Saturday, is Pending Sunday, is Due Today the following Monday, and becomes Overdue Tuesday.</p>
 </div>
+
+<div id="quotaFields" class="hidden">
+  <div class="pair">
+    <div class="field"><label for="weeklyTarget">Times per week</label><input id="weeklyTarget" type="number" min="1" max="99" step="1" value="4"></div>
+    <div class="field"><label for="quotaResetWeekday">Week resets</label><select id="quotaResetWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
+  </div>
+  <p class="fine">Each ＋ records one occurrence. The counter resets at the start of each week. If the target is still unfinished on the final day, it becomes Due Today. A missed week breaks the streak, but the new week begins fresh instead of carrying an Overdue debt forward.</p>
+</div>
+
 <div id="dailyNote" class="fine">Daily tasks are Due Today until completed. If a whole day passes without completion, they become Overdue.</div>
 
 <div class="pause-section hidden" id="pauseSection">
@@ -162,7 +172,7 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
       <button type="button" class="save" id="savePauseBtn">Save pause</button>
     </div>
   </div>
-  <p class="fine">A new pause must begin at least 7 days from today. Paused days do not count toward or against a streak. Planned pauses do not spoil a Clean Sweep.</p>
+  <p class="fine">A new pause must begin at least 7 days from today. Paused days do not count toward or against a streak. Planned pauses do not spoil a Clean Sweep. For a Times-per-Week task, the target does not shrink for individual paused days. The whole week is excused only when a planned pause covers the entire weekly window.</p>
 </div>
 
 <div class="modal-actions"><button type="button" class="delete" id="deleteBtn" hidden>Delete</button><div class="right-actions"><button type="button" class="ghost" id="cancelBtn">Cancel</button><button class="save">Save</button></div></div>
@@ -277,6 +287,12 @@ function defaultPendingWeekday(overdueWeekday){
   return (Number(overdueWeekday)+4)%7;
 }
 
+function weekStartKey(dateKey,resetWeekday){
+  const d=dateFromKey(dateKey);
+  const delta=(d.getDay()-Number(resetWeekday)+7)%7;
+  return addDaysKey(dateKey,-delta);
+}
+
 
 /* ==================================================
    OBJECT CREATION
@@ -292,6 +308,11 @@ function makeTask(name,type="daily",maxDays=7,pendingWindow=2){
     resetWeekday:1,
     pendingWeekday:5,
     overdueWeekday:1,
+    weeklyTarget:4,
+    quotaResetWeekday:1,
+    quotaEvents:[],
+    quotaWeekOutcomes:{},
+    quotaTrackingStartDate:null,
     plannedPauses:[],
     lastDoneDate:null,
     previousDoneDate:null,
@@ -428,6 +449,43 @@ function migrateState(parsed){
         createdAt:p.createdAt||Date.now()
       }))
       .sort((a,b)=>a.startDate.localeCompare(b.startDate));
+
+    if(!Number.isInteger(Number(task.weeklyTarget))||Number(task.weeklyTarget)<1){
+      task.weeklyTarget=4;
+    }else{
+      task.weeklyTarget=Number(task.weeklyTarget);
+    }
+
+    if(!Number.isInteger(Number(task.quotaResetWeekday))||Number(task.quotaResetWeekday)<0||Number(task.quotaResetWeekday)>6){
+      task.quotaResetWeekday=1;
+    }else{
+      task.quotaResetWeekday=Number(task.quotaResetWeekday);
+    }
+
+    if(!Array.isArray(task.quotaEvents))task.quotaEvents=[];
+    task.quotaEvents=task.quotaEvents
+      .filter(event=>event&&event.date)
+      .map(event=>({
+        id:event.id||uid(),
+        date:event.date,
+        createdAt:event.createdAt||Date.now(),
+        startedStreak:Boolean(event.startedStreak)
+      }))
+      .sort((a,b)=>a.date.localeCompare(b.date)||Number(a.createdAt)-Number(b.createdAt));
+
+    if(!task.quotaWeekOutcomes||typeof task.quotaWeekOutcomes!=="object"||Array.isArray(task.quotaWeekOutcomes)){
+      task.quotaWeekOutcomes={};
+    }
+
+    if(task.quotaTrackingStartDate===undefined){
+      task.quotaTrackingStartDate=task.type==="quota"
+        ?localDateKey(new Date(task.createdAt||Date.now()))
+        :null;
+    }
+
+    if(task.type==="quota"&&!task.quotaTrackingStartDate){
+      task.quotaTrackingStartDate=localDateKey(new Date(task.createdAt||Date.now()));
+    }
 
     if(task.previousDoneDate===undefined)task.previousDoneDate=null;
     if(task.totalCompletions==null)task.totalCompletions=0;
@@ -612,6 +670,138 @@ function activeDaysInclusive(task,startKey,endKey){
 
 
 /* ==================================================
+   TIMES-PER-WEEK HELPERS
+   ================================================== */
+
+function quotaTarget(task){
+  return Math.max(1,Number(task.weeklyTarget)||1);
+}
+
+function quotaResetDay(task){
+  const value=Number(task.quotaResetWeekday);
+  return Number.isInteger(value)&&value>=0&&value<=6?value:1;
+}
+
+function quotaWeekStart(task,dateKey){
+  return weekStartKey(dateKey,quotaResetDay(task));
+}
+
+function quotaWeekEndFromStart(weekStart){
+  return addDaysKey(weekStart,6);
+}
+
+function quotaEventsInRange(task,startKey,endKey){
+  const tracking=task.quotaTrackingStartDate||localDateKey(new Date(task.createdAt));
+  return(task.quotaEvents||[]).filter(event=>
+    event.date>=startKey&&event.date<=endKey&&event.date>=tracking
+  );
+}
+
+function quotaCountInRange(task,startKey,endKey){
+  return quotaEventsInRange(task,startKey,endKey).length;
+}
+
+function quotaWeekFullyExcused(task,weekStart){
+  let day=weekStart;
+
+  for(let i=0;i<7;i++){
+    if(!isPlannedPausedOn(task,day))return false;
+    day=addDaysKey(day,1);
+  }
+
+  return true;
+}
+
+function computedQuotaWeekOutcome(task,weekStart){
+  const weekEnd=quotaWeekEndFromStart(weekStart);
+  const target=quotaTarget(task);
+  const count=quotaCountInRange(task,weekStart,weekEnd);
+  const excused=quotaWeekFullyExcused(task,weekStart);
+
+  return{
+    weekStart,
+    weekEnd,
+    target,
+    count,
+    excused,
+    success:excused||count>=target
+  };
+}
+
+function finalizeQuotaWeeks(task){
+  if(task.type!=="quota")return false;
+
+  if(!task.quotaTrackingStartDate){
+    task.quotaTrackingStartDate=localDateKey(new Date(task.createdAt));
+  }
+
+  if(!task.quotaWeekOutcomes||typeof task.quotaWeekOutcomes!=="object"){
+    task.quotaWeekOutcomes={};
+  }
+
+  const today=localDateKey();
+  const currentStart=quotaWeekStart(task,today);
+  let week=quotaWeekStart(task,task.quotaTrackingStartDate);
+  let guard=0;
+  let changed=false;
+
+  while(week<currentStart&&guard<1200){
+    if(!task.quotaWeekOutcomes[week]){
+      task.quotaWeekOutcomes[week]=computedQuotaWeekOutcome(task,week);
+      changed=true;
+    }
+
+    week=addDaysKey(week,7);
+    guard++;
+  }
+
+  return changed;
+}
+
+function finalizeAllQuotaWeeks(){
+  let changed=false;
+  for(const task of state.tasks){
+    if(finalizeQuotaWeeks(task))changed=true;
+  }
+  return changed;
+}
+
+function firstMissedQuotaWeekEnd(task,notBefore=null){
+  const outcomes=Object.values(task.quotaWeekOutcomes||{})
+    .filter(outcome=>outcome&&outcome.weekEnd&&!outcome.success)
+    .sort((a,b)=>a.weekEnd.localeCompare(b.weekEnd));
+
+  for(const outcome of outcomes){
+    if(!notBefore||outcome.weekEnd>=notBefore){
+      return outcome.weekEnd;
+    }
+  }
+
+  return null;
+}
+
+function invalidateQuotaOutcomeForDate(task,dateKey){
+  if(task.type!=="quota")return;
+  const week=quotaWeekStart(task,dateKey);
+  if(task.quotaWeekOutcomes&&task.quotaWeekOutcomes[week]){
+    delete task.quotaWeekOutcomes[week];
+  }
+}
+
+function invalidateQuotaOutcomesForRange(task,startDate,endDate){
+  if(task.type!=="quota")return;
+  let day=startDate;
+  let guard=0;
+
+  while(day<=endDate&&guard<4000){
+    invalidateQuotaOutcomeForDate(task,day);
+    day=addDaysKey(day,1);
+    guard++;
+  }
+}
+
+
+/* ==================================================
    WEEKLY CYCLE HELPERS
    ================================================== */
 
@@ -689,7 +879,60 @@ function latestCompletionOnOrBefore(task,dateKey){
 
 function statusAt(task,dateKey,includeSameDay=true){
   if(isTaskExcusedOn(task,dateKey)){
+    if(task.type==="quota"){
+      const weekStart=quotaWeekStart(task,dateKey);
+      const target=quotaTarget(task);
+      const count=quotaCountInRange(task,weekStart,dateKey);
+
+      return{
+        state:"paused",
+        progress:.5,
+        count,
+        target,
+        detail:pauseDetail(task,dateKey)
+      };
+    }
+
     return{state:"paused",progress:.5,detail:pauseDetail(task,dateKey)};
+  }
+
+  /* TIMES PER WEEK */
+
+  if(task.type==="quota"){
+    const weekStart=quotaWeekStart(task,dateKey);
+    const weekEnd=quotaWeekEndFromStart(weekStart);
+    const target=quotaTarget(task);
+    const count=quotaCountInRange(task,weekStart,dateKey);
+
+    if(count>=target){
+      return{
+        state:"done",
+        progress:1,
+        count,
+        target,
+        detail:`${count} of ${target} this week`
+      };
+    }
+
+    if(dateKey===weekEnd){
+      return{
+        state:"due",
+        progress:target?count/target:0,
+        count,
+        target,
+        detail:`${count} of ${target} · Due Today`
+      };
+    }
+
+    const left=diffCalendarDays(dateKey,weekEnd)+1;
+
+    return{
+      state:"pending",
+      progress:target?Math.min(1,count/target):0,
+      count,
+      target,
+      detail:`${count} of ${target} this week · ${left} day${left===1?"":"s"} left`
+    };
   }
 
   let latest=latestCompletionOnOrBefore(task,dateKey);
@@ -918,15 +1161,21 @@ function finalizeDay(dateKey){
 }
 
 function finalizePastDays(){
+  let changed=finalizeAllQuotaWeeks();
   const today=localDateKey();
   let day=state.calendarTrackingStart;
   let guard=0;
 
   while(day<today&&guard<4000){
-    finalizeDay(day);
+    if(!state.dailySnapshots[day]){
+      finalizeDay(day);
+      changed=true;
+    }
     day=addDaysKey(day,1);
     guard++;
   }
+
+  return changed;
 }
 
 
@@ -945,6 +1194,10 @@ function lastGoodDate(task){
     return weeklyCycleAfterCompletion(task,task.lastDoneDate).dueDate;
   }
 
+  if(task.type==="quota"){
+    return firstMissedQuotaWeekEnd(task,task.streakStartDate);
+  }
+
   return advanceActiveDays(task,task.lastDoneDate,Number(task.maxDays));
 }
 
@@ -958,8 +1211,17 @@ function reconcileStreaks(){
   const today=localDateKey();
 
   for(const task of state.tasks){
-    if(task.streakStartDate&&status(task).state==="overdue"){
-      const end=lastGoodDate(task);
+    const quotaMiss=task.type==="quota"&&task.streakStartDate
+      ?firstMissedQuotaWeekEnd(task,task.streakStartDate)
+      :null;
+
+    const shouldBreak=task.streakStartDate&&(
+      status(task).state==="overdue"||
+      Boolean(quotaMiss)
+    );
+
+    if(shouldBreak){
+      const end=quotaMiss||lastGoodDate(task);
 
       if(end){
         const len=Math.max(0,activeDaysInclusive(task,task.streakStartDate,end));
@@ -1078,6 +1340,106 @@ function undoDone(task){
 
 
 /* ==================================================
+   TIMES-PER-WEEK COUNTER
+   ================================================== */
+
+function markQuotaOccurrence(task){
+  const today=localDateKey();
+
+  if(task.type!=="quota"||status(task).state==="paused")return;
+
+  finalizeQuotaWeeks(task);
+  reconcileStreaks();
+
+  if(!Array.isArray(task.quotaEvents))task.quotaEvents=[];
+  if(!Array.isArray(task.completionEvents))task.completionEvents=[];
+
+  const eventId=uid();
+  const startedStreak=!task.streakStartDate;
+
+  if(startedStreak){
+    task.streakStartDate=today;
+  }
+
+  task.quotaEvents.push({
+    id:eventId,
+    date:today,
+    createdAt:Date.now(),
+    startedStreak
+  });
+
+  task.quotaEvents.sort((a,b)=>
+    a.date.localeCompare(b.date)||
+    Number(a.createdAt)-Number(b.createdAt)
+  );
+
+  task.completionEvents.push({
+    date:today,
+    type:"quota",
+    quotaEventId:eventId
+  });
+
+  task.totalCompletions=Number(task.totalCompletions||0)+1;
+
+  updateTaskAwards(task);
+  saveState();
+  render();
+}
+
+function undoQuotaOccurrence(task){
+  if(task.type!=="quota")return;
+
+  const today=localDateKey();
+  const weekStart=quotaWeekStart(task,today);
+  const events=quotaEventsInRange(task,weekStart,today);
+
+  if(!events.length)return;
+
+  const event=events[events.length-1];
+
+  task.quotaEvents=(task.quotaEvents||[])
+    .filter(candidate=>candidate.id!==event.id);
+
+  if(Array.isArray(task.completionEvents)){
+    let removed=false;
+
+    task.completionEvents=task.completionEvents.filter(candidate=>{
+      if(!removed&&candidate.quotaEventId===event.id){
+        removed=true;
+        return false;
+      }
+      return true;
+    });
+
+    if(!removed){
+      for(let i=task.completionEvents.length-1;i>=0;i--){
+        const candidate=task.completionEvents[i];
+
+        if(candidate.date===event.date&&candidate.type==="quota"){
+          task.completionEvents.splice(i,1);
+          break;
+        }
+      }
+    }
+  }
+
+  if(event.startedStreak&&task.streakStartDate===event.date){
+    const stillHasEventOnOrAfterStart=(task.quotaEvents||[])
+      .some(candidate=>candidate.date>=event.date);
+
+    if(!stillHasEventOnOrAfterStart){
+      task.streakStartDate=null;
+    }
+  }
+
+  if(task.totalCompletions>0)task.totalCompletions--;
+
+  saveState();
+  render();
+}
+
+
+/* ==================================================
    DISPLAY HELPERS
    ================================================== */
 
@@ -1106,7 +1468,7 @@ function medalsForTask(task){
    ================================================== */
 
 function render(){
-  finalizePastDays();
+  const finalized=finalizePastDays();
 
   const changed=reconcileStreaks();
   updateAllTaskAwards();
@@ -1153,22 +1515,41 @@ function render(){
         </div>
 
         <div class="task-right">
-          <label class="switch">
-            <input
-              type="checkbox"
-              ${s.state==="done"?"checked":""}
-              ${s.state==="paused"?"disabled":""}>
-            <span></span>
-          </label>
+          ${
+            task.type==="quota"
+            ?`
+              <div class="quota-control">
+                <button type="button" class="quota-button quota-minus" aria-label="Remove most recent occurrence" ${Number(s.count||0)<=0?"disabled":""}>−</button>
+                <div class="quota-count">${Number(s.count||0)} / ${quotaTarget(task)}</div>
+                <button type="button" class="quota-button quota-plus" aria-label="Record one occurrence" ${s.state==="paused"?"disabled":""}>＋</button>
+              </div>
+              <div class="quota-note">this week</div>
+            `
+            :`
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  ${s.state==="done"?"checked":""}
+                  ${s.state==="paused"?"disabled":""}>
+                <span></span>
+              </label>
+            `
+          }
 
           <div class="task-medals">${medalsForTask(task)}</div>
           <div class="task-streak">${streak}-day streak</div>
         </div>
       </div>
 
-      <div class="bar">
-        <div style="width:${Math.round(Math.max(0,Math.min(1,s.progress))*100)}%"></div>
-      </div>
+      ${
+        task.type==="quota"
+        ?""
+        :`
+          <div class="bar">
+            <div style="width:${Math.round(Math.max(0,Math.min(1,s.progress))*100)}%"></div>
+          </div>
+        `
+      }
 
       <div class="task-bottom">
         <div class="stats">
@@ -1179,11 +1560,19 @@ function render(){
       </div>
     `;
 
-    const checkbox=card.querySelector("input");
+    if(task.type==="quota"){
+      const plus=card.querySelector(".quota-plus");
+      const minus=card.querySelector(".quota-minus");
 
-    checkbox.addEventListener("change",event=>{
-      event.target.checked?markDone(task):undoDone(task);
-    });
+      plus.addEventListener("click",()=>markQuotaOccurrence(task));
+      minus.addEventListener("click",()=>undoQuotaOccurrence(task));
+    }else{
+      const checkbox=card.querySelector("input");
+
+      checkbox.addEventListener("change",event=>{
+        event.target.checked?markDone(task):undoDone(task);
+      });
+    }
 
     card.querySelector(".edit").addEventListener("click",()=>openEdit(task));
     list.appendChild(card);
@@ -1191,7 +1580,7 @@ function render(){
 
   updateSummary();
 
-  if(changed)saveState();
+  if(finalized||changed)saveState();
 }
 
 
@@ -1249,11 +1638,11 @@ function updateSummary(){
     return;
   }
 
-  $("statusTitle").textContent="Everything is done! <br> But you could clear off some more things";
+  $("statusTitle").textContent="No tasks pending";
 
   $("statusCopy").textContent=paused
     ?`${paused} task${paused===1?" is":"s are"} paused.`
-    :"Well done! <br> Take the rest of the day off.";
+    :"The field is clear.";
 
   $("statusBadge").textContent="✓";
   $("statusBadge").style.background="var(--green-soft)";
@@ -1691,9 +2080,14 @@ function setEmergencyDay(dateKey,enabled){
     state.emergencyDays=state.emergencyDays.filter(day=>day!==dateKey);
   }
 
+  for(const task of state.tasks){
+    invalidateQuotaOutcomeForDate(task,dateKey);
+  }
+
   if(dateKey<today){
     delete state.dailySnapshots[dateKey];
     finalizeDay(dateKey);
+    finalizeAllQuotaWeeks();
   }
 
   if(enabled){
@@ -1737,6 +2131,7 @@ function updateTypeFields(){
 
   $("weeklyFields").classList.toggle("hidden",type!=="weekly");
   $("intervalFields").classList.toggle("hidden",type!=="interval");
+  $("quotaFields").classList.toggle("hidden",type!=="quota");
   $("dailyNote").classList.toggle("hidden",type!=="daily");
 }
 
@@ -1795,7 +2190,13 @@ function renderPauseList(task){
 
     row.querySelector(".remove-pause").addEventListener("click",()=>{
       if(confirm(`Remove planned pause ${pauseRangeText(pause)}?`)){
+        const oldStart=pause.startDate;
+        const oldEnd=pause.endDate;
+
         task.plannedPauses=task.plannedPauses.filter(p=>p.id!==pause.id);
+
+        invalidateQuotaOutcomesForRange(task,oldStart,oldEnd);
+        finalizeQuotaWeeks(task);
         saveState();
         renderPauseList(task);
         render();
@@ -1858,6 +2259,8 @@ $("addBtn").addEventListener("click",()=>{
   $("overdueWeekday").value="1";
   $("maxDays").value="7";
   $("pendingWindow").value="2";
+  $("weeklyTarget").value="4";
+  $("quotaResetWeekday").value="1";
   $("deleteBtn").hidden=true;
 
   clearPauseEditor();
@@ -1883,6 +2286,8 @@ function openEdit(task){
   $("overdueWeekday").value=String(s.overdue);
   $("maxDays").value=String(task.maxDays??7);
   $("pendingWindow").value=String(task.pendingWindow??2);
+  $("weeklyTarget").value=String(task.weeklyTarget??4);
+  $("quotaResetWeekday").value=String(task.quotaResetWeekday??1);
   $("deleteBtn").hidden=false;
 
   clearPauseEditor();
@@ -1938,8 +2343,13 @@ $("savePauseBtn").addEventListener("click",()=>{
   }
 
   if(oldPause){
+    const oldStart=oldPause.startDate;
+    const oldEnd=oldPause.endDate;
+
     oldPause.startDate=startDate;
     oldPause.endDate=endDate;
+
+    invalidateQuotaOutcomesForRange(task,oldStart,oldEnd);
   }else{
     task.plannedPauses.push({
       id:uid(),
@@ -1949,6 +2359,8 @@ $("savePauseBtn").addEventListener("click",()=>{
     });
   }
 
+  invalidateQuotaOutcomesForRange(task,startDate,endDate);
+  finalizeQuotaWeeks(task);
   task.plannedPauses.sort((a,b)=>a.startDate.localeCompare(b.startDate));
 
   saveState();
@@ -1967,6 +2379,8 @@ form.addEventListener("submit",event=>{
   const overdueWeekday=Number($("overdueWeekday").value);
   const max=Number($("maxDays").value);
   const pendingWindow=Number($("pendingWindow").value);
+  const weeklyTarget=Number($("weeklyTarget").value);
+  const quotaResetWeekday=Number($("quotaResetWeekday").value);
 
   if(!name)return;
 
@@ -1993,9 +2407,28 @@ form.addEventListener("submit",event=>{
     }
   }
 
+  if(type==="quota"){
+    if(
+      !Number.isInteger(weeklyTarget)||
+      weeklyTarget<1||
+      weeklyTarget>99||
+      !Number.isInteger(quotaResetWeekday)||
+      quotaResetWeekday<0||
+      quotaResetWeekday>6
+    ){
+      alert("Times per week must be a whole number from 1 to 99, and Week resets must be a valid weekday.");
+      return;
+    }
+  }
+
   if(id){
     const task=state.tasks.find(task=>task.id===id);
     if(!task)return;
+
+    const oldType=task.type;
+    const oldQuotaReset=Number(task.quotaResetWeekday??1);
+
+    if(oldType==="quota")finalizeQuotaWeeks(task);
 
     task.name=name;
     task.type=type;
@@ -2004,12 +2437,27 @@ form.addEventListener("submit",event=>{
     task.resetWeekday=overdueWeekday;
     task.maxDays=max;
     task.pendingWindow=pendingWindow;
+    task.weeklyTarget=weeklyTarget;
+    task.quotaResetWeekday=quotaResetWeekday;
+
+    if(type==="quota"&&oldType!=="quota"){
+      task.quotaTrackingStartDate=localDateKey();
+      task.quotaWeekOutcomes={};
+    }else if(type==="quota"&&oldQuotaReset!==quotaResetWeekday){
+      task.quotaTrackingStartDate=localDateKey();
+    }
   }else{
     const task=makeTask(name,type,max,pendingWindow);
 
     task.pendingWeekday=pendingWeekday;
     task.overdueWeekday=overdueWeekday;
     task.resetWeekday=overdueWeekday;
+    task.weeklyTarget=weeklyTarget;
+    task.quotaResetWeekday=quotaResetWeekday;
+
+    if(type==="quota"){
+      task.quotaTrackingStartDate=localDateKey();
+    }
 
     state.tasks.push(task);
   }
