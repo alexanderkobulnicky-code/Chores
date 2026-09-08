@@ -69,6 +69,9 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .pause-row-copy{font-size:12px;color:var(--ink)}
 .pause-row-actions{display:flex;gap:6px}
 .small-button{border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);padding:6px 9px;font-size:11px}
+.task-history-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.task-history-actions .small-button{white-space:nowrap}
+.task-history-actions .small-button:disabled{opacity:.45;cursor:default}
 .pause-editor{padding:11px;margin-top:8px;border:1px solid var(--paused-border);border-radius:12px;background:var(--paused-bg)}
 .emergency-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
 .emergency-row:first-of-type{border-top:0}
@@ -872,6 +875,33 @@ function latestCompletionOnOrBefore(task,dateKey){
   return null;
 }
 
+function syncCompletionPointers(task){
+  const arr=Array.isArray(task.completionDates)
+    ?[...new Set(task.completionDates.filter(Boolean))].sort()
+    :[];
+
+  task.completionDates=arr;
+  task.lastDoneDate=arr.length?arr[arr.length-1]:null;
+  task.previousDoneDate=arr.length>1?arr[arr.length-2]:null;
+}
+
+function recomputePastDay(dateKey){
+  const today=localDateKey();
+  if(dateKey>=today||dateKey<state.calendarTrackingStart)return;
+
+  delete state.dailySnapshots[dateKey];
+  finalizeDay(dateKey);
+}
+
+function taskExistedOn(task,dateKey){
+  return localDateKey(new Date(task.createdAt))<=dateKey;
+}
+
+function canLogYesterday(task){
+  const yesterday=addDaysKey(localDateKey(),-1);
+  return taskExistedOn(task,yesterday);
+}
+
 
 /* ==================================================
    RECURRING TASK STATUS
@@ -1241,21 +1271,37 @@ function reconcileStreaks(){
   return changed;
 }
 
-function restoreRecentBreaksAfterEmergency(){
+function restoreRecentBreakIfCorrected(task){
   const today=localDateKey();
+  const broken=task.lastStreakBreak;
 
-  for(const task of state.tasks){
-    const broken=task.lastStreakBreak;
+  if(!broken||broken.detectedDate!==today)return false;
 
-    if(
-      broken &&
-      broken.detectedDate===today &&
-      !task.streakStartDate &&
-      status(task).state!=="overdue"
-    ){
-      task.streakStartDate=broken.streakStartDate;
-      task.lastStreakBreak=null;
+  const stillBroken=task.type==="quota"
+    ?Boolean(firstMissedQuotaWeekEnd(task,broken.streakStartDate))
+    :status(task).state==="overdue";
+
+  if(stillBroken)return false;
+
+  if(!task.streakStartDate||task.streakStartDate===today){
+    task.streakStartDate=broken.streakStartDate;
+
+    /*
+      If today's completion had already started a fresh streak,
+      undoing that completion should return to the restored one.
+    */
+    if(task.lastDoneDate===today){
+      task.previousStreakStartDate=broken.streakStartDate;
     }
+  }
+
+  task.lastStreakBreak=null;
+  return true;
+}
+
+function restoreRecentBreaksAfterEmergency(){
+  for(const task of state.tasks){
+    restoreRecentBreakIfCorrected(task);
   }
 }
 
@@ -1297,10 +1343,18 @@ function markDone(task){
   if(!task.streakStartDate)task.streakStartDate=today;
 
   task.lastDoneDate=today;
-  task.lastStreakBreak=null;
+
+  /*
+    Keep a streak break detected today available until the day is over.
+    If the user later logs yesterday or excuses yesterday, we can repair
+    the old streak instead of treating today's tap as a brand-new one.
+  */
+  if(task.lastStreakBreak&&task.lastStreakBreak.detectedDate!==today){
+    task.lastStreakBreak=null;
+  }
 
   if(!task.completionDates.includes(today))task.completionDates.push(today);
-  task.completionDates.sort();
+  syncCompletionPointers(task);
 
   task.completionEvents.push({date:today,type:task.type});
   task.totalCompletions=Number(task.totalCompletions||0)+1;
@@ -1324,6 +1378,7 @@ function undoDone(task){
   task.previousStreakStartDate=null;
 
   task.completionDates=task.completionDates.filter(date=>date!==today);
+  syncCompletionPointers(task);
 
   for(let i=task.completionEvents.length-1;i>=0;i--){
     if(task.completionEvents[i].date===today){
@@ -1333,6 +1388,78 @@ function undoDone(task){
   }
 
   if(task.totalCompletions>0)task.totalCompletions--;
+
+  saveState();
+  render();
+}
+
+function logYesterdayCompletion(task){
+  if(task.type==="quota")return;
+
+  const today=localDateKey();
+  const yesterday=addDaysKey(today,-1);
+
+  if(!canLogYesterday(task)||hasCompletionOn(task,yesterday))return;
+
+  if(!Array.isArray(task.completionDates))task.completionDates=[];
+  if(!Array.isArray(task.completionEvents))task.completionEvents=[];
+
+  task.completionDates.push(yesterday);
+  syncCompletionPointers(task);
+
+  task.completionEvents.push({
+    date:yesterday,
+    type:task.type,
+    lateEntry:true,
+    enteredAt:Date.now()
+  });
+
+  task.totalCompletions=Number(task.totalCompletions||0)+1;
+
+  /*
+    A genuinely new task can start its streak yesterday. If a streak was
+    broken this morning because yesterday had not been logged yet, the
+    restoration helper below revives the original start date instead.
+  */
+  if(!task.streakStartDate&&!task.lastStreakBreak){
+    task.streakStartDate=yesterday;
+  }
+
+  recomputePastDay(yesterday);
+  restoreRecentBreakIfCorrected(task);
+  reconcileStreaks();
+  updateTaskAwards(task);
+
+  saveState();
+  render();
+}
+
+function undoYesterdayCompletion(task){
+  if(task.type==="quota")return;
+
+  const today=localDateKey();
+  const yesterday=addDaysKey(today,-1);
+
+  if(!hasCompletionOn(task,yesterday))return;
+
+  task.completionDates=(task.completionDates||[])
+    .filter(date=>date!==yesterday);
+  syncCompletionPointers(task);
+
+  if(Array.isArray(task.completionEvents)){
+    for(let i=task.completionEvents.length-1;i>=0;i--){
+      const event=task.completionEvents[i];
+      if(event.date===yesterday&&event.type===task.type){
+        task.completionEvents.splice(i,1);
+        break;
+      }
+    }
+  }
+
+  if(task.totalCompletions>0)task.totalCompletions--;
+
+  recomputePastDay(yesterday);
+  reconcileStreaks();
 
   saveState();
   render();
@@ -1433,6 +1560,106 @@ function undoQuotaOccurrence(task){
   }
 
   if(task.totalCompletions>0)task.totalCompletions--;
+
+  saveState();
+  render();
+}
+
+function markQuotaOccurrenceYesterday(task){
+  if(task.type!=="quota")return;
+
+  const today=localDateKey();
+  const yesterday=addDaysKey(today,-1);
+
+  if(!canLogYesterday(task))return;
+
+  if(!Array.isArray(task.quotaEvents))task.quotaEvents=[];
+  if(!Array.isArray(task.completionEvents))task.completionEvents=[];
+
+  const eventId=uid();
+  const hasRecentBreak=Boolean(
+    task.lastStreakBreak&&task.lastStreakBreak.detectedDate===today
+  );
+  const startedStreak=!task.streakStartDate&&!hasRecentBreak;
+
+  if(startedStreak){
+    task.streakStartDate=yesterday;
+  }
+
+  task.quotaEvents.push({
+    id:eventId,
+    date:yesterday,
+    createdAt:Date.now(),
+    startedStreak,
+    lateEntry:true
+  });
+
+  task.quotaEvents.sort((a,b)=>
+    a.date.localeCompare(b.date)||
+    Number(a.createdAt)-Number(b.createdAt)
+  );
+
+  task.completionEvents.push({
+    date:yesterday,
+    type:"quota",
+    quotaEventId:eventId,
+    lateEntry:true,
+    enteredAt:Date.now()
+  });
+
+  task.totalCompletions=Number(task.totalCompletions||0)+1;
+
+  invalidateQuotaOutcomeForDate(task,yesterday);
+  finalizeQuotaWeeks(task);
+  recomputePastDay(yesterday);
+  restoreRecentBreakIfCorrected(task);
+  reconcileStreaks();
+  updateTaskAwards(task);
+
+  saveState();
+  render();
+}
+
+function undoQuotaOccurrenceYesterday(task){
+  if(task.type!=="quota")return;
+
+  const today=localDateKey();
+  const yesterday=addDaysKey(today,-1);
+  const events=quotaEventsInRange(task,yesterday,yesterday);
+
+  if(!events.length)return;
+
+  const event=events[events.length-1];
+
+  task.quotaEvents=(task.quotaEvents||[])
+    .filter(candidate=>candidate.id!==event.id);
+
+  if(Array.isArray(task.completionEvents)){
+    let removed=false;
+
+    task.completionEvents=task.completionEvents.filter(candidate=>{
+      if(!removed&&candidate.quotaEventId===event.id){
+        removed=true;
+        return false;
+      }
+      return true;
+    });
+  }
+
+  if(
+    event.startedStreak&&
+    task.streakStartDate===event.date&&
+    !(task.quotaEvents||[]).some(candidate=>candidate.date>=event.date)
+  ){
+    task.streakStartDate=null;
+  }
+
+  if(task.totalCompletions>0)task.totalCompletions--;
+
+  invalidateQuotaOutcomeForDate(task,yesterday);
+  finalizeQuotaWeeks(task);
+  recomputePastDay(yesterday);
+  reconcileStreaks();
 
   saveState();
   render();
@@ -1566,7 +1793,24 @@ function render(){
           <span>Best ${task.bestStreakDays} days</span>
           <span>Total ${task.totalCompletions} completions</span>
         </div>
-        <button class="edit">Edit</button>
+
+        <div class="task-history-actions">
+          ${
+            canLogYesterday(task)
+            ?task.type==="quota"
+              ?`
+                <button type="button" class="small-button yesterday-quota-minus" ${quotaEventsInRange(task,addDaysKey(localDateKey(),-1),addDaysKey(localDateKey(),-1)).length?"":"disabled"}>− Yesterday</button>
+                <button type="button" class="small-button yesterday-quota-plus">＋ Yesterday</button>
+              `
+              :`
+                <button type="button" class="small-button yesterday-task">
+                  ${hasCompletionOn(task,addDaysKey(localDateKey(),-1))?"Yesterday ✓":"Log yesterday"}
+                </button>
+              `
+            :""
+          }
+          <button class="edit">Edit</button>
+        </div>
       </div>
     `;
 
@@ -1576,12 +1820,38 @@ function render(){
 
       plus.addEventListener("click",()=>markQuotaOccurrence(task));
       minus.addEventListener("click",()=>undoQuotaOccurrence(task));
+
+      const yesterdayPlus=card.querySelector(".yesterday-quota-plus");
+      const yesterdayMinus=card.querySelector(".yesterday-quota-minus");
+
+      if(yesterdayPlus){
+        yesterdayPlus.addEventListener("click",()=>markQuotaOccurrenceYesterday(task));
+      }
+
+      if(yesterdayMinus){
+        yesterdayMinus.addEventListener("click",()=>undoQuotaOccurrenceYesterday(task));
+      }
     }else{
       const checkbox=card.querySelector("input");
 
       checkbox.addEventListener("change",event=>{
         event.target.checked?markDone(task):undoDone(task);
       });
+
+      const yesterdayButton=card.querySelector(".yesterday-task");
+
+      if(yesterdayButton){
+        yesterdayButton.addEventListener("click",()=>{
+          const yesterday=addDaysKey(localDateKey(),-1);
+          if(hasCompletionOn(task,yesterday)){
+            if(confirm(`Remove yesterday’s completion for “${task.name}”?`)){
+              undoYesterdayCompletion(task);
+            }
+          }else{
+            logYesterdayCompletion(task);
+          }
+        });
+      }
     }
 
     card.querySelector(".edit").addEventListener("click",()=>openEdit(task));
