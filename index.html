@@ -974,7 +974,12 @@ function statusAt(task,dateKey,includeSameDay=true){
   /* DAILY */
 
   if(task.type==="daily"){
-    if(includeSameDay&&latest===dateKey){
+    /*
+      A Daily task is Done only when there is an actual completion whose
+      date is this date. In particular, a late entry for yesterday must
+      never make today's Daily checkbox look completed.
+    */
+    if(includeSameDay&&hasCompletionOn(task,dateKey)){
       return{state:"done",progress:1,detail:"Done for today"};
     }
 
@@ -985,11 +990,11 @@ function statusAt(task,dateKey,includeSameDay=true){
       return{state:"due",progress:0,detail:"Due Today"};
     }
 
-    if(latest===previous){
+    if(hasCompletionOn(task,previous)){
       return{state:"due",progress:0,detail:"Due Today"};
     }
 
-    if(dateKey<=createdKey&&!latest){
+    if(dateKey<=createdKey){
       return{state:"due",progress:0,detail:"Due Today"};
     }
 
