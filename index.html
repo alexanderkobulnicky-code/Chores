@@ -32,7 +32,9 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .add,.save{border:0;border-radius:999px;background:var(--ink);color:#fff;padding:11px 15px;font-weight:700}
 .secondary-button,.back-button{border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);padding:10px 13px;font-weight:650}
 .status,.award-task,.achievement-card,.calendar-card,.todo-card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 26px rgba(20,30,24,.055)}
-.status{padding:19px;margin:18px 0}.status h2{font-size:28px;letter-spacing:-.03em;margin:0}.status-copy{color:var(--muted);font-size:14px;margin-top:4px}
+.status{padding:19px;margin:18px 0;transition:background .2s,border-color .2s,box-shadow .2s}.status h2{font-size:28px;letter-spacing:-.03em;margin:0}.status-copy{color:var(--muted);font-size:14px;margin-top:4px}
+.status.celebrate{background:linear-gradient(135deg,#fff 0%,#edf6f0 58%,#f7f1d8 100%);border-color:#bfd2c5;box-shadow:0 10px 30px rgba(49,95,74,.12)}
+.status.celebrate h2{color:var(--done-slider)}
 .badge{min-width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--green-soft);color:var(--done-slider);font-weight:800;font-size:18px}
 .recovery{display:none;margin:-7px 0 15px;padding:10px 13px;border-radius:12px;background:#fff8d8;border:1px solid #e4d395;font-size:12px;color:#625925}
 .section-title{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin:18px 0 10px}
@@ -1875,6 +1877,8 @@ function render(){
 
 function updateSummary(){
   const states=state.tasks.map(task=>status(task).state);
+  const statusPanel=document.querySelector(".status");
+  statusPanel?.classList.remove("celebrate");
 
   const overdue=states.filter(x=>x==="overdue").length;
   const due=states.filter(x=>x==="due").length;
@@ -1923,13 +1927,14 @@ function updateSummary(){
     return;
   }
 
-  $("statusTitle").textContent="No tasks pending";
+  statusPanel?.classList.add("celebrate");
+  $("statusTitle").textContent="Well done!";
 
   $("statusCopy").textContent=paused
-    ?`${paused} task${paused===1?" is":"s are"} paused.`
-    :"The field is clear.";
+    ?`Take the rest of the day off! ✨ ${paused} task${paused===1?" is":"s are"} paused.`
+    :"Take the rest of the day off! ✨";
 
-  $("statusBadge").textContent="✓";
+  $("statusBadge").textContent="★";
   $("statusBadge").style.background="var(--green-soft)";
   $("statusBadge").style.color="var(--done-slider)";
 }
