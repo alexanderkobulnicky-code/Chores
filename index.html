@@ -56,7 +56,7 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .award-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.award-item{text-align:center}.award-art{width:100%;aspect-ratio:1;display:grid;place-items:center;font-size:clamp(30px,8vw,52px);line-height:1;filter:drop-shadow(0 2px 2px #0002)}.award-item.locked .award-art{opacity:.22;filter:grayscale(1)}.award-number{margin-top:5px;font-size:12px;font-weight:750}.award-state{color:var(--muted);font-size:10px;margin-top:1px}
 
 .calendar-card{padding:16px}.calendar-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.calendar-month{font-size:21px;font-weight:750;letter-spacing:-.02em}.month-button{border:1px solid var(--line);background:#fff;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:20px}.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.weekday{color:var(--muted);text-align:center;font-size:11px;font-weight:700;padding:4px 0}.day-cell{min-height:68px;border:1px solid var(--line);border-radius:11px;padding:6px;background:#fafbf9;position:relative}.day-cell.other{visibility:hidden}.day-cell.future,.day-cell.before-tracking{opacity:.35}.day-cell.clean{background:var(--done-bg);border-color:var(--done-border)}.day-cell.failed{background:var(--overdue-bg);border-color:var(--overdue-border)}.day-cell.excused{background:var(--paused-bg);border-color:var(--paused-border)}.day-cell.today{outline:2px solid var(--ink);outline-offset:-2px}.day-number{font-size:12px;font-weight:700}.day-mark{position:absolute;left:50%;top:50%;transform:translate(-50%,-42%);font-size:25px;font-weight:850}.day-cell.clean .day-mark{color:var(--done-slider)}.day-cell.failed .day-mark{color:var(--overdue-slider)}.day-cell.excused .day-mark{color:var(--paused-slider)}.day-caption{position:absolute;bottom:5px;left:5px;right:5px;font-size:8px;color:var(--muted);text-align:center}
-.achievement-list{display:grid;gap:10px}.achievement-card{padding:14px;display:flex;align-items:center;gap:13px}.achievement-token{width:46px;height:46px;flex:0 0 46px;border-radius:50%;display:grid;place-items:center;font-size:21px;font-weight:850;background:var(--green-soft);color:var(--done-slider);border:1px solid var(--done-border)}.achievement-card.locked{opacity:.42}.achievement-card.locked .achievement-token{background:#eceeeb;color:#8b918d;border-color:#d8dcd8}.achievement-name{font-size:16px;font-weight:750}.achievement-copy{color:var(--muted);font-size:12px;margin-top:2px}.achievement-date{margin-left:auto;color:var(--muted);font-size:11px;white-space:nowrap}
+.day-achievements{position:absolute;top:4px;right:3px;display:flex;gap:2px;justify-content:flex-end;flex-wrap:wrap;max-width:calc(100% - 19px)}.day-special{display:inline-grid;place-items:center;min-width:14px;height:14px;padding:0 1px;border:1px solid #d9bd78;border-radius:5px;background:#fff4ca;color:#755100;font-size:10px;font-weight:850;line-height:1}.achievement-list{display:grid;gap:10px}.achievement-card{padding:14px;display:flex;align-items:center;gap:13px}.achievement-token{width:46px;height:46px;flex:0 0 46px;border-radius:50%;display:grid;place-items:center;font-size:21px;font-weight:850;background:var(--green-soft);color:var(--done-slider);border:1px solid var(--done-border)}.achievement-card.locked{opacity:.42}.achievement-card.locked .achievement-token{background:#eceeeb;color:#8b918d;border-color:#d8dcd8}.achievement-name{font-size:16px;font-weight:750}.achievement-copy{color:var(--muted);font-size:12px;margin-top:2px}.achievement-date{margin-left:auto;color:var(--muted);font-size:11px;white-space:nowrap}
 /* To Do */
 .todo-card{padding:16px 18px;transition:background .2s,border-color .2s}.todo-card.todo{background:var(--todo-bg);border-color:var(--todo-border)}.todo-card.pending{background:var(--pending-bg);border-color:var(--pending-border)}.todo-card.due{background:var(--due-bg);border-color:var(--due-border)}.todo-card.overdue{background:var(--overdue-bg);border-color:var(--overdue-border)}.todo-card.completed{background:var(--todo-done-bg);border-color:var(--todo-done-border)}
 .todo-left{display:flex;align-items:flex-start;gap:12px;min-width:0}.todo-copy{min-width:0}.todo-bottom{margin-top:10px;color:var(--muted);font-size:11px}.todo-edit{border:0;background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px;padding:2px 0}.todo-check{position:relative;width:30px;height:30px;flex:0 0 30px;margin-top:1px}.todo-check input{position:absolute;opacity:0;width:0;height:0}.todo-check span{position:absolute;inset:0;border-radius:8px;border:2px solid var(--todo-slider);background:rgba(255,255,255,.72);display:grid;place-items:center;font-weight:900;color:#fff}.todo-check input:checked+span{background:var(--todo-done-slider);border-color:var(--todo-done-slider)}.todo-check input:checked+span:after{content:"✓"}.todo-card.pending .todo-check span{border-color:var(--pending-slider)}.todo-card.due .todo-check span{border-color:var(--due-slider)}.todo-card.overdue .todo-check span{border-color:var(--overdue-slider)}
@@ -136,13 +136,17 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 <h2 id="dialogTitle">Add task</h2>
 <input type="hidden" id="taskId">
 <div class="field"><label for="taskName">Task</label><input id="taskName" maxlength="80" required placeholder="e.g. Laundry"></div>
-<div class="field"><label for="taskType">Type</label><select id="taskType"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="interval">Every N days</option><option value="quota">Times per Week</option></select></div>
+<div class="field"><label for="taskType">Type</label><select id="taskType"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="interval">Every N days</option><option value="quota">Times per Week</option></select></div>
 <div id="weeklyFields" class="hidden">
   <div class="pair">
     <div class="field"><label for="pendingWeekday">Resets to Pending</label><select id="pendingWeekday"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5" selected>Friday</option><option value="6">Saturday</option></select></div>
     <div class="field"><label for="overdueWeekday">Becomes Overdue</label><select id="overdueWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
   </div>
   <p class="fine">A completed weekly task remains Done until the next “Resets to Pending” day. The day immediately before “Becomes Overdue” is Due Today.</p>
+</div>
+<div id="monthlyFields" class="hidden">
+  <div class="field"><label for="monthlyDay">Due on day of month</label><input id="monthlyDay" type="number" min="1" max="31" step="1" value="1"></div>
+  <p class="fine">Due each calendar month on the chosen day. In shorter months, the 29th, 30th, or 31st becomes the last day of that month. After completion, the task stays Done for the rest of the month; the next month starts Pending.</p>
 </div>
 <div id="intervalFields" class="hidden">
   <div class="field"><label for="maxDays">Maximum days between completions</label><input id="maxDays" type="number" min="1" step="1" value="7"></div>
@@ -284,6 +288,19 @@ function nextWeekdayAfter(dateKey,weekday){
   return addDaysKey(dateKey,delta);
 }
 
+function monthKey(dateKey){
+  return dateKey.slice(0,7);
+}
+
+function monthlyDueInMonth(monthDate,day){
+  const lastDay=new Date(monthDate.getFullYear(),monthDate.getMonth()+1,0).getDate();
+  return localDateKey(new Date(monthDate.getFullYear(),monthDate.getMonth(),Math.min(day,lastDay)));
+}
+
+function nextMonthDate(dateKey){
+  const date=dateFromKey(dateKey);
+  return new Date(date.getFullYear(),date.getMonth()+1,1);
+}
 function daysFromWeekdayToWeekday(fromWeekday,toWeekday){
   return (Number(toWeekday)-Number(fromWeekday)+7)%7;
 }
@@ -310,6 +327,7 @@ function makeTask(name,type="daily",maxDays=7,pendingWindow=2){
     type,
     maxDays,
     pendingWindow,
+    monthlyDay:1,
     resetWeekday:1,
     pendingWeekday:5,
     overdueWeekday:1,
@@ -444,6 +462,8 @@ function migrateState(parsed){
       if(task.pendingWeekday==null)task.pendingWeekday=defaultPendingWeekday(task.overdueWeekday);
     }
 
+    const monthlyDay=Number(task.monthlyDay);
+    task.monthlyDay=Number.isInteger(monthlyDay)&&monthlyDay>=1&&monthlyDay<=31?monthlyDay:1;
     if(!Array.isArray(task.plannedPauses))task.plannedPauses=[];
     task.plannedPauses=task.plannedPauses
       .filter(p=>p&&p.startDate&&p.endDate)
@@ -862,6 +882,34 @@ function firstWeeklyCycle(task){
 
 
 /* ==================================================
+   MONTHLY CYCLE HELPERS
+   ================================================== */
+
+function deferExcusedMonthlyDue(task,dueDate){
+  let due=dueDate;
+  let guard=0;
+  while(isTaskExcusedOn(task,due)&&guard<4000){
+    due=addDaysKey(due,1);
+    guard++;
+  }
+  return due;
+}
+
+function monthlyDueAfterCompletion(task,completionDate){
+  return deferExcusedMonthlyDue(
+    task,monthlyDueInMonth(nextMonthDate(completionDate),Number(task.monthlyDay))
+  );
+}
+
+function firstMonthlyDue(task){
+  const createdDate=localDateKey(new Date(task.createdAt));
+  const dueThisMonth=monthlyDueInMonth(dateFromKey(createdDate),Number(task.monthlyDay));
+  const nominalDue=dueThisMonth>=createdDate
+    ?dueThisMonth
+    :monthlyDueInMonth(nextMonthDate(createdDate),Number(task.monthlyDay));
+  return deferExcusedMonthlyDue(task,nominalDue);
+}
+/* ==================================================
    COMPLETION HISTORY
    ================================================== */
 
@@ -1030,6 +1078,32 @@ function statusAt(task,dateKey,includeSameDay=true){
     return{state:"overdue",progress:0,detail:"Overdue"};
   }
 
+  /* MONTHLY */
+
+  if(task.type==="monthly"){
+    if(latest&&monthKey(latest)===monthKey(dateKey)){
+      return{state:"done",progress:1,detail:"Done for this month"};
+    }
+
+    const due=latest
+      ?monthlyDueAfterCompletion(task,latest)
+      :firstMonthlyDue(task);
+
+    if(dateKey<due){
+      const daysLeft=diffCalendarDays(dateKey,due);
+      return{
+        state:"pending",
+        progress:Math.max(0,Math.min(1,daysLeft/31)),
+        detail:`Pending — due ${prettyDate(due)}`
+      };
+    }
+
+    if(dateKey===due){
+      return{state:"due",progress:0,detail:"Due Today"};
+    }
+
+    return{state:"overdue",progress:0,detail:`Overdue — due ${prettyDate(due)}`};
+  }
   /* EVERY N DAYS */
 
   if(!latest){
@@ -1229,6 +1303,10 @@ function lastGoodDate(task){
 
   if(task.type==="weekly"){
     return weeklyCycleAfterCompletion(task,task.lastDoneDate).dueDate;
+  }
+
+  if(task.type==="monthly"){
+    return monthlyDueAfterCompletion(task,task.lastDoneDate);
   }
 
   if(task.type==="quota"){
@@ -2100,8 +2178,17 @@ function renderCalendar(){
       }
     }
 
+    const specialToday=state.specialAchievements
+      .filter(earned=>earned.date===key)
+      .map(earned=>SPECIAL_ACHIEVEMENTS.find(def=>def.id===earned.id))
+      .filter(Boolean);
+    const specialBadges=specialToday.map(def=>
+      `<span class="day-special" title="${escapeHtml(def.name)}" aria-label="${escapeHtml(def.name)}">${escapeHtml(def.symbol)}</span>`
+    ).join("");
+
     cell.innerHTML=`
       <div class="day-number">${day}</div>
+      <div class="day-achievements">${specialBadges}</div>
       <div class="day-mark">${mark}</div>
       <div class="day-caption">${caption}</div>
     `;
@@ -2420,6 +2507,7 @@ function updateTypeFields(){
   const type=$("taskType").value;
 
   $("weeklyFields").classList.toggle("hidden",type!=="weekly");
+  $("monthlyFields").classList.toggle("hidden",type!=="monthly");
   $("intervalFields").classList.toggle("hidden",type!=="interval");
   $("quotaFields").classList.toggle("hidden",type!=="quota");
   $("dailyNote").classList.toggle("hidden",type!=="daily");
@@ -2547,6 +2635,7 @@ $("addBtn").addEventListener("click",()=>{
   $("taskType").value="daily";
   $("pendingWeekday").value="5";
   $("overdueWeekday").value="1";
+  $("monthlyDay").value="1";
   $("maxDays").value="7";
   $("pendingWindow").value="2";
   $("weeklyTarget").value="4";
@@ -2574,6 +2663,7 @@ function openEdit(task){
 
   $("pendingWeekday").value=String(s.pending);
   $("overdueWeekday").value=String(s.overdue);
+  $("monthlyDay").value=String(task.monthlyDay??1);
   $("maxDays").value=String(task.maxDays??7);
   $("pendingWindow").value=String(task.pendingWindow??2);
   $("weeklyTarget").value=String(task.weeklyTarget??4);
@@ -2667,6 +2757,7 @@ form.addEventListener("submit",event=>{
   const type=$("taskType").value;
   const pendingWeekday=Number($("pendingWeekday").value);
   const overdueWeekday=Number($("overdueWeekday").value);
+  const monthlyDay=Number($("monthlyDay").value);
   const max=Number($("maxDays").value);
   const pendingWindow=Number($("pendingWindow").value);
   const weeklyTarget=Number($("weeklyTarget").value);
@@ -2685,6 +2776,11 @@ form.addEventListener("submit",event=>{
     )
   ){
     alert("Maximum days and Pending window must be whole numbers, and Pending window cannot exceed Maximum days.");
+    return;
+  }
+
+  if(type==="monthly"&&(!Number.isInteger(monthlyDay)||monthlyDay<1||monthlyDay>31)){
+    alert("Choose a whole-number day of the month from 1 to 31.");
     return;
   }
 
@@ -2722,6 +2818,7 @@ form.addEventListener("submit",event=>{
 
     task.name=name;
     task.type=type;
+    task.monthlyDay=monthlyDay;
     task.pendingWeekday=pendingWeekday;
     task.overdueWeekday=overdueWeekday;
     task.resetWeekday=overdueWeekday;
@@ -2738,6 +2835,8 @@ form.addEventListener("submit",event=>{
     }
   }else{
     const task=makeTask(name,type,max,pendingWindow);
+
+    task.monthlyDay=monthlyDay;
 
     task.pendingWeekday=pendingWeekday;
     task.overdueWeekday=overdueWeekday;
