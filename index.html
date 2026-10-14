@@ -40,15 +40,15 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .section-title{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin:18px 0 10px}
 .tasks,.todos{display:grid;gap:11px}
 .task{padding:18px;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 26px rgba(20,30,24,.055);transition:background .2s,border-color .2s}
-.task.done{background:var(--done-bg);border-color:var(--done-border)}.task.pending{background:var(--pending-bg);border-color:var(--pending-border)}.task.due{background:var(--due-bg);border-color:var(--due-border)}.task.overdue{background:var(--overdue-bg);border-color:var(--overdue-border)}.task.paused{background:var(--paused-bg);border-color:var(--paused-border)}
+.task.scheduled{background:#f6f8f6;border-color:var(--line)}.task.done{background:var(--done-bg);border-color:var(--done-border)}.task.pending{background:var(--pending-bg);border-color:var(--pending-border)}.task.due{background:var(--due-bg);border-color:var(--due-border)}.task.overdue{background:var(--overdue-bg);border-color:var(--overdue-border)}.task.paused{background:var(--paused-bg);border-color:var(--paused-border)}
 .task-name,.todo-name{font-size:20px;font-weight:750;letter-spacing:-.02em}.meta{color:var(--muted);font-size:14px;margin-top:4px;line-height:1.35}
 .task-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px}.task-streak{color:var(--muted);font-size:11px;white-space:nowrap}.task-medals{display:flex;gap:4px;min-height:28px;justify-content:flex-end;flex-wrap:wrap;max-width:170px}
 .mini-medal{width:28px;height:28px;display:grid;place-items:center;font-size:22px;line-height:1;filter:drop-shadow(0 1px 1px #0002)}
 .bar{height:8px;background:rgba(255,255,255,.5);border-radius:99px;overflow:hidden;margin:14px 0}.bar>div{height:100%;border-radius:inherit}
-.done .bar>div{background:var(--done-slider)}.pending .bar>div{background:var(--pending-slider)}.due .bar>div{background:var(--due-slider)}.overdue .bar>div{background:var(--overdue-slider)}.paused .bar>div{background:var(--paused-slider)}
+.scheduled .bar>div{background:#a5afa7}.done .bar>div{background:var(--done-slider)}.pending .bar>div{background:var(--pending-slider)}.due .bar>div{background:var(--due-slider)}.overdue .bar>div{background:var(--overdue-slider)}.paused .bar>div{background:var(--paused-slider)}
 .task-bottom{font-size:12px;color:var(--muted);flex-wrap:wrap}.stats{display:flex;gap:13px;flex-wrap:wrap}.edit{border:0;background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .switch{position:relative;width:64px;height:34px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.switch span{position:absolute;inset:0;border-radius:99px;transition:.18s}.switch span:before{content:"";position:absolute;width:26px;height:26px;left:4px;top:4px;background:#fff;border-radius:50%;box-shadow:0 2px 6px #0002;transition:.18s}
-.done .switch span{background:var(--done-slider)}.done .switch span:before{transform:translateX(30px)}.pending .switch span{background:var(--pending-slider)}.due .switch span{background:var(--due-slider)}.overdue .switch span{background:var(--overdue-slider)}.paused .switch span{background:var(--paused-slider)}.paused .switch input:disabled+span{opacity:.78}
+.scheduled .switch span{background:#a5afa7}.done .switch span{background:var(--done-slider)}.done .switch span:before{transform:translateX(30px)}.pending .switch span{background:var(--pending-slider)}.due .switch span{background:var(--due-slider)}.overdue .switch span{background:var(--overdue-slider)}.paused .switch span{background:var(--paused-slider)}.paused .switch input:disabled+span{opacity:.78}
 .quota-control{display:flex;align-items:center;gap:7px}.quota-button{width:36px;height:36px;border:1px solid rgba(29,34,31,.16);border-radius:50%;background:rgba(255,255,255,.72);color:var(--ink);font-size:20px;font-weight:800;display:grid;place-items:center;padding:0;line-height:1}.quota-button:disabled{opacity:.32;cursor:default}.quota-count{min-width:58px;text-align:center;font-size:18px;font-weight:800;letter-spacing:-.02em}.quota-note{font-size:10px;color:var(--muted);text-align:right}.paused .quota-button{border-color:var(--paused-border)}
 .empty{padding:34px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}.hidden{display:none!important}
 .page-header{margin-bottom:18px}.page-header h1{font-size:36px}
@@ -139,10 +139,10 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 <div class="field"><label for="taskType">Type</label><select id="taskType"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="interval">Every N days</option><option value="quota">Times per Week</option></select></div>
 <div id="weeklyFields" class="hidden">
   <div class="pair">
-    <div class="field"><label for="pendingWeekday">Resets to Pending</label><select id="pendingWeekday"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5" selected>Friday</option><option value="6">Saturday</option></select></div>
+    <div class="field"><label for="pendingWeekday">Pending begins</label><select id="pendingWeekday"><option value="none">Never (Due Today only)</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5" selected>Friday</option><option value="6">Saturday</option></select></div>
     <div class="field"><label for="overdueWeekday">Becomes Overdue</label><select id="overdueWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
   </div>
-  <p class="fine">A completed weekly task remains Done until the next “Resets to Pending” day. The day immediately before “Becomes Overdue” is Due Today.</p>
+  <p class="fine">A completed weekly task normally stays Done until Pending begins. The day before “Becomes Overdue” is Due Today. Choose “Never” for chores that can only be done on a particular day: they go straight from Done to Due Today, then Overdue if missed. A new task shows Scheduled until its first due day.</p>
 </div>
 <div id="monthlyFields" class="hidden">
   <div class="field"><label for="monthlyDay">Due on day of month</label><input id="monthlyDay" type="number" min="1" max="31" step="1" value="1"></div>
@@ -330,6 +330,7 @@ function makeTask(name,type="daily",maxDays=7,pendingWindow=2){
     monthlyDay:1,
     resetWeekday:1,
     pendingWeekday:5,
+    weeklyNoPending:false,
     overdueWeekday:1,
     weeklyTarget:4,
     quotaResetWeekday:1,
@@ -462,6 +463,7 @@ function migrateState(parsed){
       if(task.pendingWeekday==null)task.pendingWeekday=defaultPendingWeekday(task.overdueWeekday);
     }
 
+    task.weeklyNoPending=task.weeklyNoPending===true;
     const monthlyDay=Number(task.monthlyDay);
     task.monthlyDay=Number.isInteger(monthlyDay)&&monthlyDay>=1&&monthlyDay<=31?monthlyDay:1;
     if(!Array.isArray(task.plannedPauses))task.plannedPauses=[];
@@ -833,7 +835,7 @@ function invalidateQuotaOutcomesForRange(task,startDate,endDate){
 function weeklySettings(task){
   const overdue=Number(task.overdueWeekday??task.resetWeekday??1);
   const pending=Number(task.pendingWeekday??defaultPendingWeekday(overdue));
-  return{pending,overdue};
+  return{pending,overdue,noPending:task.weeklyNoPending===true};
 }
 
 function weeklyCycleIsExcused(task,dueDate,overdueDate){
@@ -857,9 +859,15 @@ function advanceWeeklyCyclePastExcuses(task,pendingDate,overdueDate){
       if(end>anchor)anchor=end;
     }
 
-    pendingDate=nextWeekdayAfter(anchor,s.pending);
-    overdueDate=nextWeekdayAfter(pendingDate,s.overdue);
-    dueDate=addDaysKey(overdueDate,-1);
+    if(s.noPending){
+      dueDate=nextWeekdayAfter(anchor,(s.overdue+6)%7);
+      pendingDate=dueDate;
+      overdueDate=addDaysKey(dueDate,1);
+    }else{
+      pendingDate=nextWeekdayAfter(anchor,s.pending);
+      overdueDate=nextWeekdayAfter(pendingDate,s.overdue);
+      dueDate=addDaysKey(overdueDate,-1);
+    }
     guard++;
   }
 
@@ -868,6 +876,10 @@ function advanceWeeklyCyclePastExcuses(task,pendingDate,overdueDate){
 
 function weeklyCycleAfterCompletion(task,completionDate){
   const s=weeklySettings(task);
+  if(s.noPending){
+    const dueDate=nextWeekdayAfter(completionDate,(s.overdue+6)%7);
+    return advanceWeeklyCyclePastExcuses(task,dueDate,addDaysKey(dueDate,1));
+  }
   const pendingDate=nextWeekdayAfter(completionDate,s.pending);
   const overdueDate=nextWeekdayAfter(pendingDate,s.overdue);
   return advanceWeeklyCyclePastExcuses(task,pendingDate,overdueDate);
@@ -877,7 +889,8 @@ function firstWeeklyCycle(task){
   const s=weeklySettings(task);
   const createdDate=localDateKey(new Date(task.createdAt));
   const overdueDate=nextWeekdayAfter(createdDate,s.overdue);
-  return advanceWeeklyCyclePastExcuses(task,createdDate,overdueDate);
+  const pendingDate=s.noPending?addDaysKey(overdueDate,-1):createdDate;
+  return advanceWeeklyCyclePastExcuses(task,pendingDate,overdueDate);
 }
 
 
@@ -1057,6 +1070,12 @@ function statusAt(task,dateKey,includeSameDay=true){
     const cycle=latest
       ?weeklyCycleAfterCompletion(task,latest)
       :firstWeeklyCycle(task);
+
+    if(task.weeklyNoPending===true&&dateKey<cycle.dueDate){
+      return latest
+        ?{state:"done",progress:1,detail:`Done — next due ${prettyDate(cycle.dueDate)}`}
+        :{state:"scheduled",progress:0,detail:`Scheduled — due ${prettyDate(cycle.dueDate)}`};
+    }
 
     if(dateKey<cycle.pendingDate){
       return{state:"done",progress:1,detail:"Done"};
@@ -1807,7 +1826,7 @@ function render(){
     notice.textContent=`Recovered ${state.tasks.length} task${state.tasks.length===1?"":"s"} from local backup data (${recoverySource}).`;
   }
 
-  const rank={overdue:0,due:1,pending:2,paused:3,done:4};
+  const rank={overdue:0,due:1,pending:2,scheduled:3,paused:4,done:5};
 
   const tasks=[...state.tasks].sort(
     (a,b)=>
@@ -1961,12 +1980,13 @@ function updateSummary(){
   const overdue=states.filter(x=>x==="overdue").length;
   const due=states.filter(x=>x==="due").length;
   const pending=states.filter(x=>x==="pending").length;
+  const scheduled=states.filter(x=>x==="scheduled").length;
   const paused=states.filter(x=>x==="paused").length;
 
   if(overdue){
     $("statusTitle").textContent=`${overdue} task${overdue===1?"":"s"} overdue`;
 
-    const waiting=due+pending;
+    const waiting=due+pending+scheduled;
 
     $("statusCopy").textContent=waiting
       ?`${waiting} more waiting.${paused?` ${paused} paused.`:""}`
@@ -1983,7 +2003,7 @@ function updateSummary(){
   if(due){
     $("statusTitle").textContent=`${due} task${due===1?"":"s"} due today`;
     $("statusCopy").textContent=pending
-      ?`${pending} more pending.${paused?` ${paused} paused.`:""}`
+      ?`${pending} more pending.${scheduled?` ${scheduled} scheduled for later.`:""}${paused?` ${paused} paused.`:""}`
       :paused
         ?`${paused} task${paused===1?" is":"s are"} paused.`
         :"Nothing is overdue.";
@@ -1997,8 +2017,17 @@ function updateSummary(){
   if(pending){
     $("statusTitle").textContent="No tasks overdue";
     $("statusCopy").textContent=
-      `${pending} task${pending===1?" is":"s are"} pending.${paused?` ${paused} paused.`:""}`;
+      `${pending} task${pending===1?" is":"s are"} pending.${scheduled?` ${scheduled} scheduled for later.`:""}${paused?` ${paused} paused.`:""}`;
 
+    $("statusBadge").textContent="✓";
+    $("statusBadge").style.background="var(--green-soft)";
+    $("statusBadge").style.color="var(--done-slider)";
+    return;
+  }
+
+  if(scheduled){
+    $("statusTitle").textContent="Nothing due today";
+    $("statusCopy").textContent=`${scheduled} task${scheduled===1?" is":"s are"} scheduled for later.${paused?` ${paused} paused.`:""}`;
     $("statusBadge").textContent="✓";
     $("statusBadge").style.background="var(--green-soft)";
     $("statusBadge").style.color="var(--done-slider)";
@@ -2661,7 +2690,7 @@ function openEdit(task){
 
   const s=weeklySettings(task);
 
-  $("pendingWeekday").value=String(s.pending);
+  $("pendingWeekday").value=s.noPending?"none":String(s.pending);
   $("overdueWeekday").value=String(s.overdue);
   $("monthlyDay").value=String(task.monthlyDay??1);
   $("maxDays").value=String(task.maxDays??7);
@@ -2755,8 +2784,9 @@ form.addEventListener("submit",event=>{
   const id=$("taskId").value;
   const name=$("taskName").value.trim();
   const type=$("taskType").value;
-  const pendingWeekday=Number($("pendingWeekday").value);
+  const weeklyNoPending=$("pendingWeekday").value==="none";
   const overdueWeekday=Number($("overdueWeekday").value);
+  const pendingWeekday=weeklyNoPending?defaultPendingWeekday(overdueWeekday):Number($("pendingWeekday").value);
   const monthlyDay=Number($("monthlyDay").value);
   const max=Number($("maxDays").value);
   const pendingWindow=Number($("pendingWindow").value);
@@ -2784,7 +2814,7 @@ form.addEventListener("submit",event=>{
     return;
   }
 
-  if(type==="weekly"){
+  if(type==="weekly"&&!weeklyNoPending){
     const gap=daysFromWeekdayToWeekday(pendingWeekday,overdueWeekday);
 
     if(gap<2){
@@ -2820,6 +2850,7 @@ form.addEventListener("submit",event=>{
     task.type=type;
     task.monthlyDay=monthlyDay;
     task.pendingWeekday=pendingWeekday;
+    task.weeklyNoPending=weeklyNoPending;
     task.overdueWeekday=overdueWeekday;
     task.resetWeekday=overdueWeekday;
     task.maxDays=max;
@@ -2839,6 +2870,7 @@ form.addEventListener("submit",event=>{
     task.monthlyDay=monthlyDay;
 
     task.pendingWeekday=pendingWeekday;
+    task.weeklyNoPending=weeklyNoPending;
     task.overdueWeekday=overdueWeekday;
     task.resetWeekday=overdueWeekday;
     task.weeklyTarget=weeklyTarget;
