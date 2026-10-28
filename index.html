@@ -1979,7 +1979,10 @@ function updateSummary(){
 
   const overdue=states.filter(x=>x==="overdue").length;
   const due=states.filter(x=>x==="due").length;
-  const pending=states.filter(x=>x==="pending").length;
+  const pendingTasks=state.tasks.filter(task=>status(task).state==="pending");
+  const pending=pendingTasks.length;
+  // Weekly quotas stay Pending for tracking, but should not prevent the celebration.
+  const onlyQuotaPending=pending>0&&pendingTasks.every(task=>task.type==="quota");
   const scheduled=states.filter(x=>x==="scheduled").length;
   const paused=states.filter(x=>x==="paused").length;
 
@@ -2014,7 +2017,7 @@ function updateSummary(){
     return;
   }
 
-  if(pending){
+  if(pending&&!onlyQuotaPending){
     $("statusTitle").textContent="No tasks overdue";
     $("statusCopy").textContent=
       `${pending} task${pending===1?" is":"s are"} pending.${scheduled?` ${scheduled} scheduled for later.`:""}${paused?` ${paused} paused.`:""}`;
@@ -2025,7 +2028,7 @@ function updateSummary(){
     return;
   }
 
-  if(scheduled){
+  if(scheduled&&!onlyQuotaPending){
     $("statusTitle").textContent="Nothing due today";
     $("statusCopy").textContent=`${scheduled} task${scheduled===1?" is":"s are"} scheduled for later.${paused?` ${paused} paused.`:""}`;
     $("statusBadge").textContent="✓";
