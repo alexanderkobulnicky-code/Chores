@@ -207,7 +207,7 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 <dialog id="emergencyDialog">
 <form class="modal" method="dialog">
 <h2>Emergency Day</h2>
-<p class="fine">An Emergency Day excuses recurring chores without pretending they were completed. Streaks freeze, the day is marked Excused on the calendar, and it cannot count as a Clean Sweep or Perfect Week. To Do items are unaffected.</p>
+<p class="fine">An Emergency Day excuses recurring chores without pretending they were completed. Streaks freeze, the day is marked Excused on the calendar, and it cannot count toward a Clean Sweep, Perfect Week, or Perfect Month. To Do items are unaffected.</p>
 <div class="emergency-row">
   <div>
     <div class="emergency-date" id="emergencyTodayLabel"></div>
@@ -243,9 +243,9 @@ const STORAGE_KEY="chores2-v2";
 const BACKUP_KEYS=["chores2-v2-backup-1","chores2-v2-backup-2","chores2-v2-backup-3"];
 const AWARDS=[10,20,50,100,200];
 const SPECIAL_ACHIEVEMENTS=[
-  {id:"perfect-week",symbol:"7",name:"Perfect Week",description:"Earn 7 consecutive Clean Sweeps."},
+  {id:"perfect-week",symbol:"7",name:"Perfect Week",description:"Earn 7 consecutive Clean Sweeps. Earn it again for each further 7 days in the run."},
   {id:"rescue-mission",symbol:"↗",name:"Rescue Mission",description:"Begin a day with something Overdue and finish the day with nothing Overdue."},
-  {id:"full-house",symbol:"★",name:"Full House",description:"Complete a Daily, Weekly, and Every-N-Days task on the same day."}
+  {id:"perfect-month",symbol:"M",name:"Perfect Month",description:"Earn a Clean Sweep on every day of a full calendar month."}
 ];
 
 const $=id=>document.getElementById(id);
@@ -590,6 +590,7 @@ function rotateBackups(){
 }
 
 function saveState(){
+  reconcileSpecialAchievements();
   rotateBackups();
   localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
 }
@@ -1252,50 +1253,60 @@ function dayHasOverdueAtEnd(dateKey){
   });
 }
 
-function completedTypesOn(dateKey){
-  const types=new Set();
-
-  for(const task of state.tasks){
-    for(const event of(Array.isArray(task.completionEvents)?task.completionEvents:[])){
-      if(event.date===dateKey)types.add(event.type);
-    }
-  }
-
-  return types;
-}
-
-
 /* ==================================================
    SPECIAL ACHIEVEMENTS
    ================================================== */
 
-function achievementEarned(id){
-  return state.specialAchievements.find(a=>a.id===id);
-}
+function collectSpecialAchievements(includeToday=false){
+  const today=localDateKey();
+  const snapshots={...state.dailySnapshots};
+  if(includeToday)snapshots[today]=snapshotForDay(today);
 
-function grantAchievement(id,dateKey){
-  if(!achievementEarned(id)){
-    state.specialAchievements.push({id,date:dateKey});
-  }
-}
+  const dates=Object.keys(snapshots)
+    .filter(date=>date>=state.calendarTrackingStart&&(date<today||(includeToday&&date===today)))
+    .sort();
+  const earned=[];
+  let previousDate=null;
+  let cleanRun=0;
+  let currentMonth=null;
+  let cleanDaysThisMonth=0;
 
-function evaluateSpecialAchievements(dateKey){
-  const snapshot=state.dailySnapshots[dateKey];
-  if(!snapshot||snapshot.excused)return;
+  for(const date of dates){
+    const snapshot=snapshots[date];
+    const clean=Boolean(snapshot?.cleanSweep&&!snapshot.excused);
+    const month=monthKey(date);
 
-  if(snapshot.rescue)grantAchievement("rescue-mission",dateKey);
-  if(snapshot.fullHouse)grantAchievement("full-house",dateKey);
-
-  let perfect=true;
-
-  for(let i=0;i<7;i++){
-    if(!state.dailySnapshots[addDaysKey(dateKey,-i)]?.cleanSweep){
-      perfect=false;
-      break;
+    if(month!==currentMonth){
+      currentMonth=month;
+      cleanDaysThisMonth=0;
     }
+
+    cleanRun=clean
+      ?(previousDate===addDaysKey(date,-1)?cleanRun+1:1)
+      :0;
+
+    if(clean)cleanDaysThisMonth++;
+    if(snapshot?.rescue&&!snapshot.excused){
+      earned.push({id:"rescue-mission",date});
+    }
+    if(cleanRun>0&&cleanRun%7===0){
+      earned.push({id:"perfect-week",date});
+    }
+    if(monthKey(addDaysKey(date,1))!==month&&cleanDaysThisMonth===dateFromKey(date).getDate()){
+      earned.push({id:"perfect-month",date});
+    }
+
+    previousDate=date;
   }
 
-  if(perfect)grantAchievement("perfect-week",dateKey);
+  return earned;
+}
+
+function reconcileSpecialAchievements(){
+  const earned=collectSpecialAchievements();
+  if(JSON.stringify(state.specialAchievements)===JSON.stringify(earned))return false;
+  state.specialAchievements=earned;
+  return true;
 }
 
 
@@ -1303,29 +1314,25 @@ function evaluateSpecialAchievements(dateKey){
    DAILY SNAPSHOTS
    ================================================== */
 
-function finalizeDay(dateKey){
-  if(state.dailySnapshots[dateKey])return;
-
+function snapshotForDay(dateKey){
   if(isEmergencyDay(dateKey)){
-    state.dailySnapshots[dateKey]={
+    return{
       excused:true,
       cleanSweep:false,
-      rescue:false,
-      fullHouse:false
+      rescue:false
     };
-    return;
   }
 
-  const types=completedTypesOn(dateKey);
-
-  state.dailySnapshots[dateKey]={
+  return{
     excused:false,
     cleanSweep:dayQualifiesForCleanSweep(dateKey),
-    rescue:dayHadOverdueAtStart(dateKey)&&!dayHasOverdueAtEnd(dateKey),
-    fullHouse:types.has("daily")&&types.has("weekly")&&types.has("interval")
+    rescue:dayHadOverdueAtStart(dateKey)&&!dayHasOverdueAtEnd(dateKey)
   };
+}
 
-  evaluateSpecialAchievements(dateKey);
+function finalizeDay(dateKey){
+  if(state.dailySnapshots[dateKey])return;
+  state.dailySnapshots[dateKey]=snapshotForDay(dateKey);
 }
 
 function finalizePastDays(){
@@ -1343,7 +1350,7 @@ function finalizePastDays(){
     guard++;
   }
 
-  return changed;
+  return reconcileSpecialAchievements()||changed;
 }
 
 
@@ -2161,7 +2168,8 @@ let calendarCursor=new Date(
 );
 
 function renderCalendar(){
-  finalizePastDays();
+  if(finalizePastDays())saveState();
+  const achievements=collectSpecialAchievements(true);
 
   const year=calendarCursor.getFullYear();
   const month=calendarCursor.getMonth();
@@ -2248,12 +2256,12 @@ function renderCalendar(){
       }
     }
 
-    const specialToday=state.specialAchievements
+    const specialToday=achievements
       .filter(earned=>earned.date===key)
       .map(earned=>SPECIAL_ACHIEVEMENTS.find(def=>def.id===earned.id))
       .filter(Boolean);
     const specialBadges=specialToday.map(def=>
-      `<span class="day-special" title="${escapeHtml(def.name)}" aria-label="${escapeHtml(def.name)}">${escapeHtml(def.symbol)}</span>`
+      `<span class="day-special" title="${escapeHtml(def.name)}${key===today?" — so far today":""}" aria-label="${escapeHtml(def.name)}${key===today?" — so far today":""}">${escapeHtml(def.symbol)}</span>`
     ).join("");
 
     cell.innerHTML=`
@@ -2266,15 +2274,16 @@ function renderCalendar(){
     grid.appendChild(cell);
   }
 
-  renderAchievements();
+  renderAchievements(achievements);
 }
 
-function renderAchievements(){
+function renderAchievements(achievements=collectSpecialAchievements(true)){
   const list=$("achievementList");
   list.innerHTML="";
 
   for(const def of SPECIAL_ACHIEVEMENTS){
-    const earned=achievementEarned(def.id);
+    const occurrences=achievements.filter(earned=>earned.id===def.id);
+    const earned=occurrences[occurrences.length-1];
     const card=document.createElement("article");
 
     card.className="achievement-card"+(earned?"":" locked");
@@ -2285,7 +2294,7 @@ function renderAchievements(){
         <div class="achievement-name">${def.name}</div>
         <div class="achievement-copy">${def.description}</div>
       </div>
-      <div class="achievement-date">${earned?prettyDate(earned.date):"Locked"}</div>
+      <div class="achievement-date">${earned?`${prettyDate(earned.date)}${earned.date===localDateKey()?" · so far":""}<div class="achievement-copy">Earned ${occurrences.length} time${occurrences.length===1?"":"s"}</div>`:"Locked"}</div>
     `;
 
     list.appendChild(card);
