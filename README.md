@@ -1,14 +1,20 @@
-CHORES APP
+# Chores
 
-Open index.html in a modern browser.
+Open `index.html` or `Chores.html` in a modern browser. The app works as a single HTML file; no account or installation is required.
 
-Notes:
-- Data is stored only in your browser using localStorage.
-- The app works offline after it has been opened once from a web server.
-- To use it like an iPhone app, host this folder on any simple static host and choose “Add to Home Screen” in Safari.
-- The included sample tasks can be edited or deleted.
+The five editable examples cover every recurring task type:
 
-Files:
-- index.html — the complete app
-- manifest.webmanifest — installable-app metadata
-- service-worker.js — offline caching
+| Task | Schedule |
+| --- | --- |
+| Laundry | Weekly: Pending Monday, Due Today Wednesday, Overdue Thursday. |
+| Water Plants | Every 7 days after completion: goes straight to Due Today, then Overdue the next day. |
+| Pay Bills | Monthly: Pending on the 25th, Due Today on the last day of the month, Overdue on the 1st. |
+| Make Dinner | Daily. |
+| Exercise | 4 times per week, resetting Monday. |
+
+Monthly tasks have separate Pending and Due days. If Pending begins later in the month than the due day, the window runs into the next month. Days 29–31 use the last day in shorter months. A completed task stays Done until its next Pending day.
+
+Your tasks and completion history are saved in your browser on that device. Sharing the HTML file or ZIP shares the app and its examples, without your saved task data. Existing users keep their own tasks when the app is updated.
+
+For an iPhone home-screen shortcut, host the app on a static website, open it in Safari, and choose Add to Home Screen. The optional home-screen icon loads from the app's repository.
+

@@ -142,11 +142,14 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
     <div class="field"><label for="pendingWeekday">Pending begins</label><select id="pendingWeekday"><option value="none">Never (Due Today only)</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5" selected>Friday</option><option value="6">Saturday</option></select></div>
     <div class="field"><label for="overdueWeekday">Becomes Overdue</label><select id="overdueWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
   </div>
-  <p class="fine">A completed weekly task normally stays Done until Pending begins. The day before “Becomes Overdue” is Due Today. Choose “Never” for chores that can only be done on a particular day: they go straight from Done to Due Today, then Overdue if missed. A new task shows Scheduled until its first due day.</p>
+  <p class="fine">A completed weekly task normally stays Done until Pending begins. The day before “Becomes Overdue” is Due Today. Choose “Never” for chores that can only be done on a particular day: they go straight from Done to Due Today, then Overdue if missed. A new task shows Scheduled until its first Pending day, or its first due day if Pending is set to Never.</p>
 </div>
 <div id="monthlyFields" class="hidden">
-  <div class="field"><label for="monthlyDay">Due on day of month</label><input id="monthlyDay" type="number" min="1" max="31" step="1" value="1"></div>
-  <p class="fine">Due each calendar month on the chosen day. In shorter months, the 29th, 30th, or 31st becomes the last day of that month. After completion, the task stays Done for the rest of the month; the next month starts Pending.</p>
+  <div class="pair">
+    <div class="field"><label for="monthlyPendingDay">Pending begins on day</label><input id="monthlyPendingDay" type="number" min="1" max="31" step="1" value="1"></div>
+    <div class="field"><label for="monthlyDay">Due on day of month</label><input id="monthlyDay" type="number" min="1" max="31" step="1" value="1"></div>
+  </div>
+  <p class="fine">The task becomes Pending on the first day you choose, Due Today on its due day, and Overdue the following day. If Pending begins later in the month than the due day, the window crosses into the next month. In shorter months, the 29th, 30th, or 31st becomes the last day. For bills that become Pending on the 25th and Overdue on the 1st, choose Pending 25 and Due 31. After completion, the task stays Done until its next Pending day.</p>
 </div>
 <div id="intervalFields" class="hidden">
   <div class="field"><label for="maxDays">Maximum days between completions</label><input id="maxDays" type="number" min="1" step="1" value="7"></div>
@@ -328,6 +331,7 @@ function makeTask(name,type="daily",maxDays=7,pendingWindow=2){
     maxDays,
     pendingWindow,
     monthlyDay:1,
+    monthlyPendingDay:1,
     resetWeekday:1,
     pendingWeekday:5,
     weeklyNoPending:false,
@@ -466,6 +470,8 @@ function migrateState(parsed){
     task.weeklyNoPending=task.weeklyNoPending===true;
     const monthlyDay=Number(task.monthlyDay);
     task.monthlyDay=Number.isInteger(monthlyDay)&&monthlyDay>=1&&monthlyDay<=31?monthlyDay:1;
+    const monthlyPendingDay=Number(task.monthlyPendingDay);
+    task.monthlyPendingDay=Number.isInteger(monthlyPendingDay)&&monthlyPendingDay>=1&&monthlyPendingDay<=31?monthlyPendingDay:1;
     if(!Array.isArray(task.plannedPauses))task.plannedPauses=[];
     task.plannedPauses=task.plannedPauses
       .filter(p=>p&&p.startDate&&p.endDate)
@@ -553,10 +559,11 @@ function defaultState(){
     emergencyDays:[],
     todos:[],
     tasks:[
-      makeTask("Shave","daily"),
-      makeTask("Laundry","interval",7,2),
-      makeTask("Wash hair","interval",3,1),
-      makeTask("Trim fingernails","interval",14,4)
+      {...makeTask("Laundry","weekly"),pendingWeekday:1,overdueWeekday:4,resetWeekday:4},
+      makeTask("Water Plants","interval",7,1),
+      {...makeTask("Pay Bills","monthly"),monthlyPendingDay:25,monthlyDay:31},
+      makeTask("Make Dinner","daily"),
+      makeTask("Exercise","quota")
     ]
   };
 }
@@ -889,7 +896,9 @@ function firstWeeklyCycle(task){
   const s=weeklySettings(task);
   const createdDate=localDateKey(new Date(task.createdAt));
   const overdueDate=nextWeekdayAfter(createdDate,s.overdue);
-  const pendingDate=s.noPending?addDaysKey(overdueDate,-1):createdDate;
+  const pendingDate=s.noPending
+    ?addDaysKey(overdueDate,-1)
+    :addDaysKey(overdueDate,-daysFromWeekdayToWeekday(s.pending,s.overdue));
   return advanceWeeklyCyclePastExcuses(task,pendingDate,overdueDate);
 }
 
@@ -908,19 +917,37 @@ function deferExcusedMonthlyDue(task,dueDate){
   return due;
 }
 
-function monthlyDueAfterCompletion(task,completionDate){
-  return deferExcusedMonthlyDue(
-    task,monthlyDueInMonth(nextMonthDate(completionDate),Number(task.monthlyDay))
-  );
+function monthlyCycleInMonth(task,dueMonth){
+  const dueDay=Number(task.monthlyDay);
+  const pendingDay=Number(task.monthlyPendingDay??1);
+  const pendingMonth=pendingDay>dueDay
+    ?new Date(dueMonth.getFullYear(),dueMonth.getMonth()-1,1)
+    :dueMonth;
+  return{
+    pendingDate:monthlyDueInMonth(pendingMonth,pendingDay),
+    dueDate:deferExcusedMonthlyDue(task,monthlyDueInMonth(dueMonth,dueDay))
+  };
 }
 
-function firstMonthlyDue(task){
+function monthlyCycleAfterCompletion(task,completionDate){
+  let dueMonth=dateFromKey(completionDate);
+  let cycle=monthlyCycleInMonth(task,dueMonth);
+  while(cycle.pendingDate<=completionDate){
+    dueMonth=new Date(dueMonth.getFullYear(),dueMonth.getMonth()+1,1);
+    cycle=monthlyCycleInMonth(task,dueMonth);
+  }
+  return cycle;
+}
+
+function monthlyDueAfterCompletion(task,completionDate){
+  return monthlyCycleAfterCompletion(task,completionDate).dueDate;
+}
+
+function firstMonthlyCycle(task){
   const createdDate=localDateKey(new Date(task.createdAt));
   const dueThisMonth=monthlyDueInMonth(dateFromKey(createdDate),Number(task.monthlyDay));
-  const nominalDue=dueThisMonth>=createdDate
-    ?dueThisMonth
-    :monthlyDueInMonth(nextMonthDate(createdDate),Number(task.monthlyDay));
-  return deferExcusedMonthlyDue(task,nominalDue);
+  const dueMonth=dueThisMonth>=createdDate?dateFromKey(createdDate):nextMonthDate(createdDate);
+  return monthlyCycleInMonth(task,dueMonth);
 }
 /* ==================================================
    COMPLETION HISTORY
@@ -1078,7 +1105,9 @@ function statusAt(task,dateKey,includeSameDay=true){
     }
 
     if(dateKey<cycle.pendingDate){
-      return{state:"done",progress:1,detail:"Done"};
+      return latest
+        ?{state:"done",progress:1,detail:"Done"}
+        :{state:"scheduled",progress:0,detail:`Scheduled — pending ${prettyDate(cycle.pendingDate)}`};
     }
 
     if(dateKey<cycle.dueDate){
@@ -1100,19 +1129,22 @@ function statusAt(task,dateKey,includeSameDay=true){
   /* MONTHLY */
 
   if(task.type==="monthly"){
-    if(latest&&monthKey(latest)===monthKey(dateKey)){
-      return{state:"done",progress:1,detail:"Done for this month"};
-    }
+    const cycle=latest
+      ?monthlyCycleAfterCompletion(task,latest)
+      :firstMonthlyCycle(task);
+    const due=cycle.dueDate;
 
-    const due=latest
-      ?monthlyDueAfterCompletion(task,latest)
-      :firstMonthlyDue(task);
+    if(dateKey<cycle.pendingDate){
+      return latest
+        ?{state:"done",progress:1,detail:`Done — next due ${prettyDate(due)}`}
+        :{state:"scheduled",progress:0,detail:`Scheduled — pending ${prettyDate(cycle.pendingDate)}`};
+    }
 
     if(dateKey<due){
       const daysLeft=diffCalendarDays(dateKey,due);
       return{
         state:"pending",
-        progress:Math.max(0,Math.min(1,daysLeft/31)),
+        progress:Math.max(0,Math.min(1,daysLeft/Math.max(1,diffCalendarDays(cycle.pendingDate,due)))),
         detail:`Pending — due ${prettyDate(due)}`
       };
     }
@@ -1126,6 +1158,12 @@ function statusAt(task,dateKey,includeSameDay=true){
   /* EVERY N DAYS */
 
   if(!latest){
+    if(Number(task.pendingWindow)===1){
+      const firstDue=localDateKey(new Date(task.createdAt));
+      return dateKey<=firstDue
+        ?{state:"due",progress:0,detail:"Due Today"}
+        :{state:"overdue",progress:0,detail:`Overdue — due ${prettyDate(firstDue)}`};
+    }
     return{state:"pending",progress:0,detail:"Pending — not yet completed"};
   }
 
@@ -2667,6 +2705,7 @@ $("addBtn").addEventListener("click",()=>{
   $("taskType").value="daily";
   $("pendingWeekday").value="5";
   $("overdueWeekday").value="1";
+  $("monthlyPendingDay").value="1";
   $("monthlyDay").value="1";
   $("maxDays").value="7";
   $("pendingWindow").value="2";
@@ -2695,6 +2734,7 @@ function openEdit(task){
 
   $("pendingWeekday").value=s.noPending?"none":String(s.pending);
   $("overdueWeekday").value=String(s.overdue);
+  $("monthlyPendingDay").value=String(task.monthlyPendingDay??1);
   $("monthlyDay").value=String(task.monthlyDay??1);
   $("maxDays").value=String(task.maxDays??7);
   $("pendingWindow").value=String(task.pendingWindow??2);
@@ -2790,6 +2830,7 @@ form.addEventListener("submit",event=>{
   const weeklyNoPending=$("pendingWeekday").value==="none";
   const overdueWeekday=Number($("overdueWeekday").value);
   const pendingWeekday=weeklyNoPending?defaultPendingWeekday(overdueWeekday):Number($("pendingWeekday").value);
+  const monthlyPendingDay=Number($("monthlyPendingDay").value);
   const monthlyDay=Number($("monthlyDay").value);
   const max=Number($("maxDays").value);
   const pendingWindow=Number($("pendingWindow").value);
@@ -2812,8 +2853,8 @@ form.addEventListener("submit",event=>{
     return;
   }
 
-  if(type==="monthly"&&(!Number.isInteger(monthlyDay)||monthlyDay<1||monthlyDay>31)){
-    alert("Choose a whole-number day of the month from 1 to 31.");
+  if(type==="monthly"&&(!Number.isInteger(monthlyDay)||monthlyDay<1||monthlyDay>31||!Number.isInteger(monthlyPendingDay)||monthlyPendingDay<1||monthlyPendingDay>31)){
+    alert("Choose whole-number Pending and Due days from 1 to 31.");
     return;
   }
 
@@ -2852,6 +2893,7 @@ form.addEventListener("submit",event=>{
     task.name=name;
     task.type=type;
     task.monthlyDay=monthlyDay;
+    task.monthlyPendingDay=monthlyPendingDay;
     task.pendingWeekday=pendingWeekday;
     task.weeklyNoPending=weeklyNoPending;
     task.overdueWeekday=overdueWeekday;
@@ -2871,6 +2913,7 @@ form.addEventListener("submit",event=>{
     const task=makeTask(name,type,max,pendingWindow);
 
     task.monthlyDay=monthlyDay;
+    task.monthlyPendingDay=monthlyPendingDay;
 
     task.pendingWeekday=pendingWeekday;
     task.weeklyNoPending=weeklyNoPending;
@@ -3008,3 +3051,4 @@ setInterval(()=>{
 
 </body>
 </html>
+
