@@ -46,7 +46,7 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .mini-medal{width:28px;height:28px;display:grid;place-items:center;font-size:22px;line-height:1;filter:drop-shadow(0 1px 1px #0002)}
 .bar{height:8px;background:rgba(255,255,255,.5);border-radius:99px;overflow:hidden;margin:14px 0}.bar>div{height:100%;border-radius:inherit}
 .scheduled .bar>div{background:#a5afa7}.done .bar>div{background:var(--done-slider)}.pending .bar>div{background:var(--pending-slider)}.due .bar>div{background:var(--due-slider)}.overdue .bar>div{background:var(--overdue-slider)}.paused .bar>div{background:var(--paused-slider)}
-.task-bottom{font-size:12px;color:var(--muted);flex-wrap:wrap}.stats{display:flex;gap:13px;flex-wrap:wrap}.edit{border:0;background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.task-bottom{font-size:12px;color:var(--muted);flex-wrap:wrap}.stats{display:flex;flex-direction:column;align-items:flex-start;gap:10px}.new-personal-best{color:var(--done-slider);font-weight:800}.edit{border:0;background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .switch{position:relative;width:64px;height:34px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.switch span{position:absolute;inset:0;border-radius:99px;transition:.18s}.switch span:before{content:"";position:absolute;width:26px;height:26px;left:4px;top:4px;background:#fff;border-radius:50%;box-shadow:0 2px 6px #0002;transition:.18s}
 .scheduled .switch span{background:#a5afa7}.done .switch span{background:var(--done-slider)}.done .switch span:before{transform:translateX(30px)}.pending .switch span{background:var(--pending-slider)}.due .switch span{background:var(--due-slider)}.overdue .switch span{background:var(--overdue-slider)}.paused .switch span{background:var(--paused-slider)}.paused .switch input:disabled+span{opacity:.78}
 .quota-control{display:flex;align-items:center;gap:7px}.quota-button{width:36px;height:36px;border:1px solid rgba(29,34,31,.16);border-radius:50%;background:rgba(255,255,255,.72);color:var(--ink);font-size:20px;font-weight:800;display:grid;place-items:center;padding:0;line-height:1}.quota-button:disabled{opacity:.32;cursor:default}.quota-count{min-width:58px;text-align:center;font-size:18px;font-weight:800;letter-spacing:-.02em}.quota-note{font-size:10px;color:var(--muted);text-align:right}.paused .quota-button{border-color:var(--paused-border)}
@@ -736,7 +736,7 @@ function quotaCountInRange(task,startKey,endKey){
   return quotaEventsInRange(task,startKey,endKey).length;
 }
 
-function quotaPersonalBest(task){
+function quotaPersonalBest(task,excludeWeekStart=null){
   // Count recorded occurrences, including multiple on the same day.
   // Use this task's configured week boundary, which defaults to Monday.
   const countsByWeek=new Map();
@@ -746,6 +746,7 @@ function quotaPersonalBest(task){
     if(!event||!/^\d{4}-\d{2}-\d{2}$/.test(String(event.date||"")))continue;
 
     const weekStart=quotaWeekStart(task,event.date);
+    if(weekStart===excludeWeekStart)continue;
     const count=(countsByWeek.get(weekStart)||0)+1;
     countsByWeek.set(weekStart,count);
     if(count>best)best=count;
@@ -1907,6 +1908,10 @@ function render(){
   for(const task of tasks){
     const s=status(task);
     const streak=currentStreakDays(task);
+    const weeklyBest=task.type==="quota"?quotaPersonalBest(task):0;
+    const newWeeklyBest=task.type==="quota"&&Number(s.count||0)>0&&
+      Number(s.count||0)===weeklyBest&&
+      Number(s.count||0)>quotaPersonalBest(task,quotaWeekStart(task,localDateKey()));
     const card=document.createElement("article");
 
     card.className=`task ${s.state}`;
@@ -1958,7 +1963,7 @@ function render(){
       <div class="task-bottom">
         <div class="stats">
           <span>Best streak: ${task.bestStreakDays} day${task.bestStreakDays===1?"":"s"}</span>
-          ${task.type==="quota"?`<span>Personal best: ${quotaPersonalBest(task)} time${quotaPersonalBest(task)===1?"":"s"} in a week</span>`:""}
+          ${task.type==="quota"?`<span class="${newWeeklyBest?"new-personal-best":""}">${newWeeklyBest?"★ New personal best! ":"Personal best: "}${weeklyBest} time${weeklyBest===1?"":"s"} in a week</span>`:""}
         </div>
 
         <div class="task-history-actions">
