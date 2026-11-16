@@ -1097,6 +1097,13 @@ function statusAt(task,dateKey,includeSameDay=true){
     latest=latestCompletionOnOrBefore(task,addDaysKey(dateKey,-1));
   }
 
+  /* Expiring daily tasks are independent: yesterday never makes today overdue. */
+  if(task.type==="daily"&&task.deadlineBehavior==="expire"){
+    return includeSameDay&&hasCompletionOn(task,dateKey)
+      ?{state:"done",progress:1,detail:"Done for today"}
+      :{state:"due",progress:0,detail:"Due Today"};
+  }
+
   /* DAILY */
 
   if(task.type==="daily"){
@@ -1125,6 +1132,36 @@ function statusAt(task,dateKey,includeSameDay=true){
     }
 
     return{state:"overdue",progress:0,detail:"Overdue"};
+  }
+
+  /* Expiring fixed-calendar weeks/months never carry an old obligation forward. */
+  if(task.deadlineBehavior==="expire"&&(task.type==="weekly"||task.type==="monthly")){
+    let dueDate,pendingDate,periodStart;
+    if(task.type==="weekly"){
+      const settings=weeklySettings(task);
+      const dueWeekday=(settings.overdue+6)%7;
+      const lastDue=weekStartKey(dateKey,dueWeekday);
+      dueDate=lastDue===dateKey?lastDue:addDaysKey(lastDue,7);
+      periodStart=addDaysKey(dueDate,-6);
+      pendingDate=settings.noPending?dueDate:weekStartKey(dueDate,settings.pending);
+    }else{
+      const day=Number(task.monthlyDay);
+      const month=dateFromKey(dateKey);
+      const thisDue=monthlyDueInMonth(month,day);
+      const dueMonth=thisDue>=dateKey?month:nextMonthDate(dateKey);
+      const cycle=monthlyCycleInMonth(task,dueMonth);
+      dueDate=cycle.dueDate;
+      pendingDate=cycle.pendingDate;
+      const previousMonth=new Date(dueMonth.getFullYear(),dueMonth.getMonth()-1,1);
+      periodStart=addDaysKey(monthlyDueInMonth(previousMonth,day),1);
+    }
+    const completed=(task.completionDates||[]).some(d=>
+      d>=periodStart&&d<=dateKey&&(includeSameDay||d!==dateKey)
+    );
+    if(completed)return{state:"done",progress:1,detail:"Done this period"};
+    if(dateKey===dueDate)return{state:"due",progress:0,detail:"Due Today"};
+    if(dateKey>=pendingDate)return{state:"pending",progress:0,detail:`Pending — due ${prettyDate(dueDate)}`};
+    return{state:"scheduled",progress:0,detail:`Scheduled — due ${prettyDate(dueDate)}`};
   }
 
   /* WEEKLY */
@@ -1238,6 +1275,58 @@ function statusAt(task,dateKey,includeSameDay=true){
 
 function status(task){
   return statusAt(task,localDateKey(),true);
+}
+
+/* One record per expired day, weekly period, or quota week. Never treat
+   acknowledged/missed records as completions. */
+function collectMissedOccurrences(today=localDateKey()){
+  const missed=[];
+  for(const task of state.tasks){
+    const created=localDateKey(new Date(task.createdAt));
+    const tracking=task.missTrackingStartDate||today;
+    const start=created>tracking?created:tracking;
+    if(start>=today)continue;
+    const add=(dueDate,startDate,endDate,missing=1,total=1)=>{
+      const record=task.acknowledgedMisses?.[dueDate];
+      const entry={task,dueDate,startDate,endDate,missing,total,ack:record||null};
+      missed.push(entry);
+    };
+    if(task.type==="daily"&&task.deadlineBehavior==="expire"){
+      for(let date=start,guard=0;date<today&&guard<4000;date=addDaysKey(date,1),guard++){
+        if(!isTaskExcusedOn(task,date)&&!hasCompletionOn(task,date))add(date,date,date);
+      }
+    }else if(task.type==="weekly"&&task.deadlineBehavior==="expire"){
+      const dueWeekday=(weeklySettings(task).overdue+6)%7;
+      let due=weekStartKey(start,dueWeekday);
+      if(due<start)due=addDaysKey(due,7);
+      for(let guard=0;due<today&&guard<600;due=addDaysKey(due,7),guard++){
+        const windowStart=addDaysKey(due,-6);
+        if(isTaskExcusedOn(task,due))continue;
+        const did=(task.completionDates||[]).some(d=>d>=windowStart&&d<=due);
+        if(!did)add(due,windowStart,due);
+      }
+    }else if(task.type==="monthly"&&task.deadlineBehavior==="expire"){
+      let month=new Date(dateFromKey(start).getFullYear(),dateFromKey(start).getMonth(),1);
+      for(let guard=0;guard<160;guard++,month=new Date(month.getFullYear(),month.getMonth()+1,1)){
+        const due=monthlyDueInMonth(month,Number(task.monthlyDay));
+        if(due>=today)break;
+        if(due<start||isTaskExcusedOn(task,due))continue;
+        const prev=new Date(month.getFullYear(),month.getMonth()-1,1);
+        const from=addDaysKey(monthlyDueInMonth(prev,Number(task.monthlyDay)),1);
+        const did=(task.completionDates||[]).some(d=>d>=from&&d<=due);
+        if(!did)add(due,from,due);
+      }
+    }else if(task.type==="quota"){
+      const current=quotaWeekStart(task,today);
+      for(let week=quotaWeekStart(task,start),guard=0;week<current&&guard<600;week=addDaysKey(week,7),guard++){
+        const due=quotaWeekEndFromStart(week);
+        if(due<start)continue;
+        const result=computedQuotaWeekOutcome(task,week);
+        if(!result.success)add(due,week,due,result.target-result.count,result.target);
+      }
+    }
+  }
+  return missed.sort((a,b)=>a.dueDate.localeCompare(b.dueDate)||a.task.name.localeCompare(b.task.name));
 }
 
 
