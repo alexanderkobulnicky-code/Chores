@@ -2121,6 +2121,63 @@ function medalsForTask(task){
    MAIN CHORES SCREEN
    ================================================== */
 
+function renderMissedItems(){
+  const items=collectMissedOccurrences();
+  const active=items.filter(item=>!item.ack);
+  const archived=items.filter(item=>item.ack&&!item.ack.dismissed&&
+    Date.now()-Number(item.ack.acknowledgedAt)<7*86400000
+  );
+
+  const missedList=$("missedList");
+  missedList.innerHTML="";
+  for(const item of active){
+    const card=document.createElement("article");
+    card.className="task missed";
+    const description=item.task.type==="quota"
+      ?`Missed ${item.missing} of ${item.total} for the week ending ${prettyDate(item.dueDate)}`
+      :`Missed ${prettyDate(item.dueDate)} — no completion recorded`;
+    card.innerHTML=`
+      <div class="missed-title">${escapeHtml(item.task.name)} · Missed</div>
+      <div class="missed-caption">${escapeHtml(description)}</div>
+      <div class="missed-actions">
+        <button type="button" class="missed-log">Log ${escapeHtml(prettyDate(item.dueDate))}</button>
+        <button type="button" class="missed-ack">Acknowledge</button>
+      </div>`;
+    card.querySelector(".missed-log").addEventListener("click",()=>{
+      if(item.task.type==="daily")logCompletionForDate(item.task,item.dueDate);
+      else openHistory(item.task,item.dueDate,{start:item.startDate,end:item.endDate});
+    });
+    card.querySelector(".missed-ack").addEventListener("click",()=>acknowledgeMiss(item));
+    missedList.appendChild(card);
+  }
+
+  const archive=$("archiveSection");
+  archive.hidden=archived.length===0;
+  $("archiveSummary").textContent=`Acknowledged misses (${archived.length}) · hidden after 7 days`;
+  const ackList=$("acknowledgedList");
+  ackList.innerHTML="";
+  for(const item of archived){
+    const days=Math.max(0,Math.ceil((7*86400000-(Date.now()-Number(item.ack.acknowledgedAt)))/86400000));
+    const card=document.createElement("div");
+    card.className="acknowledged-card";
+    card.innerHTML=`
+      <strong>${escapeHtml(item.task.name)}</strong>
+      <div class="missed-caption">Missed ${escapeHtml(prettyDate(item.dueDate))} · hidden in ${days} day${days===1?"":"s"}</div>
+      <div class="missed-actions">
+        <button type="button" class="ack-restore">Undo acknowledgment</button>
+        <button type="button" class="ack-log">Log completion</button>
+        <button type="button" class="ack-dismiss">Dismiss reminder</button>
+      </div>`;
+    card.querySelector(".ack-restore").addEventListener("click",()=>undoAcknowledgment(item));
+    card.querySelector(".ack-log").addEventListener("click",()=>{
+      if(item.task.type==="daily")logCompletionForDate(item.task,item.dueDate);
+      else openHistory(item.task,item.dueDate,{start:item.startDate,end:item.endDate});
+    });
+    card.querySelector(".ack-dismiss").addEventListener("click",()=>dismissAcknowledged(item));
+    ackList.appendChild(card);
+  }
+}
+
 function render(){
   const finalized=finalizePastDays();
 
@@ -2147,6 +2204,7 @@ function render(){
       ||Number(a.createdAt)-Number(b.createdAt)
   );
 
+  renderMissedItems();
   const list=$("taskList");
   list.innerHTML="";
 
@@ -2184,13 +2242,10 @@ function render(){
               <div class="quota-note">this week</div>
             `
             :`
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  ${s.state==="done"?"checked":""}
-                  ${s.state==="paused"?"disabled":""}>
-                <span></span>
-              </label>
+              <button type="button" class="dated-action today-task"
+                ${s.state==="paused"||(s.state==="done"&&!hasCompletionOn(task,localDateKey()))?"disabled":""}>
+                ${hasCompletionOn(task,localDateKey())?"Undo today":s.state==="overdue"?"Choose date":"Done today"}
+              </button>
             `
           }
 
@@ -2216,20 +2271,7 @@ function render(){
         </div>
 
         <div class="task-history-actions">
-          ${
-            canLogYesterday(task)
-            ?task.type==="quota"
-              ?`
-                <button type="button" class="small-button yesterday-quota-minus" ${quotaEventsInRange(task,addDaysKey(localDateKey(),-1),addDaysKey(localDateKey(),-1)).length?"":"disabled"}>− Yesterday</button>
-                <button type="button" class="small-button yesterday-quota-plus">＋ Yesterday</button>
-              `
-              :`
-                <button type="button" class="small-button yesterday-task">
-                  ${hasCompletionOn(task,addDaysKey(localDateKey(),-1))?"Yesterday ✓":"Log yesterday"}
-                </button>
-              `
-            :""
-          }
+          <button type="button" class="small-button history-button">History / Log date</button>
           <button class="edit">Edit</button>
         </div>
       </div>
@@ -2242,39 +2284,20 @@ function render(){
       plus.addEventListener("click",()=>markQuotaOccurrence(task));
       minus.addEventListener("click",()=>undoQuotaOccurrence(task));
 
-      const yesterdayPlus=card.querySelector(".yesterday-quota-plus");
-      const yesterdayMinus=card.querySelector(".yesterday-quota-minus");
-
-      if(yesterdayPlus){
-        yesterdayPlus.addEventListener("click",()=>markQuotaOccurrenceYesterday(task));
-      }
-
-      if(yesterdayMinus){
-        yesterdayMinus.addEventListener("click",()=>undoQuotaOccurrenceYesterday(task));
-      }
     }else{
-      const checkbox=card.querySelector("input");
-
-      checkbox.addEventListener("change",event=>{
-        event.target.checked?markDone(task):undoDone(task);
+      card.querySelector(".today-task").addEventListener("click",()=>{
+        const today=localDateKey();
+        if(hasCompletionOn(task,today)){
+          if(confirm(`Remove today's completion for “${task.name}”?`))undoDone(task);
+        }else if(s.state==="overdue"){
+          openHistory(task,addDaysKey(today,-1));
+        }else{
+          markDone(task);
+        }
       });
-
-      const yesterdayButton=card.querySelector(".yesterday-task");
-
-      if(yesterdayButton){
-        yesterdayButton.addEventListener("click",()=>{
-          const yesterday=addDaysKey(localDateKey(),-1);
-          if(hasCompletionOn(task,yesterday)){
-            if(confirm(`Remove yesterday’s completion for “${task.name}”?`)){
-              undoYesterdayCompletion(task);
-            }
-          }else{
-            logYesterdayCompletion(task);
-          }
-        });
-      }
     }
 
+    card.querySelector(".history-button").addEventListener("click",()=>openHistory(task));
     card.querySelector(".edit").addEventListener("click",()=>openEdit(task));
     list.appendChild(card);
   }
@@ -2295,6 +2318,7 @@ function updateSummary(){
   statusPanel?.classList.remove("celebrate");
 
   const overdue=states.filter(x=>x==="overdue").length;
+  const missed=collectMissedOccurrences().filter(x=>!x.ack).length;
   const due=states.filter(x=>x==="due").length;
   const pendingTasks=state.tasks.filter(task=>status(task).state==="pending");
   const pending=pendingTasks.length;
@@ -2303,8 +2327,8 @@ function updateSummary(){
   const scheduled=states.filter(x=>x==="scheduled").length;
   const paused=states.filter(x=>x==="paused").length;
 
-  if(overdue){
-    $("statusTitle").textContent=`${overdue} task${overdue===1?"":"s"} overdue`;
+  if(overdue||missed){
+    $("statusTitle").textContent=[overdue?`${overdue} overdue`:"",missed?`${missed} missed`:""].filter(Boolean).join(" · ");
 
     const waiting=due+pending+scheduled;
 
@@ -2314,7 +2338,7 @@ function updateSummary(){
         ?`${paused} task${paused===1?" is":"s are"} paused.`
         :"Nothing else is waiting.";
 
-    $("statusBadge").textContent=overdue;
+    $("statusBadge").textContent=overdue+missed;
     $("statusBadge").style.background="var(--red-soft)";
     $("statusBadge").style.color="var(--overdue-slider)";
     return;
