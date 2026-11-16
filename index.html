@@ -56,7 +56,7 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .missed-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .missed-actions button,.dated-action{min-height:44px;padding:10px 14px;border-radius:12px;border:1px solid rgba(29,34,31,.18);background:#fff;font-weight:700;color:var(--ink)}
 .dated-action{min-width:108px}.dated-action:disabled{opacity:.5;cursor:default}
-.acknowledged-list{display:grid;gap:9px;margin-top:10px}.acknowledged-card{background:#f0f0ec;border:1px solid var(--line);border-radius:14px;padding:13px}
+.acknowledged-list{display:grid;gap:9px;margin-top:10px}.acknowledged-card{background:var(--overdue-bg);border:1px solid var(--overdue-border);border-radius:14px;padding:13px}
 .acknowledged-card .missed-actions button{min-height:40px;font-size:12px}
 .archive-section{margin-top:36px;border-top:1px solid var(--line);padding-top:15px}
 .archive-section summary{cursor:pointer;color:var(--muted);font-size:14px;font-weight:750}
@@ -614,7 +614,7 @@ function defaultState(){
       {...makeTask("Laundry","weekly"),pendingWeekday:1,overdueWeekday:4,resetWeekday:4},
       makeTask("Water Plants","interval",7,1),
       {...makeTask("Pay Bills","monthly"),monthlyPendingDay:25,monthlyDay:31},
-      makeTask("Make Dinner","daily"),
+      {...makeTask("Make Dinner","daily"),deadlineBehavior:"expire"},
       makeTask("Exercise","quota")
     ]
   };
@@ -1518,8 +1518,16 @@ function finalizePastDays(){
    STREAKS
    ================================================== */
 
+function firstStreakMiss(task,startDate){
+  if(!startDate||task.type==="quota")return null;
+  return collectMissedOccurrences()
+    .find(item=>item.task.id===task.id&&item.dueDate>=startDate)?.dueDate||null;
+}
+
 function lastGoodDate(task){
   if(!task.lastDoneDate)return null;
+  const firstMiss=firstStreakMiss(task,task.streakStartDate);
+  if(firstMiss)return addDaysKey(firstMiss,-1);
 
   if(task.type==="daily"){
     return nextActiveDate(task,task.lastDoneDate);
@@ -1556,7 +1564,8 @@ function reconcileStreaks(){
 
     const shouldBreak=task.streakStartDate&&(
       status(task).state==="overdue"||
-      Boolean(quotaMiss)
+      Boolean(quotaMiss)||
+      Boolean(firstStreakMiss(task,task.streakStartDate))
     );
 
     if(shouldBreak){
@@ -1588,7 +1597,7 @@ function restoreRecentBreakIfCorrected(task){
 
   const stillBroken=task.type==="quota"
     ?Boolean(firstMissedQuotaWeekEnd(task,broken.streakStartDate))
-    :status(task).state==="overdue";
+    :status(task).state==="overdue"||Boolean(firstStreakMiss(task,broken.streakStartDate));
 
   if(stillBroken)return false;
 
