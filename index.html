@@ -1599,6 +1599,22 @@ function updateAllTaskAwards(){
 
 
 /* ==================================================
+   ACTIVITY AUDIT (stored locally, never changes completion statistics)
+   ================================================== */
+function recordTaskActivity(task,action,dateKey){
+  if(!Array.isArray(task.activityLog))task.activityLog=[];
+  task.activityLog.push({action,date:dateKey,enteredAt:Date.now()});
+  if(task.activityLog.length>300)task.activityLog=task.activityLog.slice(-300);
+}
+
+function clearAcknowledgedIfResolved(task){
+  for(const item of collectMissedOccurrences().filter(x=>x.task.id===task.id)){
+    // Acknowledged misses that remain unresolved must stay acknowledged.
+    // Corrections are hidden automatically when their missing record resolves.
+  }
+}
+
+/* ==================================================
    COMPLETE / UNDO RECURRING TASKS
    ================================================== */
 
@@ -1629,7 +1645,8 @@ function markDone(task){
   if(!task.completionDates.includes(today))task.completionDates.push(today);
   syncCompletionPointers(task);
 
-  task.completionEvents.push({date:today,type:task.type});
+  task.completionEvents.push({date:today,type:task.type,enteredAt:Date.now()});
+  recordTaskActivity(task,"Completed",today);
   task.totalCompletions=Number(task.totalCompletions||0)+1;
 
   updateTaskAwards(task);
@@ -1661,6 +1678,7 @@ function undoDone(task){
   }
 
   if(task.totalCompletions>0)task.totalCompletions--;
+  recordTaskActivity(task,"Removed completion",today);
 
   saveState();
   render();
@@ -1688,6 +1706,7 @@ function logYesterdayCompletion(task){
   });
 
   task.totalCompletions=Number(task.totalCompletions||0)+1;
+  recordTaskActivity(task,"Completed (late entry)",yesterday);
 
   /*
     A genuinely new task can start its streak yesterday. If a streak was
@@ -1733,6 +1752,7 @@ function undoYesterdayCompletion(task){
 
   recomputePastDay(yesterday);
   reconcileStreaks();
+  recordTaskActivity(task,"Removed completion",yesterday);
 
   saveState();
   render();
@@ -1780,6 +1800,7 @@ function markQuotaOccurrence(task){
   });
 
   task.totalCompletions=Number(task.totalCompletions||0)+1;
+  recordTaskActivity(task,"Completed",today);
 
   updateTaskAwards(task);
   saveState();
@@ -1833,6 +1854,7 @@ function undoQuotaOccurrence(task){
   }
 
   if(task.totalCompletions>0)task.totalCompletions--;
+  recordTaskActivity(task,"Removed completion",event.date);
 
   saveState();
   render();
@@ -1881,6 +1903,7 @@ function markQuotaOccurrenceYesterday(task){
   });
 
   task.totalCompletions=Number(task.totalCompletions||0)+1;
+  recordTaskActivity(task,"Completed (late entry)",yesterday);
 
   invalidateQuotaOutcomeForDate(task,yesterday);
   finalizeQuotaWeeks(task);
@@ -1933,11 +1956,96 @@ function undoQuotaOccurrenceYesterday(task){
   finalizeQuotaWeeks(task);
   recomputePastDay(yesterday);
   reconcileStreaks();
+  recordTaskActivity(task,"Removed completion",yesterday);
 
   saveState();
   render();
 }
 
+
+/* Date-specific corrections, including dates older than yesterday.
+   Each past quota occurrence belongs to the selected historical week. */
+function logCompletionForDate(task,date){
+  const today=localDateKey(),yesterday=addDaysKey(today,-1);
+  const created=localDateKey(new Date(task.createdAt));
+  if(date<created||date>today)return false;
+  if(task.type==="quota"){
+    if(date===today){markQuotaOccurrence(task);return true;}
+    if(date===yesterday){markQuotaOccurrenceYesterday(task);return true;}
+    const id=uid();
+    if(!Array.isArray(task.quotaEvents))task.quotaEvents=[];
+    if(!Array.isArray(task.completionEvents))task.completionEvents=[];
+    task.quotaEvents.push({id,date,createdAt:Date.now(),lateEntry:true,startedStreak:false});
+    task.quotaEvents.sort((a,b)=>a.date.localeCompare(b.date)||a.createdAt-b.createdAt);
+    task.completionEvents.push({date,type:"quota",quotaEventId:id,lateEntry:true,enteredAt:Date.now()});
+    task.totalCompletions=Number(task.totalCompletions||0)+1;
+    invalidateQuotaOutcomeForDate(task,date);
+    finalizeQuotaWeeks(task);
+  }else{
+    if(hasCompletionOn(task,date))return false;
+    if(date===today){markDone(task);return true;}
+    if(date===yesterday){logYesterdayCompletion(task);return true;}
+    task.completionDates.push(date);
+    syncCompletionPointers(task);
+    task.completionEvents.push({date,type:task.type,lateEntry:true,enteredAt:Date.now()});
+    task.totalCompletions=Number(task.totalCompletions||0)+1;
+  }
+  recordTaskActivity(task,"Completed (late entry)",date);
+  recomputePastDay(date);
+  restoreRecentBreakIfCorrected(task);
+  reconcileStreaks();
+  updateTaskAwards(task);
+  saveState();
+  render();
+  return true;
+}
+function removeCompletionForDate(task,date){
+  const today=localDateKey(),yesterday=addDaysKey(today,-1);
+  if(task.type!=="quota"){
+    if(!hasCompletionOn(task,date))return false;
+    if(date===today){undoDone(task);return true;}
+    if(date===yesterday){undoYesterdayCompletion(task);return true;}
+    task.completionDates=task.completionDates.filter(d=>d!==date);
+    syncCompletionPointers(task);
+    const pos=task.completionEvents.findLastIndex(e=>e.date===date&&e.type!=="quota");
+    if(pos>=0)task.completionEvents.splice(pos,1);
+  }else{
+    const events=(task.quotaEvents||[]).filter(e=>e.date===date);
+    if(!events.length)return false;
+    if(date===yesterday){undoQuotaOccurrenceYesterday(task);return true;}
+    if(date===today){undoQuotaOccurrence(task);return true;}
+    const event=events[events.length-1];
+    task.quotaEvents=task.quotaEvents.filter(e=>e.id!==event.id);
+    const pos=task.completionEvents.findIndex(e=>e.quotaEventId===event.id);
+    if(pos>=0)task.completionEvents.splice(pos,1);
+    invalidateQuotaOutcomeForDate(task,date);
+    finalizeQuotaWeeks(task);
+  }
+  task.totalCompletions=Math.max(0,Number(task.totalCompletions||0)-1);
+  recordTaskActivity(task,"Removed completion",date);
+  recomputePastDay(date);
+  reconcileStreaks();
+  saveState();
+  render();
+  return true;
+}
+function acknowledgeMiss(item){
+  item.task.acknowledgedMisses[item.dueDate]={acknowledgedAt:Date.now(),dismissed:false};
+  recordTaskActivity(item.task,"Acknowledged miss",item.dueDate);
+  saveState();render();
+}
+function undoAcknowledgment(item){
+  delete item.task.acknowledgedMisses[item.dueDate];
+  recordTaskActivity(item.task,"Restored missed reminder",item.dueDate);
+  saveState();render();
+}
+function dismissAcknowledged(item){
+  const ack=item.task.acknowledgedMisses[item.dueDate];
+  if(!ack)return;
+  ack.dismissed=true;
+  recordTaskActivity(item.task,"Dismissed reminder",item.dueDate);
+  saveState();render();
+}
 
 /* ==================================================
    DISPLAY HELPERS
