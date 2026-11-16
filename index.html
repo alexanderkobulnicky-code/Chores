@@ -38,7 +38,7 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .badge{min-width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--green-soft);color:var(--done-slider);font-weight:800;font-size:18px}
 .recovery{display:none;margin:-7px 0 15px;padding:10px 13px;border-radius:12px;background:#fff8d8;border:1px solid #e4d395;font-size:12px;color:#625925}
 .section-title{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin:18px 0 10px}
-.tasks,.todos{display:grid;gap:11px}
+.tasks,.todos{display:grid;gap:11px}#missedList:not(:empty){margin-bottom:11px}
 .task{padding:18px;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 26px rgba(20,30,24,.055);transition:background .2s,border-color .2s}
 .task.scheduled{background:#f6f8f6;border-color:var(--line)}.task.done{background:var(--done-bg);border-color:var(--done-border)}.task.pending{background:var(--pending-bg);border-color:var(--pending-border)}.task.due{background:var(--due-bg);border-color:var(--due-border)}.task.overdue{background:var(--overdue-bg);border-color:var(--overdue-border)}.task.paused{background:var(--paused-bg);border-color:var(--paused-border)}
 .task-name,.todo-name{font-size:20px;font-weight:750;letter-spacing:-.02em}.meta{color:var(--muted);font-size:14px;margin-top:4px;line-height:1.35}
@@ -167,16 +167,16 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 <div id="weeklyFields" class="hidden">
   <div class="pair">
     <div class="field"><label for="pendingWeekday">Pending begins</label><select id="pendingWeekday"><option value="none">Never (Due Today only)</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5" selected>Friday</option><option value="6">Saturday</option></select></div>
-    <div class="field"><label for="overdueWeekday">Becomes Overdue</label><select id="overdueWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
+    <div class="field"><label for="overdueWeekday">Day after deadline</label><select id="overdueWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
   </div>
-  <p class="fine">A completed weekly task normally stays Done until Pending begins. The day before “Becomes Overdue” is Due Today. Choose “Never” for chores that can only be done on a particular day: they go straight from Done to Due Today, then Overdue if missed. A new task shows Scheduled until its first Pending day, or its first due day if Pending is set to Never.</p>
+  <p class="fine">A weekly task becomes Due Today the day before “Day after deadline.” Under Carry forward, a missed deadline stays Overdue. Under Mark as missed, a separate missed occurrence appears and a new week begins. Choose “Never” for chores due on a particular day.</p>
 </div>
 <div id="monthlyFields" class="hidden">
   <div class="pair">
     <div class="field"><label for="monthlyPendingDay">Pending begins on day</label><input id="monthlyPendingDay" type="number" min="1" max="31" step="1" value="1"></div>
     <div class="field"><label for="monthlyDay">Due on day of month</label><input id="monthlyDay" type="number" min="1" max="31" step="1" value="1"></div>
   </div>
-  <p class="fine">The task becomes Pending on the first day you choose, Due Today on its due day, and Overdue the following day. If Pending begins later in the month than the due day, the window crosses into the next month. In shorter months, the 29th, 30th, or 31st becomes the last day. For bills that become Pending on the 25th and Overdue on the 1st, choose Pending 25 and Due 31. After completion, the task stays Done until its next Pending day.</p>
+  <p class="fine">The task becomes Pending on your chosen day and Due Today on its due day. The following day, it either stays Overdue (Carry forward) or becomes a separately logged Miss (Mark as missed). Pending can begin in the previous month. Days 29–31 use the last day in shorter months. For bills pending on the 25th and due at month-end, choose Pending 25 and Due 31.</p>
 </div>
 <div id="intervalFields" class="hidden">
   <div class="field"><label for="maxDays">Maximum days between completions</label><input id="maxDays" type="number" min="1" step="1" value="7"></div>
@@ -192,7 +192,7 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
   <p class="fine">Each ＋ records one occurrence. The counter resets at the start of each week. If the target is still unfinished on the final day, it becomes Due Today. A missed week breaks the streak and can be acknowledged separately. The new week begins fresh.</p>
 </div>
 
-<div id="dailyNote" class="fine">Daily tasks are Due Today until completed. If a whole day passes without completion, they become Overdue.</div>
+<div id="dailyNote" class="fine">Daily tasks are Due Today until completed.</div>
 
 <div class="pause-section hidden" id="pauseSection">
   <div class="pause-heading">
@@ -2964,6 +2964,9 @@ function updateTypeFields(){
   $("quotaFields").classList.toggle("hidden",type!=="quota");
   $("deadlineBehaviorField").classList.toggle("hidden",type==="quota"||type==="interval");
   $("dailyNote").classList.toggle("hidden",type!=="daily");
+  $("dailyNote").textContent=$("deadlineBehavior").value==="expire"
+    ?"Each unrecorded day becomes its own Missed entry. Today remains a fresh obligation."
+    :"If a day passes unrecorded, this task remains Overdue until completed.";
 }
 
 function currentEditedTask(){
@@ -3079,6 +3082,7 @@ function overlapsOtherPause(task,pauseId,startDate,endDate){
 }
 
 $("taskType").addEventListener("change",updateTypeFields);
+$("deadlineBehavior").addEventListener("change",updateTypeFields);
 
 $("addBtn").addEventListener("click",()=>{
   form.reset();
