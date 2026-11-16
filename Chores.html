@@ -476,6 +476,26 @@ function findBestStoredState(){
    MIGRATION
    ================================================== */
 
+/* Start new missed reminders with only the most recent elapsed deadline.
+   This avoids retroactively displaying years of old unrecorded tasks. */
+function initialMissTrackingDate(task,today=localDateKey()){
+  if(task.type==="quota")return addDaysKey(quotaWeekStart(task,today),-1);
+  if(task.type==="weekly"){
+    const dueWeekday=(Number(task.overdueWeekday??1)+6)%7;
+    let due=weekStartKey(today,dueWeekday);
+    if(due===today)due=addDaysKey(due,-7);
+    return due;
+  }
+  if(task.type==="monthly"){
+    const month=dateFromKey(today);
+    const due=monthlyDueInMonth(month,Number(task.monthlyDay??1));
+    if(due<today)return due;
+    const prev=new Date(month.getFullYear(),month.getMonth()-1,1);
+    return monthlyDueInMonth(prev,Number(task.monthlyDay??1));
+  }
+  return addDaysKey(today,-1);
+}
+
 function migrateState(parsed){
   if(!parsed.dailySnapshots||typeof parsed.dailySnapshots!=="object")parsed.dailySnapshots={};
   if(!Array.isArray(parsed.specialAchievements))parsed.specialAchievements=[];
@@ -523,7 +543,7 @@ function migrateState(parsed){
     if(task.deadlineBehavior!=="expire")task.deadlineBehavior="carry";
     if(!task.acknowledgedMisses||typeof task.acknowledgedMisses!=="object"||Array.isArray(task.acknowledgedMisses))task.acknowledgedMisses={};
     if(!Array.isArray(task.activityLog))task.activityLog=[];
-    if(!task.missTrackingStartDate)task.missTrackingStartDate=addDaysKey(localDateKey(),-1);
+    if(!task.missTrackingStartDate)task.missTrackingStartDate=initialMissTrackingDate(task);
     if(!Array.isArray(task.plannedPauses))task.plannedPauses=[];
     task.plannedPauses=task.plannedPauses
       .filter(p=>p&&p.startDate&&p.endDate)
@@ -2033,6 +2053,7 @@ function logCompletionForDate(task,date){
     syncCompletionPointers(task);
     task.completionEvents.push({date,type:task.type,lateEntry:true,enteredAt:Date.now()});
     task.totalCompletions=Number(task.totalCompletions||0)+1;
+    if(!task.streakStartDate&&!task.lastStreakBreak)task.streakStartDate=date;
   }
   recordTaskActivity(task,"Completed (late entry)",date);
   recomputeDaysFrom(date);
@@ -3286,10 +3307,7 @@ form.addEventListener("submit",event=>{
 
     if(oldType==="quota")finalizeQuotaWeeks(task);
 
-    if(deadlineBehavior==="expire"&&(task.deadlineBehavior!=="expire"||oldType!==type)){
-      task.missTrackingStartDate=addDaysKey(localDateKey(),-1);
-      task.acknowledgedMisses={};
-    }
+    const startMissTracking=deadlineBehavior==="expire"&&(task.deadlineBehavior!=="expire"||oldType!==type);
     task.name=name;
     task.type=type;
     task.deadlineBehavior=deadlineBehavior;
@@ -3303,6 +3321,10 @@ form.addEventListener("submit",event=>{
     task.pendingWindow=pendingWindow;
     task.weeklyTarget=weeklyTarget;
     task.quotaResetWeekday=quotaResetWeekday;
+    if(startMissTracking){
+      task.missTrackingStartDate=initialMissTrackingDate(task);
+      task.acknowledgedMisses={};
+    }
 
     if(type==="quota"&&oldType!=="quota"){
       task.quotaTrackingStartDate=localDateKey();
