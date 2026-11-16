@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Chores</title>
-<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/alexanderkobulnicky-code/Chores/main/BE53A647-84C0-4476-9861-D24FE24B40C7.png">
+<link rel="apple-touch-icon" href="BE53A647-84C0-4476-9861-D24FE24B40C7.png">
 <style>
 :root{
   --bg:#f4f4ef;--card:#fff;--ink:#1d221f;--muted:#6d756f;--line:#dfe3dd;
@@ -38,7 +38,7 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .badge{min-width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--green-soft);color:var(--done-slider);font-weight:800;font-size:18px}
 .recovery{display:none;margin:-7px 0 15px;padding:10px 13px;border-radius:12px;background:#fff8d8;border:1px solid #e4d395;font-size:12px;color:#625925}
 .section-title{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin:18px 0 10px}
-.tasks,.todos{display:grid;gap:11px}
+.tasks,.todos{display:grid;gap:11px}#missedList:not(:empty){margin-bottom:11px}
 .task{padding:18px;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 26px rgba(20,30,24,.055);transition:background .2s,border-color .2s}
 .task.scheduled{background:#f6f8f6;border-color:var(--line)}.task.done{background:var(--done-bg);border-color:var(--done-border)}.task.pending{background:var(--pending-bg);border-color:var(--pending-border)}.task.due{background:var(--due-bg);border-color:var(--due-border)}.task.overdue{background:var(--overdue-bg);border-color:var(--overdue-border)}.task.paused{background:var(--paused-bg);border-color:var(--paused-border)}
 .task-name,.todo-name{font-size:20px;font-weight:750;letter-spacing:-.02em}.meta{color:var(--muted);font-size:14px;margin-top:4px;line-height:1.35}
@@ -46,11 +46,25 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .mini-medal{width:28px;height:28px;display:grid;place-items:center;font-size:22px;line-height:1;filter:drop-shadow(0 1px 1px #0002)}
 .bar{height:8px;background:rgba(255,255,255,.5);border-radius:99px;overflow:hidden;margin:14px 0}.bar>div{height:100%;border-radius:inherit}
 .scheduled .bar>div{background:#a5afa7}.done .bar>div{background:var(--done-slider)}.pending .bar>div{background:var(--pending-slider)}.due .bar>div{background:var(--due-slider)}.overdue .bar>div{background:var(--overdue-slider)}.paused .bar>div{background:var(--paused-slider)}
-.task-bottom{font-size:12px;color:var(--muted);flex-wrap:wrap}.stats{display:flex;gap:13px;flex-wrap:wrap}.edit{border:0;background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.task-bottom{font-size:12px;color:var(--muted);flex-wrap:wrap}.stats{display:block;flex:0 0 100%;width:100%}.stat-line{display:block}.stat-line+.stat-line{margin-top:16px}.new-personal-best{color:var(--done-slider);font-weight:800}.edit{border:0;background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .switch{position:relative;width:64px;height:34px;flex:0 0 auto}.switch input{opacity:0;width:0;height:0}.switch span{position:absolute;inset:0;border-radius:99px;transition:.18s}.switch span:before{content:"";position:absolute;width:26px;height:26px;left:4px;top:4px;background:#fff;border-radius:50%;box-shadow:0 2px 6px #0002;transition:.18s}
 .scheduled .switch span{background:#a5afa7}.done .switch span{background:var(--done-slider)}.done .switch span:before{transform:translateX(30px)}.pending .switch span{background:var(--pending-slider)}.due .switch span{background:var(--due-slider)}.overdue .switch span{background:var(--overdue-slider)}.paused .switch span{background:var(--paused-slider)}.paused .switch input:disabled+span{opacity:.78}
 .quota-control{display:flex;align-items:center;gap:7px}.quota-button{width:36px;height:36px;border:1px solid rgba(29,34,31,.16);border-radius:50%;background:rgba(255,255,255,.72);color:var(--ink);font-size:20px;font-weight:800;display:grid;place-items:center;padding:0;line-height:1}.quota-button:disabled{opacity:.32;cursor:default}.quota-count{min-width:58px;text-align:center;font-size:18px;font-weight:800;letter-spacing:-.02em}.quota-note{font-size:10px;color:var(--muted);text-align:right}.paused .quota-button{border-color:var(--paused-border)}
 .empty{padding:34px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}.hidden{display:none!important}
+.task.missed{background:var(--overdue-bg);border-color:var(--overdue-border)}
+.missed-title{font-size:20px;font-weight:750}.missed-caption{font-size:13px;color:var(--muted);margin-top:5px}
+.missed-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.missed-actions button,.dated-action{min-height:44px;padding:10px 14px;border-radius:12px;border:1px solid rgba(29,34,31,.18);background:#fff;font-weight:700;color:var(--ink)}
+.dated-action{min-width:108px}.dated-action:disabled{opacity:.5;cursor:default}
+.acknowledged-list{display:grid;gap:9px;margin-top:10px}.acknowledged-card{background:var(--overdue-bg);border:1px solid var(--overdue-border);border-radius:14px;padding:13px}
+.acknowledged-card .missed-actions button{min-height:40px;font-size:12px}
+.archive-section{margin-top:36px;border-top:1px solid var(--line);padding-top:15px}
+.archive-section summary{cursor:pointer;color:var(--muted);font-size:14px;font-weight:750}
+.history-record{padding:10px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}
+.history-copy{font-size:12px;color:var(--muted);line-height:1.5}
+.history-items{max-height:250px;overflow:auto;margin:9px 0 12px}
+.log-inline-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+
 .page-header{margin-bottom:18px}.page-header h1{font-size:36px}
 .awards-list{display:grid;gap:14px}.award-task{padding:18px}.award-task-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}.award-task-name{font-size:22px;font-weight:750}.award-task-streak{color:var(--muted);font-size:13px;margin-top:3px}.next-target{background:var(--green-soft);color:var(--done-slider);border-radius:12px;padding:8px 10px;font-size:12px;font-weight:700;text-align:right}
 .award-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.award-item{text-align:center}.award-art{width:100%;aspect-ratio:1;display:grid;place-items:center;font-size:clamp(30px,8vw,52px);line-height:1;filter:drop-shadow(0 2px 2px #0002)}.award-item.locked .award-art{opacity:.22;filter:grayscale(1)}.award-number{margin-top:5px;font-size:12px;font-weight:750}.award-state{color:var(--muted);font-size:10px;margin-top:1px}
@@ -104,7 +118,12 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
   <div class="badge" id="statusBadge">✓</div>
 </section>
 <div class="section-title">Your tasks</div>
+<section class="tasks" id="missedList"></section>
 <section class="tasks" id="taskList"></section>
+<details class="archive-section" id="archiveSection" hidden>
+  <summary id="archiveSummary">Acknowledged misses</summary>
+  <div class="acknowledged-list" id="acknowledgedList"></div>
+</details>
 </main>
 
 <main class="app hidden" id="awardsView">
@@ -137,19 +156,27 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 <input type="hidden" id="taskId">
 <div class="field"><label for="taskName">Task</label><input id="taskName" maxlength="80" required placeholder="e.g. Laundry"></div>
 <div class="field"><label for="taskType">Type</label><select id="taskType"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="interval">Every N days</option><option value="quota">Times per Week</option></select></div>
+<div class="field" id="deadlineBehaviorField">
+  <label for="deadlineBehavior">When a deadline passes</label>
+  <select id="deadlineBehavior">
+    <option value="carry">Carry forward — remains overdue until done</option>
+    <option value="expire">Mark as missed — next period starts fresh</option>
+  </select>
+  <p class="fine">Watering plants: Carry forward. Dinner or another task that cannot be made up later: Mark as missed. Existing tasks keep their old behavior unless changed.</p>
+</div>
 <div id="weeklyFields" class="hidden">
   <div class="pair">
     <div class="field"><label for="pendingWeekday">Pending begins</label><select id="pendingWeekday"><option value="none">Never (Due Today only)</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5" selected>Friday</option><option value="6">Saturday</option></select></div>
-    <div class="field"><label for="overdueWeekday">Becomes Overdue</label><select id="overdueWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
+    <div class="field"><label for="overdueWeekday">Day after deadline</label><select id="overdueWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
   </div>
-  <p class="fine">A completed weekly task normally stays Done until Pending begins. The day before “Becomes Overdue” is Due Today. Choose “Never” for chores that can only be done on a particular day: they go straight from Done to Due Today, then Overdue if missed. A new task shows Scheduled until its first Pending day, or its first due day if Pending is set to Never.</p>
+  <p class="fine">A weekly task becomes Due Today the day before “Day after deadline.” Under Carry forward, a missed deadline stays Overdue. Under Mark as missed, a separate missed occurrence appears and a new week begins. Choose “Never” for chores due on a particular day.</p>
 </div>
 <div id="monthlyFields" class="hidden">
   <div class="pair">
     <div class="field"><label for="monthlyPendingDay">Pending begins on day</label><input id="monthlyPendingDay" type="number" min="1" max="31" step="1" value="1"></div>
     <div class="field"><label for="monthlyDay">Due on day of month</label><input id="monthlyDay" type="number" min="1" max="31" step="1" value="1"></div>
   </div>
-  <p class="fine">The task becomes Pending on the first day you choose, Due Today on its due day, and Overdue the following day. If Pending begins later in the month than the due day, the window crosses into the next month. In shorter months, the 29th, 30th, or 31st becomes the last day. For bills that become Pending on the 25th and Overdue on the 1st, choose Pending 25 and Due 31. After completion, the task stays Done until its next Pending day.</p>
+  <p class="fine">The task becomes Pending on your chosen day and Due Today on its due day. The following day, it either stays Overdue (Carry forward) or becomes a separately logged Miss (Mark as missed). Pending can begin in the previous month. Days 29–31 use the last day in shorter months. For bills pending on the 25th and due at month-end, choose Pending 25 and Due 31.</p>
 </div>
 <div id="intervalFields" class="hidden">
   <div class="field"><label for="maxDays">Maximum days between completions</label><input id="maxDays" type="number" min="1" step="1" value="7"></div>
@@ -162,10 +189,10 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
     <div class="field"><label for="weeklyTarget">Times per week</label><input id="weeklyTarget" type="number" min="1" max="99" step="1" value="4"></div>
     <div class="field"><label for="quotaResetWeekday">Week resets</label><select id="quotaResetWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
   </div>
-  <p class="fine">Each ＋ records one occurrence. The counter resets at the start of each week. If the target is still unfinished on the final day, it becomes Due Today. A missed week breaks the streak, but the new week begins fresh instead of carrying an Overdue debt forward.</p>
+  <p class="fine">Each ＋ records one occurrence. The counter resets at the start of each week. If the target is still unfinished on the final day, it becomes Due Today. A missed week breaks the streak and can be acknowledged separately. The new week begins fresh.</p>
 </div>
 
-<div id="dailyNote" class="fine">Daily tasks are Due Today until completed. If a whole day passes without completion, they become Overdue.</div>
+<div id="dailyNote" class="fine">Daily tasks are Due Today until completed.</div>
 
 <div class="pause-section hidden" id="pauseSection">
   <div class="pause-heading">
@@ -189,6 +216,23 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 
 <div class="modal-actions"><button type="button" class="delete" id="deleteBtn" hidden>Delete</button><div class="right-actions"><button type="button" class="ghost" id="cancelBtn">Cancel</button><button class="save">Save</button></div></div>
 </form>
+</dialog>
+
+<dialog id="historyDialog">
+  <div class="modal">
+    <h2 id="historyTitle">Completion history</h2>
+    <p class="fine">Choose the day you actually completed a task. Editing history changes completion statistics; acknowledging a miss does not.</p>
+    <div class="field"><label for="historyDate">Date performed</label><input id="historyDate" type="date"></div>
+    <div class="log-inline-actions">
+      <button type="button" class="save" id="historyLogBtn">Record completion on this date</button>
+      <button type="button" class="ghost" id="historyRemoveBtn">Remove on this date</button>
+    </div>
+    <div class="section-title">Recent recorded completions</div>
+    <div class="history-items" id="historyItems"></div>
+    <div class="section-title">Recent changes</div>
+    <div class="history-items" id="activityItems"></div>
+    <div class="modal-actions"><span></span><button type="button" class="ghost" id="historyCloseBtn">Close</button></div>
+  </div>
 </dialog>
 
 <dialog id="todoDialog">
@@ -341,6 +385,10 @@ function makeTask(name,type="daily",maxDays=7,pendingWindow=2){
     quotaEvents:[],
     quotaWeekOutcomes:{},
     quotaTrackingStartDate:null,
+    deadlineBehavior:"carry",
+    missTrackingStartDate:null,
+    acknowledgedMisses:{},
+    activityLog:[],
     plannedPauses:[],
     lastDoneDate:null,
     previousDoneDate:null,
@@ -472,6 +520,10 @@ function migrateState(parsed){
     task.monthlyDay=Number.isInteger(monthlyDay)&&monthlyDay>=1&&monthlyDay<=31?monthlyDay:1;
     const monthlyPendingDay=Number(task.monthlyPendingDay);
     task.monthlyPendingDay=Number.isInteger(monthlyPendingDay)&&monthlyPendingDay>=1&&monthlyPendingDay<=31?monthlyPendingDay:1;
+    if(task.deadlineBehavior!=="expire")task.deadlineBehavior="carry";
+    if(!task.acknowledgedMisses||typeof task.acknowledgedMisses!=="object"||Array.isArray(task.acknowledgedMisses))task.acknowledgedMisses={};
+    if(!Array.isArray(task.activityLog))task.activityLog=[];
+    if(!task.missTrackingStartDate)task.missTrackingStartDate=addDaysKey(localDateKey(),-1);
     if(!Array.isArray(task.plannedPauses))task.plannedPauses=[];
     task.plannedPauses=task.plannedPauses
       .filter(p=>p&&p.startDate&&p.endDate)
@@ -562,7 +614,7 @@ function defaultState(){
       {...makeTask("Laundry","weekly"),pendingWeekday:1,overdueWeekday:4,resetWeekday:4},
       makeTask("Water Plants","interval",7,1),
       {...makeTask("Pay Bills","monthly"),monthlyPendingDay:25,monthlyDay:31},
-      makeTask("Make Dinner","daily"),
+      {...makeTask("Make Dinner","daily"),deadlineBehavior:"expire"},
       makeTask("Exercise","quota")
     ]
   };
@@ -734,6 +786,25 @@ function quotaEventsInRange(task,startKey,endKey){
 
 function quotaCountInRange(task,startKey,endKey){
   return quotaEventsInRange(task,startKey,endKey).length;
+}
+
+function quotaPersonalBest(task,excludeWeekStart=null){
+  // Count recorded occurrences, including multiple on the same day.
+  // Use this task's configured week boundary, which defaults to Monday.
+  const countsByWeek=new Map();
+  let best=0;
+
+  for(const event of task.quotaEvents||[]){
+    if(!event||!/^\d{4}-\d{2}-\d{2}$/.test(String(event.date||"")))continue;
+
+    const weekStart=quotaWeekStart(task,event.date);
+    if(weekStart===excludeWeekStart)continue;
+    const count=(countsByWeek.get(weekStart)||0)+1;
+    countsByWeek.set(weekStart,count);
+    if(count>best)best=count;
+  }
+
+  return best;
 }
 
 function quotaWeekFullyExcused(task,weekStart){
@@ -983,6 +1054,12 @@ function recomputePastDay(dateKey){
   delete state.dailySnapshots[dateKey];
   finalizeDay(dateKey);
 }
+function recomputeDaysFrom(startDate){
+  const today=localDateKey();
+  for(let d=startDate,guard=0;d<today&&guard<4000;d=addDaysKey(d,1),guard++){
+    recomputePastDay(d);
+  }
+}
 
 function taskExistedOn(task,dateKey){
   return localDateKey(new Date(task.createdAt))<=dateKey;
@@ -1062,6 +1139,13 @@ function statusAt(task,dateKey,includeSameDay=true){
     latest=latestCompletionOnOrBefore(task,addDaysKey(dateKey,-1));
   }
 
+  /* Expiring daily tasks are independent: yesterday never makes today overdue. */
+  if(task.type==="daily"&&task.deadlineBehavior==="expire"){
+    return includeSameDay&&hasCompletionOn(task,dateKey)
+      ?{state:"done",progress:1,detail:"Done for today"}
+      :{state:"due",progress:0,detail:"Due Today"};
+  }
+
   /* DAILY */
 
   if(task.type==="daily"){
@@ -1090,6 +1174,36 @@ function statusAt(task,dateKey,includeSameDay=true){
     }
 
     return{state:"overdue",progress:0,detail:"Overdue"};
+  }
+
+  /* Expiring fixed-calendar weeks/months never carry an old obligation forward. */
+  if(task.deadlineBehavior==="expire"&&(task.type==="weekly"||task.type==="monthly")){
+    let dueDate,pendingDate,periodStart;
+    if(task.type==="weekly"){
+      const settings=weeklySettings(task);
+      const dueWeekday=(settings.overdue+6)%7;
+      const lastDue=weekStartKey(dateKey,dueWeekday);
+      dueDate=lastDue===dateKey?lastDue:addDaysKey(lastDue,7);
+      periodStart=addDaysKey(dueDate,-6);
+      pendingDate=settings.noPending?dueDate:weekStartKey(dueDate,settings.pending);
+    }else{
+      const day=Number(task.monthlyDay);
+      const month=dateFromKey(dateKey);
+      const thisDue=monthlyDueInMonth(month,day);
+      const dueMonth=thisDue>=dateKey?month:nextMonthDate(dateKey);
+      const cycle=monthlyCycleInMonth(task,dueMonth);
+      dueDate=cycle.dueDate;
+      pendingDate=cycle.pendingDate;
+      const previousMonth=new Date(dueMonth.getFullYear(),dueMonth.getMonth()-1,1);
+      periodStart=addDaysKey(monthlyDueInMonth(previousMonth,day),1);
+    }
+    const completed=(task.completionDates||[]).some(d=>
+      d>=periodStart&&d<=dateKey&&(includeSameDay||d!==dateKey)
+    );
+    if(completed)return{state:"done",progress:1,detail:"Done this period"};
+    if(dateKey===dueDate)return{state:"due",progress:0,detail:"Due Today"};
+    if(dateKey>=pendingDate)return{state:"pending",progress:0,detail:`Pending — due ${prettyDate(dueDate)}`};
+    return{state:"scheduled",progress:0,detail:`Scheduled — due ${prettyDate(dueDate)}`};
   }
 
   /* WEEKLY */
@@ -1203,6 +1317,58 @@ function statusAt(task,dateKey,includeSameDay=true){
 
 function status(task){
   return statusAt(task,localDateKey(),true);
+}
+
+/* One record per expired day, weekly period, or quota week. Never treat
+   acknowledged/missed records as completions. */
+function collectMissedOccurrences(today=localDateKey()){
+  const missed=[];
+  for(const task of state.tasks){
+    const created=localDateKey(new Date(task.createdAt));
+    const tracking=task.missTrackingStartDate||today;
+    const start=created>tracking?created:tracking;
+    if(start>=today)continue;
+    const add=(dueDate,startDate,endDate,missing=1,total=1)=>{
+      const record=task.acknowledgedMisses?.[dueDate];
+      const entry={task,dueDate,startDate,endDate,missing,total,ack:record||null};
+      missed.push(entry);
+    };
+    if(task.type==="daily"&&task.deadlineBehavior==="expire"){
+      for(let date=start,guard=0;date<today&&guard<4000;date=addDaysKey(date,1),guard++){
+        if(!isTaskExcusedOn(task,date)&&!hasCompletionOn(task,date))add(date,date,date);
+      }
+    }else if(task.type==="weekly"&&task.deadlineBehavior==="expire"){
+      const dueWeekday=(weeklySettings(task).overdue+6)%7;
+      let due=weekStartKey(start,dueWeekday);
+      if(due<start)due=addDaysKey(due,7);
+      for(let guard=0;due<today&&guard<600;due=addDaysKey(due,7),guard++){
+        const windowStart=addDaysKey(due,-6);
+        if(isTaskExcusedOn(task,due))continue;
+        const did=(task.completionDates||[]).some(d=>d>=windowStart&&d<=due);
+        if(!did)add(due,windowStart,due);
+      }
+    }else if(task.type==="monthly"&&task.deadlineBehavior==="expire"){
+      let month=new Date(dateFromKey(start).getFullYear(),dateFromKey(start).getMonth(),1);
+      for(let guard=0;guard<160;guard++,month=new Date(month.getFullYear(),month.getMonth()+1,1)){
+        const due=monthlyCycleInMonth(task,month).dueDate;
+        if(due>=today)break;
+        if(due<start||isTaskExcusedOn(task,due))continue;
+        const prev=new Date(month.getFullYear(),month.getMonth()-1,1);
+        const from=addDaysKey(monthlyCycleInMonth(task,prev).dueDate,1);
+        const did=(task.completionDates||[]).some(d=>d>=from&&d<=due);
+        if(!did)add(due,from,due);
+      }
+    }else if(task.type==="quota"){
+      const current=quotaWeekStart(task,today);
+      for(let week=quotaWeekStart(task,start),guard=0;week<current&&guard<600;week=addDaysKey(week,7),guard++){
+        const due=quotaWeekEndFromStart(week);
+        if(due<start)continue;
+        const result=computedQuotaWeekOutcome(task,week);
+        if(!result.success)add(due,week,due,result.target-result.count,result.target);
+      }
+    }
+  }
+  return missed.sort((a,b)=>a.dueDate.localeCompare(b.dueDate)||a.task.name.localeCompare(b.task.name));
 }
 
 
@@ -1358,8 +1524,16 @@ function finalizePastDays(){
    STREAKS
    ================================================== */
 
+function firstStreakMiss(task,startDate){
+  if(!startDate||task.type==="quota")return null;
+  return collectMissedOccurrences()
+    .find(item=>item.task.id===task.id&&item.dueDate>=startDate)?.dueDate||null;
+}
+
 function lastGoodDate(task){
   if(!task.lastDoneDate)return null;
+  const firstMiss=firstStreakMiss(task,task.streakStartDate);
+  if(firstMiss)return addDaysKey(firstMiss,-1);
 
   if(task.type==="daily"){
     return nextActiveDate(task,task.lastDoneDate);
@@ -1396,7 +1570,8 @@ function reconcileStreaks(){
 
     const shouldBreak=task.streakStartDate&&(
       status(task).state==="overdue"||
-      Boolean(quotaMiss)
+      Boolean(quotaMiss)||
+      Boolean(firstStreakMiss(task,task.streakStartDate))
     );
 
     if(shouldBreak){
@@ -1428,7 +1603,7 @@ function restoreRecentBreakIfCorrected(task){
 
   const stillBroken=task.type==="quota"
     ?Boolean(firstMissedQuotaWeekEnd(task,broken.streakStartDate))
-    :status(task).state==="overdue";
+    :status(task).state==="overdue"||Boolean(firstStreakMiss(task,broken.streakStartDate));
 
   if(stillBroken)return false;
 
@@ -1475,6 +1650,15 @@ function updateAllTaskAwards(){
 
 
 /* ==================================================
+   ACTIVITY AUDIT (stored locally, never changes completion statistics)
+   ================================================== */
+function recordTaskActivity(task,action,dateKey){
+  if(!Array.isArray(task.activityLog))task.activityLog=[];
+  task.activityLog.push({action,date:dateKey,enteredAt:Date.now()});
+  if(task.activityLog.length>300)task.activityLog=task.activityLog.slice(-300);
+}
+
+/* ==================================================
    COMPLETE / UNDO RECURRING TASKS
    ================================================== */
 
@@ -1505,7 +1689,8 @@ function markDone(task){
   if(!task.completionDates.includes(today))task.completionDates.push(today);
   syncCompletionPointers(task);
 
-  task.completionEvents.push({date:today,type:task.type});
+  task.completionEvents.push({date:today,type:task.type,enteredAt:Date.now()});
+  recordTaskActivity(task,"Completed",today);
   task.totalCompletions=Number(task.totalCompletions||0)+1;
 
   updateTaskAwards(task);
@@ -1537,6 +1722,7 @@ function undoDone(task){
   }
 
   if(task.totalCompletions>0)task.totalCompletions--;
+  recordTaskActivity(task,"Removed completion",today);
 
   saveState();
   render();
@@ -1564,6 +1750,7 @@ function logYesterdayCompletion(task){
   });
 
   task.totalCompletions=Number(task.totalCompletions||0)+1;
+  recordTaskActivity(task,"Completed (late entry)",yesterday);
 
   /*
     A genuinely new task can start its streak yesterday. If a streak was
@@ -1609,6 +1796,7 @@ function undoYesterdayCompletion(task){
 
   recomputePastDay(yesterday);
   reconcileStreaks();
+  recordTaskActivity(task,"Removed completion",yesterday);
 
   saveState();
   render();
@@ -1656,6 +1844,7 @@ function markQuotaOccurrence(task){
   });
 
   task.totalCompletions=Number(task.totalCompletions||0)+1;
+  recordTaskActivity(task,"Completed",today);
 
   updateTaskAwards(task);
   saveState();
@@ -1709,6 +1898,7 @@ function undoQuotaOccurrence(task){
   }
 
   if(task.totalCompletions>0)task.totalCompletions--;
+  recordTaskActivity(task,"Removed completion",event.date);
 
   saveState();
   render();
@@ -1757,6 +1947,7 @@ function markQuotaOccurrenceYesterday(task){
   });
 
   task.totalCompletions=Number(task.totalCompletions||0)+1;
+  recordTaskActivity(task,"Completed (late entry)",yesterday);
 
   invalidateQuotaOutcomeForDate(task,yesterday);
   finalizeQuotaWeeks(task);
@@ -1809,11 +2000,96 @@ function undoQuotaOccurrenceYesterday(task){
   finalizeQuotaWeeks(task);
   recomputePastDay(yesterday);
   reconcileStreaks();
+  recordTaskActivity(task,"Removed completion",yesterday);
 
   saveState();
   render();
 }
 
+
+/* Date-specific corrections, including dates older than yesterday.
+   Each past quota occurrence belongs to the selected historical week. */
+function logCompletionForDate(task,date){
+  const today=localDateKey(),yesterday=addDaysKey(today,-1);
+  const created=localDateKey(new Date(task.createdAt));
+  if(date<created||date>today)return false;
+  if(task.type==="quota"){
+    if(date===today){markQuotaOccurrence(task);return true;}
+    if(date===yesterday){markQuotaOccurrenceYesterday(task);return true;}
+    const id=uid();
+    if(!Array.isArray(task.quotaEvents))task.quotaEvents=[];
+    if(!Array.isArray(task.completionEvents))task.completionEvents=[];
+    task.quotaEvents.push({id,date,createdAt:Date.now(),lateEntry:true,startedStreak:false});
+    task.quotaEvents.sort((a,b)=>a.date.localeCompare(b.date)||a.createdAt-b.createdAt);
+    task.completionEvents.push({date,type:"quota",quotaEventId:id,lateEntry:true,enteredAt:Date.now()});
+    task.totalCompletions=Number(task.totalCompletions||0)+1;
+    invalidateQuotaOutcomeForDate(task,date);
+    finalizeQuotaWeeks(task);
+  }else{
+    if(hasCompletionOn(task,date))return false;
+    if(date===today){markDone(task);return true;}
+    if(date===yesterday){logYesterdayCompletion(task);return true;}
+    task.completionDates.push(date);
+    syncCompletionPointers(task);
+    task.completionEvents.push({date,type:task.type,lateEntry:true,enteredAt:Date.now()});
+    task.totalCompletions=Number(task.totalCompletions||0)+1;
+  }
+  recordTaskActivity(task,"Completed (late entry)",date);
+  recomputeDaysFrom(date);
+  restoreRecentBreakIfCorrected(task);
+  reconcileStreaks();
+  updateTaskAwards(task);
+  saveState();
+  render();
+  return true;
+}
+function removeCompletionForDate(task,date){
+  const today=localDateKey(),yesterday=addDaysKey(today,-1);
+  if(task.type!=="quota"){
+    if(!hasCompletionOn(task,date))return false;
+    if(date===today){undoDone(task);return true;}
+    if(date===yesterday){undoYesterdayCompletion(task);return true;}
+    task.completionDates=task.completionDates.filter(d=>d!==date);
+    syncCompletionPointers(task);
+    const pos=task.completionEvents.findLastIndex(e=>e.date===date&&e.type!=="quota");
+    if(pos>=0)task.completionEvents.splice(pos,1);
+  }else{
+    const events=(task.quotaEvents||[]).filter(e=>e.date===date);
+    if(!events.length)return false;
+    if(date===yesterday){undoQuotaOccurrenceYesterday(task);return true;}
+    if(date===today){undoQuotaOccurrence(task);return true;}
+    const event=events[events.length-1];
+    task.quotaEvents=task.quotaEvents.filter(e=>e.id!==event.id);
+    const pos=task.completionEvents.findIndex(e=>e.quotaEventId===event.id);
+    if(pos>=0)task.completionEvents.splice(pos,1);
+    invalidateQuotaOutcomeForDate(task,date);
+    finalizeQuotaWeeks(task);
+  }
+  task.totalCompletions=Math.max(0,Number(task.totalCompletions||0)-1);
+  recordTaskActivity(task,"Removed completion",date);
+  recomputeDaysFrom(date);
+  reconcileStreaks();
+  saveState();
+  render();
+  return true;
+}
+function acknowledgeMiss(item){
+  item.task.acknowledgedMisses[item.dueDate]={acknowledgedAt:Date.now(),dismissed:false};
+  recordTaskActivity(item.task,"Acknowledged miss",item.dueDate);
+  saveState();render();
+}
+function undoAcknowledgment(item){
+  delete item.task.acknowledgedMisses[item.dueDate];
+  recordTaskActivity(item.task,"Restored missed reminder",item.dueDate);
+  saveState();render();
+}
+function dismissAcknowledged(item){
+  const ack=item.task.acknowledgedMisses[item.dueDate];
+  if(!ack)return;
+  ack.dismissed=true;
+  recordTaskActivity(item.task,"Dismissed reminder",item.dueDate);
+  saveState();render();
+}
 
 /* ==================================================
    DISPLAY HELPERS
@@ -1853,6 +2129,138 @@ function medalsForTask(task){
    MAIN CHORES SCREEN
    ================================================== */
 
+let historyTask=null;
+let historyRange=null;
+function openHistory(task,selectedDate=null,range=null){
+  historyTask=task;
+  historyRange=range;
+  const today=localDateKey();
+  const created=localDateKey(new Date(task.createdAt));
+  const input=$("historyDate");
+  input.min=range&&range.start>created?range.start:created;
+  input.max=range&&range.end<today?range.end:today;
+  input.value=selectedDate||today;
+  if(input.value<input.min)input.value=input.min;
+  if(input.value>input.max)input.value=input.max;
+  renderHistoryDialog();
+  $("historyDialog").showModal();
+}
+function renderHistoryDialog(){
+  const task=historyTask;
+  if(!task)return;
+  $("historyTitle").textContent=`History · ${task.name}`;
+  const date=$("historyDate").value;
+  const valid=date&&date>=$("historyDate").min&&date<=$("historyDate").max;
+  const qty=task.type==="quota"
+    ?(task.quotaEvents||[]).filter(x=>x.date===date).length
+    :Number(hasCompletionOn(task,date));
+  $("historyLogBtn").disabled=!valid||(task.type!=="quota"&&qty>0);
+  $("historyRemoveBtn").disabled=!valid||qty===0;
+  $("historyRemoveBtn").textContent=qty>0&&task.type==="quota"?`Remove one (${qty} recorded)`:"Remove on this date";
+
+  const events=(task.type==="quota"?(task.quotaEvents||[]).map(e=>({date:e.date,enteredAt:e.createdAt})):
+    (task.completionDates||[]).map(date=>({
+      date,enteredAt:(task.completionEvents||[]).find(e=>e.date===date)?.enteredAt
+    }))).sort((a,b)=>b.date.localeCompare(a.date)||Number(b.enteredAt||0)-Number(a.enteredAt||0)).slice(0,20);
+  $("historyItems").innerHTML=events.length?events.map(event=>`
+    <div class="history-record">
+      <span><strong>${escapeHtml(prettyDate(event.date))}</strong>
+        <span class="history-copy">${event.enteredAt?'<br>Logged '+escapeHtml(new Date(event.enteredAt).toLocaleString()):""}</span>
+      </span>
+      <button type="button" class="small-button remove-record" data-date="${event.date}">Remove</button>
+    </div>`).join(""):'<p class="fine">No completions recorded.</p>';
+  for(const btn of $("historyItems").querySelectorAll(".remove-record")){
+    btn.addEventListener("click",()=>{
+      if(confirm(`Remove a completion for ${task.name} on ${prettyDate(btn.dataset.date)}?`)){
+        removeCompletionForDate(task,btn.dataset.date);
+        renderHistoryDialog();
+      }
+    });
+  }
+  const recent=(task.activityLog||[]).slice(-12).reverse();
+  $("activityItems").innerHTML=recent.length?recent.map(e=>`
+    <div class="history-record">
+      <span><strong>${escapeHtml(e.action||"Change")}</strong>
+        <span class="history-copy"> · ${escapeHtml(prettyDate(e.date))}
+        ${e.enteredAt?" · "+escapeHtml(new Date(e.enteredAt).toLocaleString()):""}</span></span>
+    </div>`).join(""):'<p class="fine">Changes made before this update were not separately audited.</p>';
+}
+$("historyDate").addEventListener("change",renderHistoryDialog);
+$("historyLogBtn").addEventListener("click",()=>{
+  if(!historyTask)return;
+  const date=$("historyDate").value;
+  if(date<$("historyDate").min||date>$("historyDate").max)return;
+  logCompletionForDate(historyTask,date);
+  renderHistoryDialog();
+});
+$("historyRemoveBtn").addEventListener("click",()=>{
+  if(!historyTask)return;
+  const date=$("historyDate").value;
+  if(date<$("historyDate").min||date>$("historyDate").max)return;
+  if(confirm(`Remove a completion for ${historyTask.name} on ${prettyDate(date)}?`)){
+    removeCompletionForDate(historyTask,date);
+    renderHistoryDialog();
+  }
+});
+$("historyCloseBtn").addEventListener("click",()=>$("historyDialog").close());
+
+function renderMissedItems(){
+  const items=collectMissedOccurrences();
+  const active=items.filter(item=>!item.ack);
+  const archived=items.filter(item=>item.ack&&!item.ack.dismissed&&
+    Date.now()-Number(item.ack.acknowledgedAt)<7*86400000
+  );
+
+  const missedList=$("missedList");
+  missedList.innerHTML="";
+  for(const item of active){
+    const card=document.createElement("article");
+    card.className="task missed";
+    const description=item.task.type==="quota"
+      ?`Missed ${item.missing} of ${item.total} for the week ending ${prettyDate(item.dueDate)}`
+      :`Missed ${prettyDate(item.dueDate)} — no completion recorded`;
+    card.innerHTML=`
+      <div class="missed-title">${escapeHtml(item.task.name)} · Missed</div>
+      <div class="missed-caption">${escapeHtml(description)}</div>
+      <div class="missed-actions">
+        <button type="button" class="missed-log">Log ${escapeHtml(prettyDate(item.dueDate))}</button>
+        <button type="button" class="missed-ack">Acknowledge</button>
+      </div>`;
+    card.querySelector(".missed-log").addEventListener("click",()=>{
+      if(item.task.type==="daily")logCompletionForDate(item.task,item.dueDate);
+      else openHistory(item.task,item.dueDate,{start:item.startDate,end:item.endDate});
+    });
+    card.querySelector(".missed-ack").addEventListener("click",()=>acknowledgeMiss(item));
+    missedList.appendChild(card);
+  }
+
+  const archive=$("archiveSection");
+  archive.hidden=archived.length===0;
+  $("archiveSummary").textContent=`Acknowledged misses (${archived.length}) · hidden after 7 days`;
+  const ackList=$("acknowledgedList");
+  ackList.innerHTML="";
+  for(const item of archived){
+    const days=Math.max(0,Math.ceil((7*86400000-(Date.now()-Number(item.ack.acknowledgedAt)))/86400000));
+    const card=document.createElement("div");
+    card.className="acknowledged-card";
+    card.innerHTML=`
+      <strong>${escapeHtml(item.task.name)}</strong>
+      <div class="missed-caption">Missed ${escapeHtml(prettyDate(item.dueDate))} · hidden in ${days} day${days===1?"":"s"}</div>
+      <div class="missed-actions">
+        <button type="button" class="ack-restore">Undo acknowledgment</button>
+        <button type="button" class="ack-log">Log completion</button>
+        <button type="button" class="ack-dismiss">Dismiss reminder</button>
+      </div>`;
+    card.querySelector(".ack-restore").addEventListener("click",()=>undoAcknowledgment(item));
+    card.querySelector(".ack-log").addEventListener("click",()=>{
+      if(item.task.type==="daily")logCompletionForDate(item.task,item.dueDate);
+      else openHistory(item.task,item.dueDate,{start:item.startDate,end:item.endDate});
+    });
+    card.querySelector(".ack-dismiss").addEventListener("click",()=>dismissAcknowledged(item));
+    ackList.appendChild(card);
+  }
+}
+
 function render(){
   const finalized=finalizePastDays();
 
@@ -1879,6 +2287,7 @@ function render(){
       ||Number(a.createdAt)-Number(b.createdAt)
   );
 
+  renderMissedItems();
   const list=$("taskList");
   list.innerHTML="";
 
@@ -1889,6 +2298,10 @@ function render(){
   for(const task of tasks){
     const s=status(task);
     const streak=currentStreakDays(task);
+    const weeklyBest=task.type==="quota"?quotaPersonalBest(task):0;
+    const newWeeklyBest=task.type==="quota"&&Number(s.count||0)>0&&
+      Number(s.count||0)===weeklyBest&&
+      Number(s.count||0)>quotaPersonalBest(task,quotaWeekStart(task,localDateKey()));
     const card=document.createElement("article");
 
     card.className=`task ${s.state}`;
@@ -1912,13 +2325,10 @@ function render(){
               <div class="quota-note">this week</div>
             `
             :`
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  ${s.state==="done"?"checked":""}
-                  ${s.state==="paused"?"disabled":""}>
-                <span></span>
-              </label>
+              <button type="button" class="dated-action today-task"
+                ${s.state==="paused"||(s.state==="done"&&!hasCompletionOn(task,localDateKey()))?"disabled":""}>
+                ${hasCompletionOn(task,localDateKey())?"Undo today":s.state==="overdue"?"Choose date":"Done today"}
+              </button>
             `
           }
 
@@ -1939,25 +2349,12 @@ function render(){
 
       <div class="task-bottom">
         <div class="stats">
-          <span>Best ${task.bestStreakDays} days</span>
-          <span>Total ${task.totalCompletions} completions</span>
+          <div class="stat-line">Best streak: ${task.bestStreakDays} day${task.bestStreakDays===1?"":"s"}</div>
+          ${task.type==="quota"?`<div class="stat-line ${newWeeklyBest?"new-personal-best":""}">${newWeeklyBest?"★ New personal best! ":"Personal best: "}${weeklyBest} time${weeklyBest===1?"":"s"} in a week</div>`:""}
         </div>
 
         <div class="task-history-actions">
-          ${
-            canLogYesterday(task)
-            ?task.type==="quota"
-              ?`
-                <button type="button" class="small-button yesterday-quota-minus" ${quotaEventsInRange(task,addDaysKey(localDateKey(),-1),addDaysKey(localDateKey(),-1)).length?"":"disabled"}>− Yesterday</button>
-                <button type="button" class="small-button yesterday-quota-plus">＋ Yesterday</button>
-              `
-              :`
-                <button type="button" class="small-button yesterday-task">
-                  ${hasCompletionOn(task,addDaysKey(localDateKey(),-1))?"Yesterday ✓":"Log yesterday"}
-                </button>
-              `
-            :""
-          }
+          <button type="button" class="small-button history-button">History / Log date</button>
           <button class="edit">Edit</button>
         </div>
       </div>
@@ -1970,39 +2367,20 @@ function render(){
       plus.addEventListener("click",()=>markQuotaOccurrence(task));
       minus.addEventListener("click",()=>undoQuotaOccurrence(task));
 
-      const yesterdayPlus=card.querySelector(".yesterday-quota-plus");
-      const yesterdayMinus=card.querySelector(".yesterday-quota-minus");
-
-      if(yesterdayPlus){
-        yesterdayPlus.addEventListener("click",()=>markQuotaOccurrenceYesterday(task));
-      }
-
-      if(yesterdayMinus){
-        yesterdayMinus.addEventListener("click",()=>undoQuotaOccurrenceYesterday(task));
-      }
     }else{
-      const checkbox=card.querySelector("input");
-
-      checkbox.addEventListener("change",event=>{
-        event.target.checked?markDone(task):undoDone(task);
+      card.querySelector(".today-task").addEventListener("click",()=>{
+        const today=localDateKey();
+        if(hasCompletionOn(task,today)){
+          if(confirm(`Remove today's completion for “${task.name}”?`))undoDone(task);
+        }else if(s.state==="overdue"){
+          openHistory(task,addDaysKey(today,-1));
+        }else{
+          markDone(task);
+        }
       });
-
-      const yesterdayButton=card.querySelector(".yesterday-task");
-
-      if(yesterdayButton){
-        yesterdayButton.addEventListener("click",()=>{
-          const yesterday=addDaysKey(localDateKey(),-1);
-          if(hasCompletionOn(task,yesterday)){
-            if(confirm(`Remove yesterday’s completion for “${task.name}”?`)){
-              undoYesterdayCompletion(task);
-            }
-          }else{
-            logYesterdayCompletion(task);
-          }
-        });
-      }
     }
 
+    card.querySelector(".history-button").addEventListener("click",()=>openHistory(task));
     card.querySelector(".edit").addEventListener("click",()=>openEdit(task));
     list.appendChild(card);
   }
@@ -2023,6 +2401,7 @@ function updateSummary(){
   statusPanel?.classList.remove("celebrate");
 
   const overdue=states.filter(x=>x==="overdue").length;
+  const missed=collectMissedOccurrences().filter(x=>!x.ack).length;
   const due=states.filter(x=>x==="due").length;
   const pendingTasks=state.tasks.filter(task=>status(task).state==="pending");
   const pending=pendingTasks.length;
@@ -2031,8 +2410,8 @@ function updateSummary(){
   const scheduled=states.filter(x=>x==="scheduled").length;
   const paused=states.filter(x=>x==="paused").length;
 
-  if(overdue){
-    $("statusTitle").textContent=`${overdue} task${overdue===1?"":"s"} overdue`;
+  if(overdue||missed){
+    $("statusTitle").textContent=[overdue?`${overdue} overdue`:"",missed?`${missed} missed`:""].filter(Boolean).join(" · ");
 
     const waiting=due+pending+scheduled;
 
@@ -2042,7 +2421,7 @@ function updateSummary(){
         ?`${paused} task${paused===1?" is":"s are"} paused.`
         :"Nothing else is waiting.";
 
-    $("statusBadge").textContent=overdue;
+    $("statusBadge").textContent=overdue+missed;
     $("statusBadge").style.background="var(--red-soft)";
     $("statusBadge").style.color="var(--overdue-slider)";
     return;
@@ -2589,7 +2968,11 @@ function updateTypeFields(){
   $("monthlyFields").classList.toggle("hidden",type!=="monthly");
   $("intervalFields").classList.toggle("hidden",type!=="interval");
   $("quotaFields").classList.toggle("hidden",type!=="quota");
+  $("deadlineBehaviorField").classList.toggle("hidden",type==="quota"||type==="interval");
   $("dailyNote").classList.toggle("hidden",type!=="daily");
+  $("dailyNote").textContent=$("deadlineBehavior").value==="expire"
+    ?"Each unrecorded day becomes its own Missed entry. Today remains a fresh obligation."
+    :"If a day passes unrecorded, this task remains Overdue until completed.";
 }
 
 function currentEditedTask(){
@@ -2705,6 +3088,7 @@ function overlapsOtherPause(task,pauseId,startDate,endDate){
 }
 
 $("taskType").addEventListener("change",updateTypeFields);
+$("deadlineBehavior").addEventListener("change",updateTypeFields);
 
 $("addBtn").addEventListener("click",()=>{
   form.reset();
@@ -2720,6 +3104,7 @@ $("addBtn").addEventListener("click",()=>{
   $("pendingWindow").value="2";
   $("weeklyTarget").value="4";
   $("quotaResetWeekday").value="1";
+  $("deadlineBehavior").value="carry";
   $("deleteBtn").hidden=true;
 
   clearPauseEditor();
@@ -2749,6 +3134,7 @@ function openEdit(task){
   $("pendingWindow").value=String(task.pendingWindow??2);
   $("weeklyTarget").value=String(task.weeklyTarget??4);
   $("quotaResetWeekday").value=String(task.quotaResetWeekday??1);
+  $("deadlineBehavior").value=task.deadlineBehavior||"carry";
   $("deleteBtn").hidden=false;
 
   clearPauseEditor();
@@ -2845,6 +3231,7 @@ form.addEventListener("submit",event=>{
   const pendingWindow=Number($("pendingWindow").value);
   const weeklyTarget=Number($("weeklyTarget").value);
   const quotaResetWeekday=Number($("quotaResetWeekday").value);
+  const deadlineBehavior=(type==="quota"?"expire":type==="interval"?"carry":$("deadlineBehavior").value);
 
   if(!name)return;
 
@@ -2899,8 +3286,13 @@ form.addEventListener("submit",event=>{
 
     if(oldType==="quota")finalizeQuotaWeeks(task);
 
+    if(deadlineBehavior==="expire"&&(task.deadlineBehavior!=="expire"||oldType!==type)){
+      task.missTrackingStartDate=addDaysKey(localDateKey(),-1);
+      task.acknowledgedMisses={};
+    }
     task.name=name;
     task.type=type;
+    task.deadlineBehavior=deadlineBehavior;
     task.monthlyDay=monthlyDay;
     task.monthlyPendingDay=monthlyPendingDay;
     task.pendingWeekday=pendingWeekday;
@@ -2920,6 +3312,8 @@ form.addEventListener("submit",event=>{
     }
   }else{
     const task=makeTask(name,type,max,pendingWindow);
+    task.deadlineBehavior=deadlineBehavior;
+    task.missTrackingStartDate=localDateKey();
 
     task.monthlyDay=monthlyDay;
     task.monthlyPendingDay=monthlyPendingDay;
