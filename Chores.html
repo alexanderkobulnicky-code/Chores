@@ -83,7 +83,7 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 /* dialogs */
 dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;box-shadow:0 25px 80px #0004}dialog::backdrop{background:#0004;backdrop-filter:blur(2px)}.modal{padding:21px}.modal h2{margin:0 0 16px;font-size:25px}.field{display:grid;gap:6px;margin:12px 0}.field label{font-size:13px;color:var(--muted);font-weight:700}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink)}.fine{font-size:12px;color:var(--muted);line-height:1.45;margin:10px 0 0}.modal-actions{margin-top:18px}.right-actions{display:flex;gap:8px}.ghost,.delete{border:1px solid var(--line);border-radius:999px;padding:10px 13px;background:#fff}.delete{color:var(--overdue-slider)}
 @media(max-width:600px){h1{font-size:36px}.header-actions{flex-direction:column-reverse;align-items:flex-end}.pair{grid-template-columns:1fr}.status{align-items:flex-start}.award-row{gap:5px}.award-number{font-size:11px}.award-state{font-size:9px}.day-cell{min-height:59px;padding:5px}.day-mark{font-size:21px}.page-header{align-items:flex-start}.todo-actions{flex-direction:column;align-items:flex-end}}
-</style>
+.today-button{min-height:42px;padding:9px 12px;border:1px solid var(--done-border);background:white;border-radius:12px;font-size:13px;font-weight:750;white-space:nowrap}.today-button:disabled{opacity:.5;cursor:default}.missed-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}.task.missed{background:var(--overdue-bg);border-color:var(--overdue-border)}.task.acknowledged{background:#eceeea;border-color:var(--line)}.acknowledged-section{margin-top:34px;padding-top:8px;border-top:1px solid var(--line)}.acknowledged-section .tasks{margin-top:15px}.action-notice{margin:10px 0;padding:10px;border:1px solid var(--done-border);border-radius:12px;background:var(--done-bg);font-size:12px}.history-activity{font-size:11px;white-space:pre-wrap;line-height:1.5;max-height:170px;overflow:auto;color:var(--muted)}</style>
 </head>
 <body>
 
@@ -104,7 +104,9 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
   <div class="badge" id="statusBadge">✓</div>
 </section>
 <div class="section-title">Your tasks</div>
+<div id="actionNotice" class="action-notice hidden" role="status"></div>
 <section class="tasks" id="taskList"></section>
+<section class="acknowledged-section hidden" id="acknowledgedSection"><div class="section-title">Acknowledged misses (<span id="acknowledgedCount">0</span>)</div><p class="fine">Hidden automatically seven days after acknowledgment. The history remains editable.</p><div class="tasks" id="acknowledgedList"></div></section>
 </main>
 
 <main class="app hidden" id="awardsView">
@@ -165,7 +167,8 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
   <p class="fine">Each ＋ records one occurrence. The counter resets at the start of each week. If the target is still unfinished on the final day, it becomes Due Today. A missed week breaks the streak, but the new week begins fresh instead of carrying an Overdue debt forward.</p>
 </div>
 
-<div id="dailyNote" class="fine">Daily tasks are Due Today until completed. If a whole day passes without completion, they become Overdue.</div>
+<div id="dailyNote" class="fine">Daily tasks are due every day. Choose how to handle a day without a recorded completion below.</div>
+<div class="field" id="deadlineBehaviorField"><label for="deadlineBehavior">When a deadline is missed</label><select id="deadlineBehavior"><option value="carry">Carry forward (overdue until done)</option><option value="expire">Mark as missed (next period starts fresh)</option></select><p class="fine">Plants can be watered late; yesterday’s dinner or exercise cannot be made up today. Weekly quotas always reset.</p></div>
 
 <div class="pause-section hidden" id="pauseSection">
   <div class="pause-heading">
@@ -191,6 +194,7 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 </form>
 </dialog>
 
+<dialog id="historyDialog"><div class="modal"><h2 id="historyTitle">Completion history</h2><div class="field"><label for="historyDate">Choose a date</label><input type="date" id="historyDate"></div><p class="fine" id="historyCount"></p><div class="missed-actions"><button type="button" class="small-button" id="historyRecord">Record completion</button><button type="button" class="small-button" id="historyRemove">Remove one completion</button></div><p class="fine">You can correct earlier dates here, even after an acknowledged reminder disappears. Weekly quotas count each occurrence separately.</p><h3>Recent changes</h3><div class="history-activity" id="historyActivity"></div><div class="modal-actions"><button type="button" class="secondary-button" id="historyClose">Close</button></div></div></dialog>
 <dialog id="todoDialog">
 <form class="modal" id="todoForm">
 <h2 id="todoDialogTitle">Add to-do</h2>
@@ -338,6 +342,10 @@ function makeTask(name,type="daily",maxDays=7,pendingWindow=2){
     overdueWeekday:1,
     weeklyTarget:4,
     quotaResetWeekday:1,
+    deadlineBehavior:type==="quota"?"expire":"carry",
+    missTrackingStartDate:type==="quota"?localDateKey():null,
+    missedAcknowledgments:{},
+    activityLog:[],
     quotaEvents:[],
     quotaWeekOutcomes:{},
     quotaTrackingStartDate:null,
@@ -520,6 +528,13 @@ function migrateState(parsed){
       task.quotaTrackingStartDate=localDateKey(new Date(task.createdAt||Date.now()));
     }
 
+    if(task.deadlineBehavior!=="carry"&&task.deadlineBehavior!=="expire")task.deadlineBehavior=task.type==="quota"?"expire":"carry";
+    if(task.type==="quota")task.deadlineBehavior="expire";
+    if(task.missTrackingStartDate===undefined||task.missTrackingStartDate===null){
+      task.missTrackingStartDate=task.type==="quota"?addDaysKey(weekStartKey(localDateKey(),Number(task.quotaResetWeekday??1)),-7):null;
+    }
+    if(!task.missedAcknowledgments||typeof task.missedAcknowledgments!=="object")task.missedAcknowledgments={};
+    if(!Array.isArray(task.activityLog))task.activityLog=[];
     if(task.previousDoneDate===undefined)task.previousDoneDate=null;
     if(task.totalCompletions==null)task.totalCompletions=0;
 
@@ -1019,6 +1034,8 @@ function statusAt(task,dateKey,includeSameDay=true){
 
   /* TIMES PER WEEK */
 
+  if(isExpiringTask(task)&&task.type!=="quota")return expiringStatusAt(task,dateKey,includeSameDay);
+
   if(task.type==="quota"){
     const weekStart=quotaWeekStart(task,dateKey);
     const weekEnd=quotaWeekEndFromStart(weekStart);
@@ -1206,6 +1223,223 @@ function status(task){
 }
 
 
+/* === Missed cards, corrections, and audit trail === */
+function noticeAction(message){
+  const el=$("actionNotice");el.textContent=message;el.classList.remove("hidden");
+}
+function recordOnDate(task,day){
+  const today=localDateKey(),yesterday=addDaysKey(today,-1);
+  const created=localDateKey(new Date(task.createdAt));
+  if(day<created||day>today||isTaskExcusedOn(task,day))return;
+  if(task.type!=="quota"&&hasCompletionOn(task,day))return;
+  if(day===today){
+    if(task.type==="quota")markQuotaOccurrence(task);else markDone(task);
+  }else if(day===yesterday){
+    if(task.type==="quota")markQuotaOccurrenceYesterday(task);else logYesterdayCompletion(task);
+  }else{
+    if(task.type==="quota"){
+      const id=uid();
+      task.quotaEvents.push({id,date:day,createdAt:Date.now(),startedStreak:false,lateEntry:true});
+      task.quotaEvents.sort((a,b)=>a.date.localeCompare(b.date)||a.createdAt-b.createdAt);
+      task.completionEvents.push({date:day,type:"quota",quotaEventId:id,lateEntry:true,enteredAt:Date.now()});
+      invalidateQuotaOutcomeForDate(task,day);finalizeQuotaWeeks(task);
+    }else{
+      task.completionDates.push(day);syncCompletionPointers(task);
+      task.completionEvents.push({date:day,type:task.type,lateEntry:true,enteredAt:Date.now()});
+    }
+    task.totalCompletions=Number(task.totalCompletions||0)+1;
+    recomputePastDay(day);restoreRecentBreakIfCorrected(task);reconcileStreaks();updateTaskAwards(task);
+  }
+  const key=task.type==="quota"?quotaWeekEndFromStart(quotaWeekStart(task,day)):day;
+  if(task.missedAcknowledgments)delete task.missedAcknowledgments[key];
+  addActivity(task,"Logged completion",day);saveState();render();
+  noticeAction("Recorded "+task.name+" for "+prettyDate(day)+".");
+}
+function removeOnDate(task,day){
+  const today=localDateKey(),yesterday=addDaysKey(today,-1);
+  const events=task.type==="quota"?quotaEventsInRange(task,day,day):[];
+  if(task.type==="quota"&&!events.length)return;
+  if(task.type!=="quota"&&!hasCompletionOn(task,day))return;
+  if(day===today){
+    if(task.type==="quota")undoQuotaOccurrence(task);else undoDone(task);
+  }else if(day===yesterday){
+    if(task.type==="quota")undoQuotaOccurrenceYesterday(task);else undoYesterdayCompletion(task);
+  }else{
+    if(task.type==="quota"){
+      const event=events[events.length-1];
+      task.quotaEvents=task.quotaEvents.filter(e=>e.id!==event.id);
+      let index=task.completionEvents.findIndex(e=>e.quotaEventId===event.id);
+      if(index<0)index=task.completionEvents.findIndex(e=>e.type==="quota"&&e.date===day);
+      if(index>=0)task.completionEvents.splice(index,1);
+      invalidateQuotaOutcomeForDate(task,day);finalizeQuotaWeeks(task);
+    }else{
+      task.completionDates=task.completionDates.filter(d=>d!==day);
+      syncCompletionPointers(task);
+      const index=task.completionEvents.findIndex(e=>e.date===day&&e.type===task.type);
+      if(index>=0)task.completionEvents.splice(index,1);
+    }
+    task.totalCompletions=Math.max(0,Number(task.totalCompletions||0)-1);
+    recomputePastDay(day);reconcileStreaks();
+  }
+  addActivity(task,"Removed completion",day);saveState();render();
+  noticeAction("Removed "+task.name+" completion for "+prettyDate(day)+".");
+}
+function buttonForMiss(label,handler){
+  const b=document.createElement("button");
+  b.type="button";b.className="small-button";b.textContent=label;b.addEventListener("click",handler);
+  return b;
+}
+function drawMissedEntry(entry,archived){
+  const {task,date}=entry;
+  const card=document.createElement("article");
+  card.className="task "+(archived?"acknowledged":"missed");
+  const name=document.createElement("div");
+  name.className="task-name";name.textContent=task.name;
+  const detail=document.createElement("div");
+  detail.className="meta";detail.textContent="Missed "+prettyDate(date)+(archived?" · acknowledged":"");
+  const actions=document.createElement("div");actions.className="missed-actions";
+  actions.appendChild(buttonForMiss("Log "+prettyDate(date),()=>{
+    if(confirm('Record "'+task.name+'" as completed on '+prettyDate(date)+'?'))recordOnDate(task,date);
+  }));
+  if(archived){
+    actions.appendChild(buttonForMiss("Undo acknowledgment",()=>restoreMiss(task,date)));
+    actions.appendChild(buttonForMiss("Dismiss",()=>dismissMiss(task,date)));
+    const days=Math.max(0,7-Math.floor((Date.now()-entry.ack.acknowledgedAt)/86400000));
+    const info=document.createElement("div");
+    info.className="meta";info.textContent="Automatically hidden in "+days+" day"+(days===1?"":"s");
+    card.append(name,detail,info,actions);
+  }else{
+    actions.appendChild(buttonForMiss("Acknowledge",()=>acknowledgeMiss(task,date)));
+    card.append(name,detail,actions);
+  }
+  return card;
+}
+function showArchivedMisses(entries){
+  const section=$("acknowledgedSection"),list=$("acknowledgedList");
+  list.replaceChildren();
+  section.classList.toggle("hidden",entries.length===0);
+  $("acknowledgedCount").textContent=entries.length;
+  for(const entry of entries)list.appendChild(drawMissedEntry(entry,true));
+}
+let historyTaskId=null;
+function openHistory(task,day=null){
+  historyTaskId=task.id;
+  $("historyTitle").textContent=task.name+" — history";
+  $("historyDate").min=localDateKey(new Date(task.createdAt));
+  $("historyDate").max=localDateKey();
+  const created=localDateKey(new Date(task.createdAt));
+  const yesterday=addDaysKey(localDateKey(),-1);
+  $("historyDate").value=day||(created>yesterday?created:yesterday);
+  updateHistoryDialog();$("historyDialog").showModal();
+}
+function updateHistoryDialog(){
+  const task=state.tasks.find(t=>t.id===historyTaskId);
+  if(!task)return;
+  const day=$("historyDate").value;
+  if(!day)return;
+  const count=task.type==="quota"?quotaEventsInRange(task,day,day).length:Number(hasCompletionOn(task,day));
+  $("historyCount").textContent=count+" completion"+(count===1?"":"s")+" recorded for "+prettyDate(day);
+  $("historyRemove").disabled=count===0;
+  $("historyRecord").disabled=day>localDateKey()||day<localDateKey(new Date(task.createdAt))||(task.type!=="quota"&&count>0);
+  const actions=(task.activityLog||[]).slice(-12).reverse();
+  $("historyActivity").textContent=actions.length
+    ?actions.map(a=>new Date(a.enteredAt).toLocaleString()+": "+a.action+" — "+prettyDate(a.date)).join("\n")
+    :"No changes recorded yet (logging begins with this update).";
+}
+$("historyClose").addEventListener("click",()=>$("historyDialog").close());
+$("historyDate").addEventListener("change",updateHistoryDialog);
+$("historyRecord").addEventListener("click",()=>{
+  const task=state.tasks.find(t=>t.id===historyTaskId),day=$("historyDate").value;
+  if(task&&confirm('Record "'+task.name+'" for '+prettyDate(day)+'?')){recordOnDate(task,day);updateHistoryDialog();}
+});
+$("historyRemove").addEventListener("click",()=>{
+  const task=state.tasks.find(t=>t.id===historyTaskId),day=$("historyDate").value;
+  if(task&&confirm('Remove a recorded completion for "'+task.name+'" on '+prettyDate(day)+'?')){removeOnDate(task,day);updateHistoryDialog();}
+});
+
+/* === Individual expired deadlines === */
+function isExpiringTask(task){return task.type==="quota"||task.deadlineBehavior==="expire";}
+function expiringCycle(task,day){
+  if(task.type==="weekly"){
+    const cfg=weeklySettings(task);
+    const due=nextWeekdayAfter(addDaysKey(day,-1),(cfg.overdue+6)%7);
+    return{due,previous:addDaysKey(due,-7),pending:cfg.noPending?due:addDaysKey(due,-daysFromWeekdayToWeekday(cfg.pending,cfg.overdue)+1)};
+  }
+  if(task.type==="monthly"){
+    let month=dateFromKey(day),c=monthlyCycleInMonth(task,month);
+    if(c.dueDate<day){month=new Date(month.getFullYear(),month.getMonth()+1,1);c=monthlyCycleInMonth(task,month);}
+    const prev=new Date(month.getFullYear(),month.getMonth()-1,1);
+    return{due:c.dueDate,previous:monthlyDueInMonth(prev,Number(task.monthlyDay)),pending:c.pendingDate};
+  }
+  return{due:day,previous:addDaysKey(day,-1),pending:day};
+}
+function expiringStatusAt(task,day,includeSameDay){
+  if(task.type==="daily"){
+    return hasCompletionOn(task,day)&&includeSameDay
+      ?{state:"done",progress:1,detail:"Done for today"}
+      :{state:"due",progress:0,detail:"Due today"};
+  }
+  const c=expiringCycle(task,day);
+  if((task.completionDates||[]).some(d=>d>c.previous&&d<=day&&(includeSameDay||d!==day)))
+    return{state:"done",progress:1,detail:"Done this period"};
+  if(day===c.due)return{state:"due",progress:0,detail:"Due today"};
+  if(day>=c.pending)return{state:"pending",progress:0,detail:"Pending — due "+prettyDate(c.due)};
+  return{state:"scheduled",progress:0,detail:"Scheduled — due "+prettyDate(c.due)};
+}
+function completedExpiredDeadline(task,due){
+  if(task.type==="daily")return hasCompletionOn(task,due);
+  if(task.type==="quota")return computedQuotaWeekOutcome(task,quotaWeekStart(task,due)).success;
+  let previous;
+  if(task.type==="weekly")previous=addDaysKey(due,-7);
+  else {
+    const d=dateFromKey(due);
+    previous=monthlyDueInMonth(new Date(d.getFullYear(),d.getMonth()-1,1),Number(task.monthlyDay));
+  }
+  return(task.completionDates||[]).some(d=>d>previous&&d<=due);
+}
+function missedEntriesFor(task){
+  if(!isExpiringTask(task))return[];
+  const today=localDateKey(),created=localDateKey(new Date(task.createdAt||Date.now()));
+  let day=task.missTrackingStartDate||today;
+  if(day<created)day=created;
+  const out=[],records=task.missedAcknowledgments||{};
+  let guard=0;
+  while(day<today&&guard++<4000){
+    const weekday=dateFromKey(day).getDay();
+    let due=false;
+    if(task.type==="daily")due=true;
+    if(task.type==="quota")due=weekday===(quotaResetDay(task)+6)%7;
+    if(task.type==="weekly")due=weekday===(Number(task.overdueWeekday??1)+6)%7;
+    if(task.type==="monthly")due=monthlyDueInMonth(dateFromKey(day),Number(task.monthlyDay))===day;
+    if(due&&!isTaskExcusedOn(task,day)&&!isEmergencyDay(day)&&!completedExpiredDeadline(task,day))
+      out.push({task,date:day,ack:records[day]||null});
+    day=addDaysKey(day,1);
+  }
+  return out;
+}
+function allMissedEntries(){
+  return state.tasks.flatMap(missedEntriesFor).sort((a,b)=>a.date.localeCompare(b.date)||a.task.name.localeCompare(b.task.name));
+}
+function addActivity(task,action,date){
+  if(!Array.isArray(task.activityLog))task.activityLog=[];
+  task.activityLog.push({action,date,enteredAt:Date.now()});
+  if(task.activityLog.length>250)task.activityLog.splice(0,task.activityLog.length-250);
+}
+function acknowledgeMiss(task,date){
+  task.missedAcknowledgments[date]={acknowledgedAt:Date.now(),dismissedAt:null};
+  addActivity(task,"Acknowledged missed occurrence",date);saveState();render();
+}
+function restoreMiss(task,date){
+  delete task.missedAcknowledgments[date];
+  addActivity(task,"Restored missed occurrence",date);saveState();render();
+}
+function dismissMiss(task,date){
+  task.missedAcknowledgments[date].dismissedAt=Date.now();
+  addActivity(task,"Dismissed acknowledged reminder",date);saveState();render();
+}
+
+
+
 /* ==================================================
    CLEAN SWEEPS
    ================================================== */
@@ -1381,7 +1615,7 @@ function lastGoodDate(task){
 }
 
 function currentStreakDays(task){
-  if(!task.streakStartDate||status(task).state==="overdue")return 0;
+  if(!task.streakStartDate||status(task).state==="overdue"||(isExpiringTask(task)&&task.type!=="quota"&&missedEntriesFor(task).some(e=>e.date>=task.streakStartDate)))return 0;
   return activeDaysInclusive(task,task.streakStartDate,localDateKey());
 }
 
@@ -1394,13 +1628,15 @@ function reconcileStreaks(){
       ?firstMissedQuotaWeekEnd(task,task.streakStartDate)
       :null;
 
+    const expiredMiss=task.streakStartDate&&isExpiringTask(task)&&task.type!=="quota"
+      ?missedEntriesFor(task).find(e=>e.date>=task.streakStartDate)
+      :null;
     const shouldBreak=task.streakStartDate&&(
-      status(task).state==="overdue"||
-      Boolean(quotaMiss)
+      status(task).state==="overdue"||Boolean(quotaMiss)||Boolean(expiredMiss)
     );
 
     if(shouldBreak){
-      const end=quotaMiss||lastGoodDate(task);
+      const end=quotaMiss||(expiredMiss?addDaysKey(expiredMiss.date,-1):lastGoodDate(task));
 
       if(end){
         const len=Math.max(0,activeDaysInclusive(task,task.streakStartDate,end));
@@ -1428,7 +1664,7 @@ function restoreRecentBreakIfCorrected(task){
 
   const stillBroken=task.type==="quota"
     ?Boolean(firstMissedQuotaWeekEnd(task,broken.streakStartDate))
-    :status(task).state==="overdue";
+    :(status(task).state==="overdue"||(isExpiringTask(task)&&missedEntriesFor(task).some(e=>e.date>=broken.streakStartDate)));
 
   if(stillBroken)return false;
 
@@ -1872,6 +2108,9 @@ function render(){
   }
 
   const rank={overdue:0,due:1,pending:2,scheduled:3,paused:4,done:5};
+  const missed=allMissedEntries();
+  const activeMisses=missed.filter(e=>!e.ack);
+  const acknowledgedMisses=missed.filter(e=>e.ack&&!e.ack.dismissedAt&&Date.now()-e.ack.acknowledgedAt<7*86400000);
 
   const tasks=[...state.tasks].sort(
     (a,b)=>
@@ -1885,6 +2124,8 @@ function render(){
   if(!tasks.length){
     list.innerHTML='<div class="empty">No tasks yet.</div>';
   }
+  for(const entry of activeMisses)list.appendChild(drawMissedEntry(entry,false));
+  showArchivedMisses(acknowledgedMisses);
 
   for(const task of tasks){
     const s=status(task);
@@ -1912,13 +2153,7 @@ function render(){
               <div class="quota-note">this week</div>
             `
             :`
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  ${s.state==="done"?"checked":""}
-                  ${s.state==="paused"?"disabled":""}>
-                <span></span>
-              </label>
+              <button type="button" class="today-button today-task" ${s.state==="paused"||(s.state==="done"&&!hasCompletionOn(task,localDateKey()))?"disabled":""}>${hasCompletionOn(task,localDateKey())?"✓ Logged today":"Log today"}</button>
             `
           }
 
@@ -1958,6 +2193,7 @@ function render(){
               `
             :""
           }
+          <button type="button" class="small-button history-task">History</button>
           <button class="edit">Edit</button>
         </div>
       </div>
@@ -1967,24 +2203,31 @@ function render(){
       const plus=card.querySelector(".quota-plus");
       const minus=card.querySelector(".quota-minus");
 
-      plus.addEventListener("click",()=>markQuotaOccurrence(task));
-      minus.addEventListener("click",()=>undoQuotaOccurrence(task));
+      plus.addEventListener("click",()=>recordOnDate(task,localDateKey()));
+      minus.addEventListener("click",()=>removeOnDate(task,localDateKey()));
 
       const yesterdayPlus=card.querySelector(".yesterday-quota-plus");
       const yesterdayMinus=card.querySelector(".yesterday-quota-minus");
 
       if(yesterdayPlus){
-        yesterdayPlus.addEventListener("click",()=>markQuotaOccurrenceYesterday(task));
+        yesterdayPlus.addEventListener("click",()=>{
+          const day=addDaysKey(localDateKey(),-1);
+          if(confirm("Record "+task.name+" for "+prettyDate(day)+"?"))recordOnDate(task,day);
+        });
       }
 
       if(yesterdayMinus){
-        yesterdayMinus.addEventListener("click",()=>undoQuotaOccurrenceYesterday(task));
+        yesterdayMinus.addEventListener("click",()=>{
+          const day=addDaysKey(localDateKey(),-1);
+          if(confirm("Remove a "+task.name+" entry for "+prettyDate(day)+"?"))removeOnDate(task,day);
+        });
       }
     }else{
-      const checkbox=card.querySelector("input");
-
-      checkbox.addEventListener("change",event=>{
-        event.target.checked?markDone(task):undoDone(task);
+      const todayButton=card.querySelector(".today-task");
+      todayButton.addEventListener("click",()=>{
+        if(hasCompletionOn(task,localDateKey())){
+          if(confirm("Remove today’s completion for "+task.name+"?"))removeOnDate(task,localDateKey());
+        }else recordOnDate(task,localDateKey());
       });
 
       const yesterdayButton=card.querySelector(".yesterday-task");
@@ -1994,15 +2237,16 @@ function render(){
           const yesterday=addDaysKey(localDateKey(),-1);
           if(hasCompletionOn(task,yesterday)){
             if(confirm(`Remove yesterday’s completion for “${task.name}”?`)){
-              undoYesterdayCompletion(task);
+              removeOnDate(task,yesterday);
             }
           }else{
-            logYesterdayCompletion(task);
+            if(confirm("Record "+task.name+" for "+prettyDate(yesterday)+"?"))recordOnDate(task,yesterday);
           }
         });
       }
     }
 
+    card.querySelector(".history-task").addEventListener("click",()=>openHistory(task));
     card.querySelector(".edit").addEventListener("click",()=>openEdit(task));
     list.appendChild(card);
   }
@@ -2030,6 +2274,15 @@ function updateSummary(){
   const onlyQuotaPending=pending>0&&pendingTasks.every(task=>task.type==="quota");
   const scheduled=states.filter(x=>x==="scheduled").length;
   const paused=states.filter(x=>x==="paused").length;
+  const missedCount=allMissedEntries().filter(e=>!e.ack).length;
+  if(missedCount){
+    $("statusTitle").textContent=missedCount+" missed occurrence"+(missedCount===1?"":"s")+(overdue?" · "+overdue+" overdue":"");
+    $("statusCopy").textContent="Log each missed date or acknowledge it.";
+    $("statusBadge").textContent=missedCount+overdue;
+    $("statusBadge").style.background="var(--red-soft)";
+    $("statusBadge").style.color="var(--overdue-slider)";
+    return;
+  }
 
   if(overdue){
     $("statusTitle").textContent=`${overdue} task${overdue===1?"":"s"} overdue`;
@@ -2590,6 +2843,9 @@ function updateTypeFields(){
   $("intervalFields").classList.toggle("hidden",type!=="interval");
   $("quotaFields").classList.toggle("hidden",type!=="quota");
   $("dailyNote").classList.toggle("hidden",type!=="daily");
+  $("deadlineBehaviorField").classList.toggle("hidden",type==="interval");
+  $("deadlineBehavior").disabled=type==="quota";
+  if(type==="quota")$("deadlineBehavior").value="expire";
 }
 
 function currentEditedTask(){
@@ -2720,6 +2976,7 @@ $("addBtn").addEventListener("click",()=>{
   $("pendingWindow").value="2";
   $("weeklyTarget").value="4";
   $("quotaResetWeekday").value="1";
+  $("deadlineBehavior").value="carry";
   $("deleteBtn").hidden=true;
 
   clearPauseEditor();
@@ -2729,6 +2986,7 @@ $("addBtn").addEventListener("click",()=>{
   dialog.showModal();
 });
 
+$("taskType").addEventListener("change",updateTypeFields);
 $("cancelBtn").addEventListener("click",()=>{
   dialog.close();
 });
@@ -2749,6 +3007,7 @@ function openEdit(task){
   $("pendingWindow").value=String(task.pendingWindow??2);
   $("weeklyTarget").value=String(task.weeklyTarget??4);
   $("quotaResetWeekday").value=String(task.quotaResetWeekday??1);
+  $("deadlineBehavior").value=task.deadlineBehavior||"carry";
   $("deleteBtn").hidden=false;
 
   clearPauseEditor();
@@ -2845,6 +3104,7 @@ form.addEventListener("submit",event=>{
   const pendingWindow=Number($("pendingWindow").value);
   const weeklyTarget=Number($("weeklyTarget").value);
   const quotaResetWeekday=Number($("quotaResetWeekday").value);
+  const deadlineBehavior=type==="quota"?"expire":type==="interval"?"carry":$("deadlineBehavior").value;
 
   if(!name)return;
 
@@ -2911,6 +3171,11 @@ form.addEventListener("submit",event=>{
     task.pendingWindow=pendingWindow;
     task.weeklyTarget=weeklyTarget;
     task.quotaResetWeekday=quotaResetWeekday;
+    const wasExpiring=oldType==="quota"||task.deadlineBehavior==="expire";
+    task.deadlineBehavior=deadlineBehavior;
+    if(deadlineBehavior==="expire"&&!wasExpiring)task.missTrackingStartDate=type==="quota"?addDaysKey(weekStartKey(localDateKey(),quotaResetWeekday),-7):addDaysKey(localDateKey(),-1);
+    if(deadlineBehavior==="expire"&&oldType!==type)task.missTrackingStartDate=type==="quota"?addDaysKey(weekStartKey(localDateKey(),quotaResetWeekday),-7):addDaysKey(localDateKey(),-1);
+    if(deadlineBehavior==="carry")task.missTrackingStartDate=null;
 
     if(type==="quota"&&oldType!=="quota"){
       task.quotaTrackingStartDate=localDateKey();
@@ -2930,6 +3195,8 @@ form.addEventListener("submit",event=>{
     task.resetWeekday=overdueWeekday;
     task.weeklyTarget=weeklyTarget;
     task.quotaResetWeekday=quotaResetWeekday;
+    task.deadlineBehavior=deadlineBehavior;
+    task.missTrackingStartDate=deadlineBehavior==="expire"?localDateKey():null;
 
     if(type==="quota"){
       task.quotaTrackingStartDate=localDateKey();
