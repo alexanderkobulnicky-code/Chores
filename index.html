@@ -1054,6 +1054,12 @@ function recomputePastDay(dateKey){
   delete state.dailySnapshots[dateKey];
   finalizeDay(dateKey);
 }
+function recomputeDaysFrom(startDate){
+  const today=localDateKey();
+  for(let d=startDate,guard=0;d<today&&guard<4000;d=addDaysKey(d,1),guard++){
+    recomputePastDay(d);
+  }
+}
 
 function taskExistedOn(task,dateKey){
   return localDateKey(new Date(task.createdAt))<=dateKey;
@@ -1344,11 +1350,11 @@ function collectMissedOccurrences(today=localDateKey()){
     }else if(task.type==="monthly"&&task.deadlineBehavior==="expire"){
       let month=new Date(dateFromKey(start).getFullYear(),dateFromKey(start).getMonth(),1);
       for(let guard=0;guard<160;guard++,month=new Date(month.getFullYear(),month.getMonth()+1,1)){
-        const due=monthlyDueInMonth(month,Number(task.monthlyDay));
+        const due=monthlyCycleInMonth(task,month).dueDate;
         if(due>=today)break;
         if(due<start||isTaskExcusedOn(task,due))continue;
         const prev=new Date(month.getFullYear(),month.getMonth()-1,1);
-        const from=addDaysKey(monthlyDueInMonth(prev,Number(task.monthlyDay)),1);
+        const from=addDaysKey(monthlyCycleInMonth(task,prev).dueDate,1);
         const did=(task.completionDates||[]).some(d=>d>=from&&d<=due);
         if(!did)add(due,from,due);
       }
@@ -2029,7 +2035,7 @@ function logCompletionForDate(task,date){
     task.totalCompletions=Number(task.totalCompletions||0)+1;
   }
   recordTaskActivity(task,"Completed (late entry)",date);
-  recomputePastDay(date);
+  recomputeDaysFrom(date);
   restoreRecentBreakIfCorrected(task);
   reconcileStreaks();
   updateTaskAwards(task);
@@ -2061,7 +2067,7 @@ function removeCompletionForDate(task,date){
   }
   task.totalCompletions=Math.max(0,Number(task.totalCompletions||0)-1);
   recordTaskActivity(task,"Removed completion",date);
-  recomputePastDay(date);
+  recomputeDaysFrom(date);
   reconcileStreaks();
   saveState();
   render();
