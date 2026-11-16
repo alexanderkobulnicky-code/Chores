@@ -51,6 +51,20 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .scheduled .switch span{background:#a5afa7}.done .switch span{background:var(--done-slider)}.done .switch span:before{transform:translateX(30px)}.pending .switch span{background:var(--pending-slider)}.due .switch span{background:var(--due-slider)}.overdue .switch span{background:var(--overdue-slider)}.paused .switch span{background:var(--paused-slider)}.paused .switch input:disabled+span{opacity:.78}
 .quota-control{display:flex;align-items:center;gap:7px}.quota-button{width:36px;height:36px;border:1px solid rgba(29,34,31,.16);border-radius:50%;background:rgba(255,255,255,.72);color:var(--ink);font-size:20px;font-weight:800;display:grid;place-items:center;padding:0;line-height:1}.quota-button:disabled{opacity:.32;cursor:default}.quota-count{min-width:58px;text-align:center;font-size:18px;font-weight:800;letter-spacing:-.02em}.quota-note{font-size:10px;color:var(--muted);text-align:right}.paused .quota-button{border-color:var(--paused-border)}
 .empty{padding:34px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}.hidden{display:none!important}
+.task.missed{background:var(--overdue-bg);border-color:var(--overdue-border)}
+.missed-title{font-size:20px;font-weight:750}.missed-caption{font-size:13px;color:var(--muted);margin-top:5px}
+.missed-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.missed-actions button,.dated-action{min-height:44px;padding:10px 14px;border-radius:12px;border:1px solid rgba(29,34,31,.18);background:#fff;font-weight:700;color:var(--ink)}
+.dated-action{min-width:108px}.dated-action:disabled{opacity:.5;cursor:default}
+.acknowledged-list{display:grid;gap:9px;margin-top:10px}.acknowledged-card{background:#f0f0ec;border:1px solid var(--line);border-radius:14px;padding:13px}
+.acknowledged-card .missed-actions button{min-height:40px;font-size:12px}
+.archive-section{margin-top:36px;border-top:1px solid var(--line);padding-top:15px}
+.archive-section summary{cursor:pointer;color:var(--muted);font-size:14px;font-weight:750}
+.history-record{padding:10px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}
+.history-copy{font-size:12px;color:var(--muted);line-height:1.5}
+.history-items{max-height:250px;overflow:auto;margin:9px 0 12px}
+.log-inline-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+
 .page-header{margin-bottom:18px}.page-header h1{font-size:36px}
 .awards-list{display:grid;gap:14px}.award-task{padding:18px}.award-task-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}.award-task-name{font-size:22px;font-weight:750}.award-task-streak{color:var(--muted);font-size:13px;margin-top:3px}.next-target{background:var(--green-soft);color:var(--done-slider);border-radius:12px;padding:8px 10px;font-size:12px;font-weight:700;text-align:right}
 .award-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.award-item{text-align:center}.award-art{width:100%;aspect-ratio:1;display:grid;place-items:center;font-size:clamp(30px,8vw,52px);line-height:1;filter:drop-shadow(0 2px 2px #0002)}.award-item.locked .award-art{opacity:.22;filter:grayscale(1)}.award-number{margin-top:5px;font-size:12px;font-weight:750}.award-state{color:var(--muted);font-size:10px;margin-top:1px}
@@ -104,7 +118,12 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
   <div class="badge" id="statusBadge">✓</div>
 </section>
 <div class="section-title">Your tasks</div>
+<section class="tasks" id="missedList"></section>
 <section class="tasks" id="taskList"></section>
+<details class="archive-section" id="archiveSection" hidden>
+  <summary id="archiveSummary">Acknowledged misses</summary>
+  <div class="acknowledged-list" id="acknowledgedList"></div>
+</details>
 </main>
 
 <main class="app hidden" id="awardsView">
@@ -197,6 +216,23 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 
 <div class="modal-actions"><button type="button" class="delete" id="deleteBtn" hidden>Delete</button><div class="right-actions"><button type="button" class="ghost" id="cancelBtn">Cancel</button><button class="save">Save</button></div></div>
 </form>
+</dialog>
+
+<dialog id="historyDialog">
+  <div class="modal">
+    <h2 id="historyTitle">Completion history</h2>
+    <p class="fine">Choose the day you actually completed a task. Editing history changes completion statistics; acknowledging a miss does not.</p>
+    <div class="field"><label for="historyDate">Date performed</label><input id="historyDate" type="date"></div>
+    <div class="log-inline-actions">
+      <button type="button" class="save" id="historyLogBtn">Record completion on this date</button>
+      <button type="button" class="ghost" id="historyRemoveBtn">Remove on this date</button>
+    </div>
+    <div class="section-title">Recent recorded completions</div>
+    <div class="history-items" id="historyItems"></div>
+    <div class="section-title">Recent changes</div>
+    <div class="history-items" id="activityItems"></div>
+    <div class="modal-actions"><span></span><button type="button" class="ghost" id="historyCloseBtn">Close</button></div>
+  </div>
 </dialog>
 
 <dialog id="todoDialog">
