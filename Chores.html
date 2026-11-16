@@ -1327,7 +1327,9 @@ function openHistory(task,day=null){
   $("historyTitle").textContent=task.name+" — history";
   $("historyDate").min=localDateKey(new Date(task.createdAt));
   $("historyDate").max=localDateKey();
-  $("historyDate").value=day||addDaysKey(localDateKey(),-1);
+  const created=localDateKey(new Date(task.createdAt));
+  const yesterday=addDaysKey(localDateKey(),-1);
+  $("historyDate").value=day||(created>yesterday?created:yesterday);
   updateHistoryDialog();$("historyDialog").showModal();
 }
 function updateHistoryDialog(){
@@ -1613,7 +1615,7 @@ function lastGoodDate(task){
 }
 
 function currentStreakDays(task){
-  if(!task.streakStartDate||status(task).state==="overdue")return 0;
+  if(!task.streakStartDate||status(task).state==="overdue"||(isExpiringTask(task)&&task.type!=="quota"&&missedEntriesFor(task).some(e=>e.date>=task.streakStartDate)))return 0;
   return activeDaysInclusive(task,task.streakStartDate,localDateKey());
 }
 
@@ -1626,13 +1628,15 @@ function reconcileStreaks(){
       ?firstMissedQuotaWeekEnd(task,task.streakStartDate)
       :null;
 
+    const expiredMiss=task.streakStartDate&&isExpiringTask(task)&&task.type!=="quota"
+      ?missedEntriesFor(task).find(e=>e.date>=task.streakStartDate)
+      :null;
     const shouldBreak=task.streakStartDate&&(
-      status(task).state==="overdue"||
-      Boolean(quotaMiss)
+      status(task).state==="overdue"||Boolean(quotaMiss)||Boolean(expiredMiss)
     );
 
     if(shouldBreak){
-      const end=quotaMiss||lastGoodDate(task);
+      const end=quotaMiss||(expiredMiss?addDaysKey(expiredMiss.date,-1):lastGoodDate(task));
 
       if(end){
         const len=Math.max(0,activeDaysInclusive(task,task.streakStartDate,end));
@@ -1660,7 +1664,7 @@ function restoreRecentBreakIfCorrected(task){
 
   const stillBroken=task.type==="quota"
     ?Boolean(firstMissedQuotaWeekEnd(task,broken.streakStartDate))
-    :status(task).state==="overdue";
+    :(status(task).state==="overdue"||(isExpiringTask(task)&&missedEntriesFor(task).some(e=>e.date>=broken.streakStartDate)));
 
   if(stillBroken)return false;
 
@@ -2233,7 +2237,7 @@ function render(){
           const yesterday=addDaysKey(localDateKey(),-1);
           if(hasCompletionOn(task,yesterday)){
             if(confirm(`Remove yesterday’s completion for “${task.name}”?`)){
-              undoYesterdayCompletion(task);
+              removeOnDate(task,yesterday);
             }
           }else{
             if(confirm("Record "+task.name+" for "+prettyDate(yesterday)+"?"))recordOnDate(task,yesterday);
