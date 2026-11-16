@@ -137,6 +137,14 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 <input type="hidden" id="taskId">
 <div class="field"><label for="taskName">Task</label><input id="taskName" maxlength="80" required placeholder="e.g. Laundry"></div>
 <div class="field"><label for="taskType">Type</label><select id="taskType"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="interval">Every N days</option><option value="quota">Times per Week</option></select></div>
+<div class="field" id="deadlineBehaviorField">
+  <label for="deadlineBehavior">When a deadline passes</label>
+  <select id="deadlineBehavior">
+    <option value="carry">Carry forward — remains overdue until done</option>
+    <option value="expire">Mark as missed — next period starts fresh</option>
+  </select>
+  <p class="fine">Watering plants: Carry forward. Dinner or another task that cannot be made up later: Mark as missed. Existing tasks keep their old behavior unless changed.</p>
+</div>
 <div id="weeklyFields" class="hidden">
   <div class="pair">
     <div class="field"><label for="pendingWeekday">Pending begins</label><select id="pendingWeekday"><option value="none">Never (Due Today only)</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5" selected>Friday</option><option value="6">Saturday</option></select></div>
@@ -162,7 +170,7 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
     <div class="field"><label for="weeklyTarget">Times per week</label><input id="weeklyTarget" type="number" min="1" max="99" step="1" value="4"></div>
     <div class="field"><label for="quotaResetWeekday">Week resets</label><select id="quotaResetWeekday"><option value="0">Sunday</option><option value="1" selected>Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div>
   </div>
-  <p class="fine">Each ＋ records one occurrence. The counter resets at the start of each week. If the target is still unfinished on the final day, it becomes Due Today. A missed week breaks the streak, but the new week begins fresh instead of carrying an Overdue debt forward.</p>
+  <p class="fine">Each ＋ records one occurrence. The counter resets at the start of each week. If the target is still unfinished on the final day, it becomes Due Today. A missed week breaks the streak and can be acknowledged separately. The new week begins fresh.</p>
 </div>
 
 <div id="dailyNote" class="fine">Daily tasks are Due Today until completed. If a whole day passes without completion, they become Overdue.</div>
@@ -341,6 +349,10 @@ function makeTask(name,type="daily",maxDays=7,pendingWindow=2){
     quotaEvents:[],
     quotaWeekOutcomes:{},
     quotaTrackingStartDate:null,
+    deadlineBehavior:"carry",
+    missTrackingStartDate:null,
+    acknowledgedMisses:{},
+    activityLog:[],
     plannedPauses:[],
     lastDoneDate:null,
     previousDoneDate:null,
@@ -472,6 +484,10 @@ function migrateState(parsed){
     task.monthlyDay=Number.isInteger(monthlyDay)&&monthlyDay>=1&&monthlyDay<=31?monthlyDay:1;
     const monthlyPendingDay=Number(task.monthlyPendingDay);
     task.monthlyPendingDay=Number.isInteger(monthlyPendingDay)&&monthlyPendingDay>=1&&monthlyPendingDay<=31?monthlyPendingDay:1;
+    if(task.deadlineBehavior!=="expire")task.deadlineBehavior="carry";
+    if(!task.acknowledgedMisses||typeof task.acknowledgedMisses!=="object"||Array.isArray(task.acknowledgedMisses))task.acknowledgedMisses={};
+    if(!Array.isArray(task.activityLog))task.activityLog=[];
+    if(!task.missTrackingStartDate)task.missTrackingStartDate=addDaysKey(localDateKey(),-1);
     if(!Array.isArray(task.plannedPauses))task.plannedPauses=[];
     task.plannedPauses=task.plannedPauses
       .filter(p=>p&&p.startDate&&p.endDate)
@@ -2612,6 +2628,7 @@ function updateTypeFields(){
   $("monthlyFields").classList.toggle("hidden",type!=="monthly");
   $("intervalFields").classList.toggle("hidden",type!=="interval");
   $("quotaFields").classList.toggle("hidden",type!=="quota");
+  $("deadlineBehaviorField").classList.toggle("hidden",type==="quota"||type==="interval");
   $("dailyNote").classList.toggle("hidden",type!=="daily");
 }
 
@@ -2743,6 +2760,7 @@ $("addBtn").addEventListener("click",()=>{
   $("pendingWindow").value="2";
   $("weeklyTarget").value="4";
   $("quotaResetWeekday").value="1";
+  $("deadlineBehavior").value="carry";
   $("deleteBtn").hidden=true;
 
   clearPauseEditor();
@@ -2772,6 +2790,7 @@ function openEdit(task){
   $("pendingWindow").value=String(task.pendingWindow??2);
   $("weeklyTarget").value=String(task.weeklyTarget??4);
   $("quotaResetWeekday").value=String(task.quotaResetWeekday??1);
+  $("deadlineBehavior").value=task.deadlineBehavior||"carry";
   $("deleteBtn").hidden=false;
 
   clearPauseEditor();
@@ -2868,6 +2887,7 @@ form.addEventListener("submit",event=>{
   const pendingWindow=Number($("pendingWindow").value);
   const weeklyTarget=Number($("weeklyTarget").value);
   const quotaResetWeekday=Number($("quotaResetWeekday").value);
+  const deadlineBehavior=(type==="quota"?"expire":type==="interval"?"carry":$("deadlineBehavior").value);
 
   if(!name)return;
 
@@ -2922,8 +2942,13 @@ form.addEventListener("submit",event=>{
 
     if(oldType==="quota")finalizeQuotaWeeks(task);
 
+    if(deadlineBehavior==="expire"&&(task.deadlineBehavior!=="expire"||oldType!==type)){
+      task.missTrackingStartDate=addDaysKey(localDateKey(),-1);
+      task.acknowledgedMisses={};
+    }
     task.name=name;
     task.type=type;
+    task.deadlineBehavior=deadlineBehavior;
     task.monthlyDay=monthlyDay;
     task.monthlyPendingDay=monthlyPendingDay;
     task.pendingWeekday=pendingWeekday;
@@ -2943,6 +2968,8 @@ form.addEventListener("submit",event=>{
     }
   }else{
     const task=makeTask(name,type,max,pendingWindow);
+    task.deadlineBehavior=deadlineBehavior;
+    task.missTrackingStartDate=localDateKey();
 
     task.monthlyDay=monthlyDay;
     task.monthlyPendingDay=monthlyPendingDay;
