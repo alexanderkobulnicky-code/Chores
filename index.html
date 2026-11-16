@@ -1359,7 +1359,7 @@ function updateHistoryDialog(){
   const count=task.type==="quota"?quotaEventsInRange(task,day,day).length:Number(hasCompletionOn(task,day));
   $("historyCount").textContent=count+" completion"+(count===1?"":"s")+" recorded for "+prettyDate(day);
   $("historyRemove").disabled=count===0;
-  $("historyRecord").disabled=day>localDateKey()||day<localDateKey(new Date(task.createdAt));
+  $("historyRecord").disabled=day>localDateKey()||day<localDateKey(new Date(task.createdAt))||(task.type!=="quota"&&count>0);
   const actions=(task.activityLog||[]).slice(-12).reverse();
   $("historyActivity").textContent=actions.length
     ?actions.map(a=>new Date(a.enteredAt).toLocaleString()+": "+a.action+" — "+prettyDate(a.date)).join("\n")
@@ -3197,6 +3197,7 @@ form.addEventListener("submit",event=>{
     const wasExpiring=oldType==="quota"||task.deadlineBehavior==="expire";
     task.deadlineBehavior=deadlineBehavior;
     if(deadlineBehavior==="expire"&&!wasExpiring)task.missTrackingStartDate=type==="quota"?addDaysKey(weekStartKey(localDateKey(),quotaResetWeekday),-7):addDaysKey(localDateKey(),-1);
+    if(deadlineBehavior==="expire"&&oldType!==type)task.missTrackingStartDate=type==="quota"?addDaysKey(weekStartKey(localDateKey(),quotaResetWeekday),-7):addDaysKey(localDateKey(),-1);
     if(deadlineBehavior==="carry")task.missTrackingStartDate=null;
 
     if(type==="quota"&&oldType!=="quota"){
