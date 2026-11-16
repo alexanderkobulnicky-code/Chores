@@ -194,6 +194,7 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 </form>
 </dialog>
 
+<dialog id="historyDialog"><div class="modal"><h2 id="historyTitle">Completion history</h2><div class="field"><label for="historyDate">Choose a date</label><input type="date" id="historyDate"></div><p class="fine" id="historyCount"></p><div class="missed-actions"><button type="button" class="small-button" id="historyRecord">Record completion</button><button type="button" class="small-button" id="historyRemove">Remove one completion</button></div><p class="fine">You can correct earlier dates here, even after an acknowledged reminder disappears. Weekly quotas count each occurrence separately.</p><h3>Recent changes</h3><div class="history-activity" id="historyActivity"></div><div class="modal-actions"><button type="button" class="secondary-button" id="historyClose">Close</button></div></div></dialog>
 <dialog id="todoDialog">
 <form class="modal" id="todoForm">
 <h2 id="todoDialogTitle">Add to-do</h2>
@@ -1221,6 +1222,139 @@ function status(task){
   return statusAt(task,localDateKey(),true);
 }
 
+
+/* === Missed cards, corrections, and audit trail === */
+function noticeAction(message){
+  const el=$("actionNotice");el.textContent=message;el.classList.remove("hidden");
+}
+function recordOnDate(task,day){
+  const today=localDateKey(),yesterday=addDaysKey(today,-1);
+  const created=localDateKey(new Date(task.createdAt));
+  if(day<created||day>today||isTaskExcusedOn(task,day))return;
+  if(task.type!=="quota"&&hasCompletionOn(task,day))return;
+  if(day===today){
+    if(task.type==="quota")markQuotaOccurrence(task);else markDone(task);
+  }else if(day===yesterday){
+    if(task.type==="quota")markQuotaOccurrenceYesterday(task);else logYesterdayCompletion(task);
+  }else{
+    if(task.type==="quota"){
+      const id=uid();
+      task.quotaEvents.push({id,date:day,createdAt:Date.now(),startedStreak:false,lateEntry:true});
+      task.quotaEvents.sort((a,b)=>a.date.localeCompare(b.date)||a.createdAt-b.createdAt);
+      task.completionEvents.push({date:day,type:"quota",quotaEventId:id,lateEntry:true,enteredAt:Date.now()});
+      invalidateQuotaOutcomeForDate(task,day);finalizeQuotaWeeks(task);
+    }else{
+      task.completionDates.push(day);syncCompletionPointers(task);
+      task.completionEvents.push({date:day,type:task.type,lateEntry:true,enteredAt:Date.now()});
+    }
+    task.totalCompletions=Number(task.totalCompletions||0)+1;
+    recomputePastDay(day);restoreRecentBreakIfCorrected(task);reconcileStreaks();updateTaskAwards(task);
+  }
+  const key=task.type==="quota"?quotaWeekEndFromStart(quotaWeekStart(task,day)):day;
+  if(task.missedAcknowledgments)delete task.missedAcknowledgments[key];
+  addActivity(task,"Logged completion",day);saveState();render();
+  noticeAction("Recorded "+task.name+" for "+prettyDate(day)+".");
+}
+function removeOnDate(task,day){
+  const today=localDateKey(),yesterday=addDaysKey(today,-1);
+  const events=task.type==="quota"?quotaEventsInRange(task,day,day):[];
+  if(task.type==="quota"&&!events.length)return;
+  if(task.type!=="quota"&&!hasCompletionOn(task,day))return;
+  if(day===today){
+    if(task.type==="quota")undoQuotaOccurrence(task);else undoDone(task);
+  }else if(day===yesterday){
+    if(task.type==="quota")undoQuotaOccurrenceYesterday(task);else undoYesterdayCompletion(task);
+  }else{
+    if(task.type==="quota"){
+      const event=events[events.length-1];
+      task.quotaEvents=task.quotaEvents.filter(e=>e.id!==event.id);
+      let index=task.completionEvents.findIndex(e=>e.quotaEventId===event.id);
+      if(index<0)index=task.completionEvents.findIndex(e=>e.type==="quota"&&e.date===day);
+      if(index>=0)task.completionEvents.splice(index,1);
+      invalidateQuotaOutcomeForDate(task,day);finalizeQuotaWeeks(task);
+    }else{
+      task.completionDates=task.completionDates.filter(d=>d!==day);
+      syncCompletionPointers(task);
+      const index=task.completionEvents.findIndex(e=>e.date===day&&e.type===task.type);
+      if(index>=0)task.completionEvents.splice(index,1);
+    }
+    task.totalCompletions=Math.max(0,Number(task.totalCompletions||0)-1);
+    recomputePastDay(day);reconcileStreaks();
+  }
+  addActivity(task,"Removed completion",day);saveState();render();
+  noticeAction("Removed "+task.name+" completion for "+prettyDate(day)+".");
+}
+function buttonForMiss(label,handler){
+  const b=document.createElement("button");
+  b.type="button";b.className="small-button";b.textContent=label;b.addEventListener("click",handler);
+  return b;
+}
+function drawMissedEntry(entry,archived){
+  const {task,date}=entry;
+  const card=document.createElement("article");
+  card.className="task "+(archived?"acknowledged":"missed");
+  const name=document.createElement("div");
+  name.className="task-name";name.textContent=task.name;
+  const detail=document.createElement("div");
+  detail.className="meta";detail.textContent="Missed "+prettyDate(date)+(archived?" · acknowledged":"");
+  const actions=document.createElement("div");actions.className="missed-actions";
+  actions.appendChild(buttonForMiss("Log "+prettyDate(date),()=>{
+    if(confirm('Record "'+task.name+'" as completed on '+prettyDate(date)+'?'))recordOnDate(task,date);
+  }));
+  if(archived){
+    actions.appendChild(buttonForMiss("Undo acknowledgment",()=>restoreMiss(task,date)));
+    actions.appendChild(buttonForMiss("Dismiss",()=>dismissMiss(task,date)));
+    const days=Math.max(0,7-Math.floor((Date.now()-entry.ack.acknowledgedAt)/86400000));
+    const info=document.createElement("div");
+    info.className="meta";info.textContent="Automatically hidden in "+days+" day"+(days===1?"":"s");
+    card.append(name,detail,info,actions);
+  }else{
+    actions.appendChild(buttonForMiss("Acknowledge",()=>acknowledgeMiss(task,date)));
+    card.append(name,detail,actions);
+  }
+  return card;
+}
+function showArchivedMisses(entries){
+  const section=$("acknowledgedSection"),list=$("acknowledgedList");
+  list.replaceChildren();
+  section.classList.toggle("hidden",entries.length===0);
+  $("acknowledgedCount").textContent=entries.length;
+  for(const entry of entries)list.appendChild(drawMissedEntry(entry,true));
+}
+let historyTaskId=null;
+function openHistory(task,day=null){
+  historyTaskId=task.id;
+  $("historyTitle").textContent=task.name+" — history";
+  $("historyDate").min=localDateKey(new Date(task.createdAt));
+  $("historyDate").max=localDateKey();
+  $("historyDate").value=day||addDaysKey(localDateKey(),-1);
+  updateHistoryDialog();$("historyDialog").showModal();
+}
+function updateHistoryDialog(){
+  const task=state.tasks.find(t=>t.id===historyTaskId);
+  if(!task)return;
+  const day=$("historyDate").value;
+  if(!day)return;
+  const count=task.type==="quota"?quotaEventsInRange(task,day,day).length:Number(hasCompletionOn(task,day));
+  $("historyCount").textContent=count+" completion"+(count===1?"":"s")+" recorded for "+prettyDate(day);
+  $("historyRemove").disabled=count===0;
+  $("historyRecord").disabled=day>localDateKey()||day<localDateKey(new Date(task.createdAt));
+  const actions=(task.activityLog||[]).slice(-12).reverse();
+  $("historyActivity").textContent=actions.length
+    ?actions.map(a=>new Date(a.enteredAt).toLocaleString()+": "+a.action+" — "+prettyDate(a.date)).join("\n")
+    :"No changes recorded yet (logging begins with this update).";
+}
+$("historyClose").addEventListener("click",()=>$("historyDialog").close());
+$("historyDate").addEventListener("change",updateHistoryDialog);
+$("historyRecord").addEventListener("click",()=>{
+  const task=state.tasks.find(t=>t.id===historyTaskId),day=$("historyDate").value;
+  if(task&&confirm('Record "'+task.name+'" for '+prettyDate(day)+'?')){recordOnDate(task,day);updateHistoryDialog();}
+});
+$("historyRemove").addEventListener("click",()=>{
+  const task=state.tasks.find(t=>t.id===historyTaskId),day=$("historyDate").value;
+  if(task&&confirm('Remove a recorded completion for "'+task.name+'" on '+prettyDate(day)+'?')){removeOnDate(task,day);updateHistoryDialog();}
+});
+
 /* === Individual expired deadlines === */
 function isExpiringTask(task){return task.type==="quota"||task.deadlineBehavior==="expire";}
 function expiringCycle(task,day){
@@ -1970,6 +2104,9 @@ function render(){
   }
 
   const rank={overdue:0,due:1,pending:2,scheduled:3,paused:4,done:5};
+  const missed=allMissedEntries();
+  const activeMisses=missed.filter(e=>!e.ack);
+  const acknowledgedMisses=missed.filter(e=>e.ack&&!e.ack.dismissedAt&&Date.now()-e.ack.acknowledgedAt<7*86400000);
 
   const tasks=[...state.tasks].sort(
     (a,b)=>
@@ -1983,6 +2120,8 @@ function render(){
   if(!tasks.length){
     list.innerHTML='<div class="empty">No tasks yet.</div>';
   }
+  for(const entry of activeMisses)list.appendChild(drawMissedEntry(entry,false));
+  showArchivedMisses(acknowledgedMisses);
 
   for(const task of tasks){
     const s=status(task);
@@ -2010,13 +2149,7 @@ function render(){
               <div class="quota-note">this week</div>
             `
             :`
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  ${s.state==="done"?"checked":""}
-                  ${s.state==="paused"?"disabled":""}>
-                <span></span>
-              </label>
+              <button type="button" class="today-button today-task" ${s.state==="paused"||(s.state==="done"&&!hasCompletionOn(task,localDateKey()))?"disabled":""}>${hasCompletionOn(task,localDateKey())?"✓ Logged today":"Log today"}</button>
             `
           }
 
@@ -2056,6 +2189,7 @@ function render(){
               `
             :""
           }
+          <button type="button" class="small-button history-task">History</button>
           <button class="edit">Edit</button>
         </div>
       </div>
@@ -2065,24 +2199,31 @@ function render(){
       const plus=card.querySelector(".quota-plus");
       const minus=card.querySelector(".quota-minus");
 
-      plus.addEventListener("click",()=>markQuotaOccurrence(task));
-      minus.addEventListener("click",()=>undoQuotaOccurrence(task));
+      plus.addEventListener("click",()=>recordOnDate(task,localDateKey()));
+      minus.addEventListener("click",()=>removeOnDate(task,localDateKey()));
 
       const yesterdayPlus=card.querySelector(".yesterday-quota-plus");
       const yesterdayMinus=card.querySelector(".yesterday-quota-minus");
 
       if(yesterdayPlus){
-        yesterdayPlus.addEventListener("click",()=>markQuotaOccurrenceYesterday(task));
+        yesterdayPlus.addEventListener("click",()=>{
+          const day=addDaysKey(localDateKey(),-1);
+          if(confirm("Record "+task.name+" for "+prettyDate(day)+"?"))recordOnDate(task,day);
+        });
       }
 
       if(yesterdayMinus){
-        yesterdayMinus.addEventListener("click",()=>undoQuotaOccurrenceYesterday(task));
+        yesterdayMinus.addEventListener("click",()=>{
+          const day=addDaysKey(localDateKey(),-1);
+          if(confirm("Remove a "+task.name+" entry for "+prettyDate(day)+"?"))removeOnDate(task,day);
+        });
       }
     }else{
-      const checkbox=card.querySelector("input");
-
-      checkbox.addEventListener("change",event=>{
-        event.target.checked?markDone(task):undoDone(task);
+      const todayButton=card.querySelector(".today-task");
+      todayButton.addEventListener("click",()=>{
+        if(hasCompletionOn(task,localDateKey())){
+          if(confirm("Remove today’s completion for "+task.name+"?"))removeOnDate(task,localDateKey());
+        }else recordOnDate(task,localDateKey());
       });
 
       const yesterdayButton=card.querySelector(".yesterday-task");
@@ -2095,12 +2236,13 @@ function render(){
               undoYesterdayCompletion(task);
             }
           }else{
-            logYesterdayCompletion(task);
+            if(confirm("Record "+task.name+" for "+prettyDate(yesterday)+"?"))recordOnDate(task,yesterday);
           }
         });
       }
     }
 
+    card.querySelector(".history-task").addEventListener("click",()=>openHistory(task));
     card.querySelector(".edit").addEventListener("click",()=>openEdit(task));
     list.appendChild(card);
   }
@@ -2128,6 +2270,15 @@ function updateSummary(){
   const onlyQuotaPending=pending>0&&pendingTasks.every(task=>task.type==="quota");
   const scheduled=states.filter(x=>x==="scheduled").length;
   const paused=states.filter(x=>x==="paused").length;
+  const missedCount=allMissedEntries().filter(e=>!e.ack).length;
+  if(missedCount){
+    $("statusTitle").textContent=missedCount+" missed occurrence"+(missedCount===1?"":"s")+(overdue?" · "+overdue+" overdue":"");
+    $("statusCopy").textContent="Log each missed date or acknowledge it.";
+    $("statusBadge").textContent=missedCount+overdue;
+    $("statusBadge").style.background="var(--red-soft)";
+    $("statusBadge").style.color="var(--overdue-slider)";
+    return;
+  }
 
   if(overdue){
     $("statusTitle").textContent=`${overdue} task${overdue===1?"":"s"} overdue`;
