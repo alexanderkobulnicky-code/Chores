@@ -1643,13 +1643,6 @@ function recordTaskActivity(task,action,dateKey){
   if(task.activityLog.length>300)task.activityLog=task.activityLog.slice(-300);
 }
 
-function clearAcknowledgedIfResolved(task){
-  for(const item of collectMissedOccurrences().filter(x=>x.task.id===task.id)){
-    // Acknowledged misses that remain unresolved must stay acknowledged.
-    // Corrections are hidden automatically when their missing record resolves.
-  }
-}
-
 /* ==================================================
    COMPLETE / UNDO RECURRING TASKS
    ================================================== */
@@ -2120,6 +2113,81 @@ function medalsForTask(task){
 /* ==================================================
    MAIN CHORES SCREEN
    ================================================== */
+
+let historyTask=null;
+let historyRange=null;
+function openHistory(task,selectedDate=null,range=null){
+  historyTask=task;
+  historyRange=range;
+  const today=localDateKey();
+  const created=localDateKey(new Date(task.createdAt));
+  const input=$("historyDate");
+  input.min=range&&range.start>created?range.start:created;
+  input.max=range&&range.end<today?range.end:today;
+  input.value=selectedDate||today;
+  if(input.value<input.min)input.value=input.min;
+  if(input.value>input.max)input.value=input.max;
+  renderHistoryDialog();
+  $("historyDialog").showModal();
+}
+function renderHistoryDialog(){
+  const task=historyTask;
+  if(!task)return;
+  $("historyTitle").textContent=`History · ${task.name}`;
+  const date=$("historyDate").value;
+  const valid=date&&date>=$("historyDate").min&&date<=$("historyDate").max;
+  const qty=task.type==="quota"
+    ?(task.quotaEvents||[]).filter(x=>x.date===date).length
+    :Number(hasCompletionOn(task,date));
+  $("historyLogBtn").disabled=!valid||(task.type!=="quota"&&qty>0);
+  $("historyRemoveBtn").disabled=!valid||qty===0;
+  $("historyRemoveBtn").textContent=qty>0&&task.type==="quota"?`Remove one (${qty} recorded)`:"Remove on this date";
+
+  const events=(task.type==="quota"?(task.quotaEvents||[]).map(e=>({date:e.date,enteredAt:e.createdAt})):
+    (task.completionDates||[]).map(date=>({
+      date,enteredAt:(task.completionEvents||[]).find(e=>e.date===date)?.enteredAt
+    }))).sort((a,b)=>b.date.localeCompare(a.date)||Number(b.enteredAt||0)-Number(a.enteredAt||0)).slice(0,20);
+  $("historyItems").innerHTML=events.length?events.map(event=>`
+    <div class="history-record">
+      <span><strong>${escapeHtml(prettyDate(event.date))}</strong>
+        <span class="history-copy">${event.enteredAt?'<br>Logged '+escapeHtml(new Date(event.enteredAt).toLocaleString()):""}</span>
+      </span>
+      <button type="button" class="small-button remove-record" data-date="${event.date}">Remove</button>
+    </div>`).join(""):'<p class="fine">No completions recorded.</p>';
+  for(const btn of $("historyItems").querySelectorAll(".remove-record")){
+    btn.addEventListener("click",()=>{
+      if(confirm(`Remove a completion for ${task.name} on ${prettyDate(btn.dataset.date)}?`)){
+        removeCompletionForDate(task,btn.dataset.date);
+        renderHistoryDialog();
+      }
+    });
+  }
+  const recent=(task.activityLog||[]).slice(-12).reverse();
+  $("activityItems").innerHTML=recent.length?recent.map(e=>`
+    <div class="history-record">
+      <span><strong>${escapeHtml(e.action||"Change")}</strong>
+        <span class="history-copy"> · ${escapeHtml(prettyDate(e.date))}
+        ${e.enteredAt?" · "+escapeHtml(new Date(e.enteredAt).toLocaleString()):""}</span></span>
+    </div>`).join(""):'<p class="fine">Changes made before this update were not separately audited.</p>';
+}
+$("historyDate").addEventListener("change",renderHistoryDialog);
+$("historyLogBtn").addEventListener("click",()=>{
+  if(!historyTask)return;
+  const date=$("historyDate").value;
+  if(date<$("historyDate").min||date>$("historyDate").max)return;
+  logCompletionForDate(historyTask,date);
+  renderHistoryDialog();
+});
+$("historyRemoveBtn").addEventListener("click",()=>{
+  if(!historyTask)return;
+  const date=$("historyDate").value;
+  if(date<$("historyDate").min||date>$("historyDate").max)return;
+  if(confirm(`Remove a completion for ${historyTask.name} on ${prettyDate(date)}?`)){
+    removeCompletionForDate(historyTask,date);
+    renderHistoryDialog();
+  }
+});
+$("historyCloseBtn").addEventListener("click",()=>$("historyDialog").close());
 
 function renderMissedItems(){
   const items=collectMissedOccurrences();
