@@ -2347,7 +2347,7 @@ function render(){
             `
             :`
               <button type="button" class="dated-action today-task"
-                ${s.state==="paused"||(s.state==="done"&&!hasCompletionOn(task,localDateKey()))?"disabled":""}>
+                ${s.state==="paused"?"disabled":""}>
                 ${hasCompletionOn(task,localDateKey())?"Undo today":s.state==="overdue"?"Choose date":"Done today"}
               </button>
             `
