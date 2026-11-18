@@ -422,7 +422,7 @@ let recoverySource=null;
 
 function findBestStoredState(){
   const primary=parseState(localStorage.getItem(STORAGE_KEY));
-  if(primary&&primary.tasks.length>0)return primary;
+  if(primary&&(primary.tasks.length>0||primary.explicitlyEmptyTasks===true))return primary;
 
   let best=primary;
   let bestKey=primary?STORAGE_KEY:null;
@@ -738,6 +738,7 @@ $("backupFileInput").addEventListener("change",async event=>{
 
   try{
     rotateBackups(); // Retain a local rollback copy before overwriting.
+    if(restored.tasks.length===0)restored.explicitlyEmptyTasks=true;
     localStorage.setItem(STORAGE_KEY,JSON.stringify(restored));
   }catch(error){
     alert("The backup could not be saved to this device. Your current data remains in place.");
