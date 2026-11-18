@@ -24,3 +24,7 @@ Your tasks and completion history are saved in your browser on that device. Shar
 
 For an iPhone home-screen shortcut, host the app on a static website, open it in Safari, and choose Add to Home Screen. The optional home-screen icon loads from the app's repository.
 
+
+## Backups
+
+The **Your data** section on the main Chores page offers **Export Backup** and **Import Backup**. Export creates a JSON file containing all saved tasks, to-dos, completion history, streaks, calendar data, awards, and emergency days. On an iPhone, choose **Save to Files** from the share sheet; other browsers may download it to Downloads. Import accepts Chores-format JSON backups, checks their structure, and asks before replacing current local data. The existing rotating local backups remain in place, but are not a substitute for exporting before deleting a Home Screen installation or switching phones.

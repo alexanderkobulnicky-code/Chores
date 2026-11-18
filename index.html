@@ -76,6 +76,13 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 .task-history-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
 .task-history-actions .small-button{white-space:nowrap}
 .task-history-actions .small-button:disabled{opacity:.45;cursor:default}
+.backup-tools{margin-top:30px;padding:17px 18px;border:1px solid var(--line);border-radius:16px;background:#fafbf8;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+.backup-tools h2{font-size:16px;margin:0 0 4px}
+.backup-tools p{font-size:12px;color:var(--muted);margin:0;max-width:440px;line-height:1.45}
+.backup-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.backup-actions .secondary-button{white-space:nowrap;padding:9px 12px;font-size:13px}
+.backup-notice{flex-basis:100%;font-size:12px;color:var(--done-slider);line-height:1.4}
+.backup-notice:empty{display:none}
 .pause-editor{padding:11px;margin-top:8px;border:1px solid var(--paused-border);border-radius:12px;background:var(--paused-bg)}
 .emergency-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
 .emergency-row:first-of-type{border-top:0}
@@ -109,6 +116,15 @@ dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;
 <div id="actionNotice" class="action-notice hidden" role="status"></div>
 <section class="tasks" id="taskList"></section>
 <section class="acknowledged-section hidden" id="acknowledgedSection"><div class="section-title">Acknowledged misses (<span id="acknowledgedCount">0</span>)</div><p class="fine">Hidden automatically seven days after acknowledgment. The history remains editable.</p><div class="tasks" id="acknowledgedList"></div></section>
+<section class="backup-tools" aria-labelledby="backupTitle">
+  <div><h2 id="backupTitle">Your data</h2><p>Keep a copy in Files or iCloud Drive before removing the Home Screen app. Import replaces this installation’s saved data.</p></div>
+  <div class="backup-actions">
+    <button type="button" class="secondary-button" id="exportBackupBtn">Export Backup</button>
+    <button type="button" class="secondary-button" id="importBackupBtn">Import Backup</button>
+  </div>
+  <input type="file" id="backupFileInput" accept=".json,application/json" hidden aria-label="Choose Chores backup file">
+  <div class="backup-notice" id="backupNotice" role="status" aria-live="polite"></div>
+</section>
 </main>
 
 <main class="app hidden" id="awardsView">
@@ -612,6 +628,124 @@ function saveState(){
   localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
 }
 
+
+
+/* ==================================================
+   PORTABLE BACKUPS (JSON)
+   ================================================== */
+
+function isBackupObject(value){
+  return value!==null&&typeof value==="object"&&!Array.isArray(value);
+}
+
+function isValidBackupState(data){
+  if(!isBackupObject(data)||!Array.isArray(data.tasks)||!Array.isArray(data.todos))return false;
+  if(!isBackupObject(data.dailySnapshots)||!Array.isArray(data.specialAchievements)||
+     !Array.isArray(data.emergencyDays)||typeof data.calendarTrackingStart!=="string")return false;
+
+  const taskTypes=["daily","interval","weekly","monthly","quota"];
+  if(!data.tasks.every(task=>
+    isBackupObject(task)&&typeof task.id==="string"&&typeof task.name==="string"&&
+    task.name.trim().length>0&&taskTypes.includes(task.type)&&
+    ["completionDates","completionEvents","quotaEvents","plannedPauses","unlockedAwards","activityLog"]
+      .every(key=>task[key]===undefined||Array.isArray(task[key]))
+  ))return false;
+
+  return data.todos.every(todo=>
+    isBackupObject(todo)&&typeof todo.id==="string"&&typeof todo.name==="string"&&
+    todo.name.trim().length>0
+  );
+}
+
+function downloadBackupFile(file){
+  const url=URL.createObjectURL(file);
+  const link=document.createElement("a");
+  link.href=url;
+  link.download=file.name;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+
+$("exportBackupBtn").addEventListener("click",async()=>{
+  const filename=`chores-backup-${localDateKey()}-${new Date().toTimeString().slice(0,5).replace(":","")}.json`;
+  const contents=JSON.stringify({
+    app:"Chores",backupFormat:1,exportedAt:new Date().toISOString(),data:state
+  },null,2);
+  const file=new File([contents],filename,{type:"application/json"});
+  const notice=$("backupNotice");
+
+  // On an iPhone, the share sheet lets you choose Save to Files.
+  if(typeof navigator.share==="function"&&typeof navigator.canShare==="function"&&
+     navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file],title:"Chores backup"});
+      notice.textContent="Backup shared. Keep the JSON file somewhere safe.";
+      return;
+    }catch(error){
+      if(error&&error.name==="AbortError")return;
+      // Older browsers may support the share sheet but not sharing files.
+    }
+  }
+
+  try{
+    downloadBackupFile(file);
+    notice.textContent="Backup download requested. Check Downloads or Files for the JSON file.";
+  }catch(error){
+    alert("The backup could not be downloaded. No saved data was changed.");
+  }
+});
+
+$("importBackupBtn").addEventListener("click",()=>$("backupFileInput").click());
+
+$("backupFileInput").addEventListener("change",async event=>{
+  const file=event.target.files&&event.target.files[0];
+  event.target.value=""; // Choosing the same file again should work.
+  if(!file)return;
+
+  if(file.size>25*1024*1024){
+    alert("This backup file is too large to import (25 MB limit). No data was changed.");
+    return;
+  }
+
+  let backup;
+  try{
+    backup=JSON.parse(await file.text());
+  }catch(error){
+    alert("That file is not readable JSON. Nothing was imported.");
+    return;
+  }
+
+  if(!isBackupObject(backup)||backup.app!=="Chores"||backup.backupFormat!==1||
+     !isValidBackupState(backup.data)){
+    alert("This is not a recognized Chores backup file. Nothing was imported.");
+    return;
+  }
+
+  let restored;
+  try{
+    restored=migrateState(backup.data);
+  }catch(error){
+    alert("The backup is damaged or incompatible. Nothing was imported.");
+    return;
+  }
+
+  const when=typeof backup.exportedAt==="string"&&!Number.isNaN(Date.parse(backup.exportedAt))
+    ?new Date(backup.exportedAt).toLocaleString():"an unknown date";
+  const message=`Import backup from ${when}?\n\nThis will replace all the data currently saved in this installation (${state.tasks.length} chores and ${state.todos.length} to-dos) with the backup (${restored.tasks.length} chores and ${restored.todos.length} to-dos), including history and awards.\n\nExport your current data first if you want to keep it.`;
+  if(!confirm(message))return;
+
+  try{
+    rotateBackups(); // Retain a local rollback copy before overwriting.
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(restored));
+  }catch(error){
+    alert("The backup could not be saved to this device. Your current data remains in place.");
+    return;
+  }
+  alert("Backup imported successfully. Chores will reload with your restored data.");
+  location.reload();
+});
 
 /* ==================================================
    EXCUSED DAYS

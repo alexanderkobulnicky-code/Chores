@@ -1,5 +1,5 @@
 
-const CACHE = "chores-v5-icon";
+const CACHE = "chores-v6-backup";
 
 const ASSETS = [
 
