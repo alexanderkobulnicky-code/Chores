@@ -1,5 +1,5 @@
 
-const CACHE = "chores-v4";
+const CACHE = "chores-v5-icon";
 
 const ASSETS = [
 
@@ -7,7 +7,9 @@ const ASSETS = [
 
   "./index.html",
 
-  "./manifest.webmanifest"
+  "./manifest.webmanifest",
+
+  "./chores-icon-cream.png"
 
 ];
 
