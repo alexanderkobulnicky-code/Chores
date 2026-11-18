@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f4f4ef">
+<meta name="theme-color" content="#f6ead4">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -92,20 +92,154 @@ h1{margin:0;font-size:42px;letter-spacing:-.045em}.date{color:var(--muted);font-
 /* dialogs */
 dialog{width:min(520px,calc(100% - 24px));border:0;border-radius:20px;padding:0;box-shadow:0 25px 80px #0004}dialog::backdrop{background:#0004;backdrop-filter:blur(2px)}.modal{padding:21px}.modal h2{margin:0 0 16px;font-size:25px}.field{display:grid;gap:6px;margin:12px 0}.field label{font-size:13px;color:var(--muted);font-weight:700}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink)}.fine{font-size:12px;color:var(--muted);line-height:1.45;margin:10px 0 0}.modal-actions{margin-top:18px}.right-actions{display:flex;gap:8px}.ghost,.delete{border:1px solid var(--line);border-radius:999px;padding:10px 13px;background:#fff}.delete{color:var(--overdue-slider)}
 @media(max-width:600px){h1{font-size:36px}.header-actions{flex-direction:column-reverse;align-items:flex-end}.pair{grid-template-columns:1fr}.status{align-items:flex-start}.award-row{gap:5px}.award-number{font-size:11px}.award-state{font-size:9px}.day-cell{min-height:59px;padding:5px}.day-mark{font-size:21px}.page-header{align-items:flex-start}.todo-actions{flex-direction:column;align-items:flex-end}}
-.today-button{min-height:42px;padding:9px 12px;border:1px solid var(--done-border);background:white;border-radius:12px;font-size:13px;font-weight:750;white-space:nowrap}.today-button:disabled{opacity:.5;cursor:default}.missed-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}.task.missed{background:var(--overdue-bg);border-color:var(--overdue-border)}.task.acknowledged{background:#eceeea;border-color:var(--line)}.acknowledged-section{margin-top:34px;padding-top:8px;border-top:1px solid var(--line)}.acknowledged-section .tasks{margin-top:15px}.action-notice{margin:10px 0;padding:10px;border:1px solid var(--done-border);border-radius:12px;background:var(--done-bg);font-size:12px}.history-activity{font-size:11px;white-space:pre-wrap;line-height:1.5;max-height:170px;overflow:auto;color:var(--muted)}</style>
+.today-button{min-height:42px;padding:9px 12px;border:1px solid var(--done-border);background:white;border-radius:12px;font-size:13px;font-weight:750;white-space:nowrap}.today-button:disabled{opacity:.5;cursor:default}.missed-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}.task.missed{background:var(--overdue-bg);border-color:var(--overdue-border)}.task.acknowledged{background:#eceeea;border-color:var(--line)}.acknowledged-section{margin-top:34px;padding-top:8px;border-top:1px solid var(--line)}.acknowledged-section .tasks{margin-top:15px}.action-notice{margin:10px 0;padding:10px;border:1px solid var(--done-border);border-radius:12px;background:var(--done-bg);font-size:12px}.history-activity{font-size:11px;white-space:pre-wrap;line-height:1.5;max-height:170px;overflow:auto;color:var(--muted)}
+/* Warm paper and restrained stationery details — interface only; task states keep their colors. */
+:root{
+  --bg:#f6ead4;
+  --card:#fffaf0;
+  --ink:#4b2d20;
+  --muted:#796655;
+  --line:#ddc4a0;
+}
+html,body{background-color:var(--bg)}
+body{
+  background-image:
+    radial-gradient(ellipse at 30% 12%,rgba(255,255,250,.68),transparent 48%),
+    radial-gradient(ellipse at 89% 77%,rgba(198,153,85,.13),transparent 50%),
+    repeating-linear-gradient(0deg,rgba(121,73,32,.012) 0px,rgba(121,73,32,.012) 1px,transparent 1px,transparent 6px);
+  background-attachment:fixed;
+}
+.app{
+  position:relative;
+  width:min(820px,calc(100% - 24px));
+  min-height:calc(100dvh - 28px);
+  margin:14px auto;
+  padding:30px 31px 50px;
+  border:2px solid #a47743;
+  border-radius:21px;
+  background:linear-gradient(135deg,rgba(255,250,236,.88),rgba(253,238,206,.73));
+  box-shadow:0 12px 40px rgba(86,52,25,.09), inset 0 0 0 3px rgba(255,253,243,.65);
+}
+.app::before{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border:1px solid rgba(174,123,57,.46);
+  border-radius:13px;
+  pointer-events:none;
+}
+.app-header{display:block;text-align:center;margin-bottom:18px}
+.masthead{display:flex;flex-direction:column;align-items:center;gap:0}
+.masthead-emblem{width:min(280px,85%);display:flex;align-items:center;justify-content:center;gap:15px}
+.masthead-art{display:block;flex:0 0 auto;width:96px;height:76px}
+.emblem-rule{height:1px;flex:1;background:linear-gradient(90deg,transparent,#b18450)}
+.emblem-rule:last-child{transform:rotate(180deg)}
+.masthead h1{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(38px,7vw,51px);
+  font-weight:700;
+  line-height:1.05;
+  letter-spacing:-.045em;
+  color:#4a2817;
+  margin:-2px 0 5px;
+}
+.masthead-divider{
+  height:13px;
+  width:min(248px,75%);
+  position:relative;
+  margin-bottom:3px;
+  background:linear-gradient(to right,transparent,#bd8f4d 20%,#bd8f4d 44%,transparent 44%,transparent 56%,#bd8f4d 56%,#bd8f4d 80%,transparent) center/100% 1px no-repeat;
+}
+.masthead-divider::after{
+  content:"";position:absolute;top:4px;left:calc(50% - 4px);
+  width:8px;height:8px;background:#bf8c37;transform:rotate(45deg);
+}
+.masthead .date{color:#79563a;font-size:13px;letter-spacing:.015em;margin-top:2px}
+.app-header .header-actions{
+  display:flex;flex-direction:row;align-items:center;justify-content:center;
+  flex-wrap:wrap;gap:7px;margin-top:17px
+}
+.app-header .header-actions button{font-size:13px;padding:10px 13px}
+.app-header .header-actions .add{background:#633d25;color:#fff7e8}
+.add,.save{background:#633d25;color:#fff7e8}
+.secondary-button,.back-button,.ghost,.small-button,.month-button{
+  background:#fffaf1;border-color:#d1b48c;color:#553522
+}
+.secondary-button:focus-visible,.back-button:focus-visible,.add:focus-visible,.small-button:focus-visible,button:focus-visible{
+  outline:2px solid #a37635;outline-offset:3px
+}
+.status,.award-task,.achievement-card,.calendar-card,.todo-card{
+  border-color:var(--line);border-radius:14px;
+  box-shadow:0 3px 12px rgba(99,65,26,.06)
+}
+.status{
+  margin:19px 0 20px;
+  background:rgba(255,252,242,.87);
+  border-left:4px solid #b89151
+}
+.status h2{font-size:clamp(19px,4vw,24px);font-family:Georgia,"Times New Roman",serif;letter-spacing:-.02em}
+.task{
+  border-radius:13px;
+  border-color:#dec9a9;
+  box-shadow:0 3px 10px rgba(93,57,25,.045);
+}
+.task.scheduled{background:rgba(255,252,244,.93);border-color:#dec9a9}
+.task-name,.todo-name{color:#4b2d20}
+.section-title{
+  display:flex;align-items:center;gap:12px;
+  color:#765335;letter-spacing:.1em;font-size:12px;margin:20px 0 12px
+}
+.section-title::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,#cfad7d,transparent)}
+.page-header h1{font-family:Georgia,"Times New Roman",serif;color:#4a2817}
+.page-header{border-bottom:1px solid #d8b98a;padding:6px 0 16px}
+.backup-tools{background:rgba(255,251,240,.83);border-color:var(--line);border-radius:13px}
+.backup-tools h2{font-family:Georgia,"Times New Roman",serif;color:#4b2d20}
+.day-cell{background:#fffbf2}
+dialog{background:#fff9eb;color:var(--ink);border:1px solid #b99462}
+@media(max-width:600px){
+  .app{width:calc(100% - 14px);padding:22px 19px 36px;margin:7px auto;min-height:calc(100dvh - 14px);border-radius:16px}
+  .app::before{inset:6px;border-radius:9px}
+  .masthead-art{width:83px;height:67px}
+  .masthead-emblem{gap:12px}
+  .app-header .header-actions{flex-direction:row;align-items:center;justify-content:center;gap:7px;margin-top:14px}
+  .app-header .header-actions button{font-size:12px;padding:9px 11px}
+  .status{padding:14px}
+  .task{padding:15px}
+  .task-name{font-size:18px}
+  .page-header{gap:10px}
+}
+</style>
 </head>
 <body>
 
 <main class="app" id="mainView">
-<header>
-  <div><h1>Chores</h1><div class="date" id="date"></div></div>
-  <div class="header-actions">
-    <button class="secondary-button" id="todoBtn">To Do</button>
-    <button class="secondary-button" id="calendarBtn">Calendar</button>
-    <button class="secondary-button" id="awardsBtn">Awards</button>
-    <button class="secondary-button" id="emergencyBtn">Emergency</button>
-    <button class="add" id="addBtn">＋ Add task</button>
+<header class="app-header">
+  <div class="masthead" aria-label="Chores">
+    <div class="masthead-emblem" aria-hidden="true">
+      <span class="emblem-rule"></span>
+      <svg class="masthead-art" viewBox="0 0 124 98" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <rect x="18" y="18" width="76" height="72" rx="7" fill="#fff9e8" stroke="#643d23" stroke-width="4"/>
+        <path d="M40 18v-5c0-3 3-6 6-6h3a9 9 0 0 1 18 0h3c4 0 7 3 7 6v5z" fill="#d9a441" stroke="#643d23" stroke-width="3.5" stroke-linejoin="round"/>
+        <circle cx="58" cy="7" r="3" fill="#fff8e4"/>
+        <path d="m31 37 5 5 9-11 M31 57l5 5 9-11 M31 77l5 5 9-11" fill="none" stroke="#643d23" stroke-width="3.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M52 37h22 M52 57h18 M52 77h11" stroke="#b58c5f" stroke-width="3" stroke-linecap="round"/>
+        <path d="m91 67 19-48" stroke="#643d23" stroke-width="7" stroke-linecap="round"/>
+        <path d="m81 75 4-12 11 1 9 12 4 16H72z" fill="#ecc15d" stroke="#643d23" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="m83 78-3 14 M94 79l2 13" stroke="#9b6e33" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <span class="emblem-rule"></span>
+    </div>
+    <h1>Chores</h1>
+    <div class="masthead-divider" aria-hidden="true"></div>
+    <div class="date" id="date"></div>
   </div>
+  <nav class="header-actions" aria-label="Chores navigation">
+    <button type="button" class="secondary-button" id="todoBtn">To Do</button>
+    <button type="button" class="secondary-button" id="calendarBtn">Calendar</button>
+    <button type="button" class="secondary-button" id="awardsBtn">Awards</button>
+    <button type="button" class="secondary-button" id="emergencyBtn">Emergency</button>
+    <button type="button" class="add" id="addBtn">＋ Add task</button>
+  </nav>
 </header>
 <div class="recovery" id="recoveryNotice"></div>
 <section class="status">

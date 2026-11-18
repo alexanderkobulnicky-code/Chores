@@ -28,3 +28,7 @@ For an iPhone home-screen shortcut, host the app on a static website, open it in
 ## Backups
 
 The **Your data** section on the main Chores page offers **Export Backup** and **Import Backup**. Export creates a JSON file containing all saved tasks, to-dos, completion history, streaks, calendar data, awards, and emergency days. On an iPhone, choose **Save to Files** from the share sheet; other browsers may download it to Downloads. Import accepts Chores-format JSON backups, checks their structure, and asks before replacing current local data. The existing rotating local backups remain in place, but are not a substitute for exporting before deleting a Home Screen installation or switching phones.
+
+## Visual design
+
+The interface uses a warm cream parchment-inspired background, a thin double brown border, a modest clipboard-and-broom vector illustration in the main heading, and restrained golden separators. Status colors, user-defined task names, and the existing task controls remain unchanged. The artwork is inline SVG and the paper texture uses CSS, so no extra network assets are needed.

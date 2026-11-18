@@ -3,8 +3,8 @@
   "short_name": "Chores",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f4f4ef",
-  "theme_color": "#f4f4ef",
+  "background_color": "#f6ead4",
+  "theme_color": "#f6ead4",
   "icons": [
     {
       "src": "chores-icon-cream.png",
